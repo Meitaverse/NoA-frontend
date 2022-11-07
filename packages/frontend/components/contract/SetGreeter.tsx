@@ -1,14 +1,14 @@
-import { useEffect, useState, FormEvent } from 'react';
-import { useContract, useSigner } from 'wagmi';
+import { useEffect, useState, FormEvent } from "react";
+import { useContract, useSigner } from "wagmi";
 
-import contracts from '@/contracts/hardhat_contracts.json';
-import { NETWORK_ID } from '@/config';
+import contracts from "@/contracts/hardhat_contracts.json";
+import { NETWORK_ID } from "@/config";
 
 export const SetGreeter = () => {
   const chainId = Number(NETWORK_ID);
-  const [newGreeter, setNewGreeter] = useState('');
+  const [newGreeter, setNewGreeter] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const { data: signerData } = useSigner();
 
@@ -21,14 +21,14 @@ export const SetGreeter = () => {
     contractInterface: greeterABI,
     signerOrProvider: signerData,
   });
-
+  debugger;
   useEffect(() => {
     if (signerData) {
-      setError('');
+      setError("");
       setLoading(false);
     } else {
       setLoading(false);
-      setError('please connect your wallet');
+      setError("please connect your wallet");
     }
   }, [signerData]);
 
@@ -38,10 +38,10 @@ export const SetGreeter = () => {
       setLoading(true);
       const tx = await greeterContract.setGreeting(newGreeter);
       await tx.wait();
-      setNewGreeter('');
+      setNewGreeter("");
       setLoading(false);
     } catch (error) {
-      setError('txn failed, check contract');
+      setError("txn failed, check contract");
       setLoading(false);
     }
   };
@@ -55,15 +55,15 @@ export const SetGreeter = () => {
   }
 
   return (
-    <div style={{ margin: '20px' }}>
-      <form onSubmit={(e) => handleSubmit(e)}>
+    <div style={{ margin: "20px" }}>
+      <form onSubmit={e => handleSubmit(e)}>
         <input
           required
           value={newGreeter}
           placeholder="new greeter"
-          onChange={(e) => setNewGreeter(e.target.value)}
+          onChange={e => setNewGreeter(e.target.value)}
         />
-        <button style={{ marginLeft: '20px' }} type="submit">
+        <button style={{ marginLeft: "20px" }} type="submit">
           submit
         </button>
       </form>
