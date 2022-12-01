@@ -1,0 +1,41 @@
+.eventTable {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  .filter {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 24px;
+
+    &Item {
+      display: flex;
+      align-items: center;
+      margin-right: 71px;
+      flex: 1;  
+      &Label {
+        flex-shrink: 0;
+        margin-right: 8px;
+      }
+    }
+
+    // 不明原因未生效，后面看看。
+    // .filterItem + .fitlerItem {
+    //   margin-left: 71px;
+    // }
+  }
+
+  .contentTable {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    margin-top:24px;
+    padding: 24px;
+    &Header {
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      margin-bottom: 16px;
+    }
+  }
+}
