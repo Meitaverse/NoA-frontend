@@ -1,56 +1,21 @@
-import * as React from 'react';
-import type { AppProps } from 'next/app';
-import NextHead from 'next/head';
-import '../styles/globals.css';
+import * as React from "react";
+import type { AppProps } from "next/app";
+import NextHead from "next/head";
+import "../styles/globals.css";
+import "@rainbow-me/rainbowkit/styles.css";
 
 // Imports
-import { chain, createClient, WagmiConfig, configureChains } from 'wagmi';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { publicProvider } from 'wagmi/providers/public';
+import { WagmiConfig } from "wagmi";
 
-import '@rainbow-me/rainbowkit/styles.css';
-import {
-  getDefaultWallets,
-  RainbowKitProvider,
-  Chain,
-} from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 
-import { useIsMounted } from '../hooks';
+import { useIsMounted } from "../hooks";
+import { chains, wagmiClient } from "@/chain";
 
-// Get environment variables
-const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID as string;
-// const infuraId = process.env.NEXT_PUBLIC_INFURA_ID as string;
-
-const hardhatChain: Chain = {
-  id: 31337,
-  name: 'Hardhat',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Hardhat',
-    symbol: 'HARD',
-  },
-  network: 'hardhat',
-  rpcUrls: {
-    default: 'http://127.0.0.1:8545',
-  },
-  testnet: true,
-};
-
-const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, hardhatChain],
-  [alchemyProvider({ apiKey: alchemyId }), publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: 'create-web3',
-  chains,
-});
-
-const wagmiClient = createClient({
-  autoConnect: true,
-  connectors,
-  provider,
-});
+import CommonHeader from "@/components/header/index";
+import "./index.scss";
+import Sider from "@/components/sider";
+import CurrentPanel from "@/components/currentPanel";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
@@ -60,9 +25,31 @@ const App = ({ Component, pageProps }: AppProps) => {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider coolMode chains={chains}>
         <NextHead>
-          <title>create-web3</title>
+          <title>NoA</title>
         </NextHead>
-        <Component {...pageProps} />
+        <div id="app">
+          {/* 
+            外围的布局：
+            header header header header header header
+            side side current route title
+            side side component
+            side side 
+            side side
+            side side 
+            side side
+           */}
+          <CommonHeader></CommonHeader>
+          <div
+            className="main"
+            style={{ flex: 1, display: "flex", background: "#F5f5f5" }}
+          >
+            <Sider></Sider>
+            <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+              <CurrentPanel></CurrentPanel>
+              <Component {...pageProps} />
+            </div>
+          </div>
+        </div>
       </RainbowKitProvider>
     </WagmiConfig>
   );

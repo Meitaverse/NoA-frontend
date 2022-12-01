@@ -21,7 +21,6 @@ export const SetGreeter = () => {
     contractInterface: greeterABI,
     signerOrProvider: signerData,
   });
-  debugger;
   useEffect(() => {
     if (signerData) {
       setError("");
