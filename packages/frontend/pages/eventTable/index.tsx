@@ -8,6 +8,7 @@ import { Button, Input, Select, Table } from "antd";
 import React, { FC, useState } from "react";
 import styles from "./index.module.scss";
 import type { ColumnsType } from "antd/es/table";
+import { useRouter } from "next/router";
 interface IProps {}
 
 interface DataType {
@@ -65,6 +66,8 @@ const EventTable: FC<IProps> = props => {
     "checkbox"
   );
 
+  const router = useRouter();
+
   return (
     <div className={styles.eventTable}>
       <div className={styles.filter}>
@@ -106,6 +109,9 @@ const EventTable: FC<IProps> = props => {
             icon={<PlusOutlined />}
             type="primary"
             style={{ marginLeft: "16px" }}
+            onClick={() => {
+              router.push("/createEvent");
+            }}
           >
             Create New Event
           </Button>

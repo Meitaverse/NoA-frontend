@@ -19,7 +19,6 @@ const Header: FC<IProps> = props => {
       >
         Bitsoul logo
       </div>
-      <ConnectButton />
 
       <div
         style={{
@@ -31,6 +30,7 @@ const Header: FC<IProps> = props => {
         <SearchOutlined />
         <SearchOutlined />
         {isConnected && <div>{address}</div>}
+        {!isConnected && <ConnectButton />}
       </div>
     </div>
   );
