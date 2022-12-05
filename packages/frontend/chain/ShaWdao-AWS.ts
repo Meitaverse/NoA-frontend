@@ -14,7 +14,7 @@ const ShaWdao:Chain =  {
   rpcUrls: {
     default: "http://16.163.166.55:8545",
   },
-  testnet: true,
+  // testnet: true,
 };
 
 export default ShaWdao

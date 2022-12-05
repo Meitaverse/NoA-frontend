@@ -30,7 +30,7 @@ const Header: FC<IProps> = props => {
         <SearchOutlined />
         <SearchOutlined />
         {isConnected && <div>{address}</div>}
-        {!isConnected && <ConnectButton />}
+        {<ConnectButton />}
       </div>
     </div>
   );

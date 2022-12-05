@@ -1,11 +1,62 @@
+import { useNoaContract } from "@/hooks/useNoaContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
-import { Form, Input, Select, Upload, DatePicker, Switch, Radio } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  DatePicker,
+  Switch,
+  Radio,
+  Button,
+} from "antd";
 import React, { FC } from "react";
 import styles from "./index.module.scss";
 
 interface IProps {}
 
+// "inputs": [
+//   {
+//     "components": [
+//       {
+//         "internalType": "address",
+//         "name": "organizer",
+//         "type": "address"
+//       },
+//       {
+//         "internalType": "string",
+//         "name": "eventName",
+//         "type": "string"
+//       },
+//       {
+//         "internalType": "string",
+//         "name": "eventDescription",
+//         "type": "string"
+//       },
+//       {
+//         "internalType": "string",
+//         "name": "eventImage",
+//         "type": "string"
+//       },
+//       {
+//         "internalType": "string",
+//         "name": "eventMetadataURI",
+//         "type": "string"
+//       },
+//       {
+//         "internalType": "uint256",
+//         "name": "mintMax",
+//         "type": "uint256"
+//       }
+//     ],
+//     "internalType": "struct INoAV1.Event",
+//     "name": "event_",
+//     "type": "tuple"
+//   }
+// ]
+
 const CreateEvent: FC<IProps> = props => {
+  const { setContract, getContract } = useNoaContract();
   const loading = false;
   const uploadButton = (
     <div>
@@ -13,6 +64,41 @@ const CreateEvent: FC<IProps> = props => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
+  const create = () => {
+    setContract.createEvent({
+      components: [
+        // {
+        //   organizer: "test",
+        //   eventName: "testName",
+        //   eventDescription: "testDesc",
+        //   eventImage: "no image",
+        //   eventMetadataURI: "test",
+        //   mintMax: 1,
+        // },
+        {
+          organizer: "test",
+        },
+        {
+          eventName: "testName",
+        },
+        {
+          eventDescription: "testDesc",
+        },
+        {
+          eventImage: "no image",
+        },
+        {
+          eventMetadataURI: "test",
+        },
+        {
+          mintMax: 1,
+        },
+      ],
+    });
+    // getContract.name();
+  };
+
   return (
     <div className={styles.createEvent}>
       <div className={styles.createEventBoard}>
@@ -135,6 +221,18 @@ const CreateEvent: FC<IProps> = props => {
             </div>
           </Form.Item>
         </Form>
+
+        <div style={{ display: "flex" }}>
+          <Button>Cancel</Button>
+          <Button
+            style={{ marginLeft: "8px" }}
+            onClick={() => {
+              create();
+            }}
+          >
+            Creat
+          </Button>
+        </div>
       </div>
     </div>
   );

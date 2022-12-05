@@ -4,6 +4,7 @@
   .createEventBoard {
     display: flex;
     align-items: center;
+    flex-direction: column;
     background: #fff;
     padding: 28px 0;
     :global .ant-form {
