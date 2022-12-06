@@ -1,4 +1,5 @@
 import { useNoaContract } from "@/hooks/useNoaContract";
+import { useNoaContractEvent } from "@/hooks/useNoaContractEvent";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Form,
@@ -9,8 +10,10 @@ import {
   Switch,
   Radio,
   Button,
+  message,
 } from "antd";
 import React, { FC } from "react";
+import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 
 interface IProps {}
@@ -57,6 +60,7 @@ interface IProps {}
 
 const CreateEvent: FC<IProps> = props => {
   const { setContract, getContract } = useNoaContract();
+  const account = useAccount();
   const loading = false;
   const uploadButton = (
     <div>
@@ -65,36 +69,19 @@ const CreateEvent: FC<IProps> = props => {
     </div>
   );
 
-  const create = () => {
+  useNoaContractEvent("EventAdded", (a, b, c, d) => {
+    console.log(a, b, c, d);
+    message.success("创建成功");
+  });
+
+  const create = async () => {
     setContract.createEvent({
-      components: [
-        // {
-        //   organizer: "test",
-        //   eventName: "testName",
-        //   eventDescription: "testDesc",
-        //   eventImage: "no image",
-        //   eventMetadataURI: "test",
-        //   mintMax: 1,
-        // },
-        {
-          organizer: "test",
-        },
-        {
-          eventName: "testName",
-        },
-        {
-          eventDescription: "testDesc",
-        },
-        {
-          eventImage: "no image",
-        },
-        {
-          eventMetadataURI: "test",
-        },
-        {
-          mintMax: 1,
-        },
-      ],
+      organizer: account.address,
+      eventName: "testName",
+      eventDescription: "testDesc",
+      eventImage: "no image",
+      eventMetadataURI: "test",
+      mintMax: 1,
     });
     // getContract.name();
   };

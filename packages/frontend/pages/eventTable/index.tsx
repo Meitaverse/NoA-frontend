@@ -5,59 +5,36 @@ import {
   RedoOutlined,
 } from "@ant-design/icons";
 import { Button, Input, Select, Table } from "antd";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import type { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/router";
+import {
+  getEventList,
+  IGetEventList,
+  IGetEventListParams,
+} from "@/services/graphql";
+
 interface IProps {}
 
-interface DataType {
-  key: React.Key;
-  name: string;
-  age: number;
-  address: string;
-}
+// eventDescription: string,
+//     eventId: string,
+//     eventName: string,
+//     id: string
 
-const columns: ColumnsType<DataType> = [
+const columns: ColumnsType<IGetEventList["eventItems"][number]> = [
   {
-    title: "Name",
-    dataIndex: "name",
+    title: "eventId",
+    dataIndex: "eventId",
+  },
+  {
+    title: "eventName",
+    dataIndex: "eventName",
     render: (text: string) => <a>{text}</a>,
   },
   {
-    title: "Age",
-    dataIndex: "age",
-  },
-  {
-    title: "Address",
-    dataIndex: "address",
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park",
-  },
-  {
-    key: "4",
-    name: "Disabled User",
-    age: 99,
-    address: "Sidney No. 1 Lake Park",
+    title: "eventDescription",
+    dataIndex: "eventDescription",
   },
 ];
 
@@ -65,8 +42,31 @@ const EventTable: FC<IProps> = props => {
   const [selectionType, setSelectionType] = useState<"checkbox" | "radio">(
     "checkbox"
   );
+  const getEventListParams = useRef<IGetEventListParams>({
+    skip: 0,
+    limit: 10,
+    eventName: "",
+    eventDescription: "",
+    orderBy: "id",
+  });
+
+  const [eventName, setEventName] = useState("");
+  const [eventDesc, setEventDesc] = useState("");
+  const [orderBy, setOrderBy] = useState("id");
+
+  const [eventItems, setEventItems] = useState<IGetEventList["eventItems"]>([]);
 
   const router = useRouter();
+
+  const getList = async () => {
+    const { data, status } = await getEventList(getEventListParams.current);
+
+    setEventItems(data.eventItems);
+  };
+
+  useEffect(() => {
+    getList();
+  }, []);
 
   return (
     <div className={styles.eventTable}>
@@ -76,17 +76,52 @@ const EventTable: FC<IProps> = props => {
             Event Name <QuestionCircleOutlined />:
           </span>
 
-          <Input placeholder="Please enter"></Input>
+          <Input
+            value={eventName}
+            placeholder="Please enter"
+            onChange={e => {
+              getEventListParams.current.eventName = e.target.value;
+              setEventName(e.target.value);
+            }}
+          ></Input>
         </div>
 
         <div className={styles.filterItem}>
           <span className={styles.filterItemLabel}>Description:</span>
 
-          <Input placeholder="Please enter"></Input>
+          <Input
+            value={eventDesc}
+            placeholder="Please enter"
+            onChange={e => {
+              getEventListParams.current.eventDescription = e.target.value;
+              setEventDesc(e.target.value);
+            }}
+          ></Input>
         </div>
 
-        <Button>Reset</Button>
-        <Button type="primary" style={{ marginLeft: "8px" }}>
+        <Button
+          onClick={() => {
+            getEventListParams.current = {
+              skip: 0,
+              limit: 10,
+              eventName: "",
+              eventDescription: "",
+              orderBy: "id",
+            };
+            setEventName("");
+            setEventDesc("");
+          }}
+        >
+          Reset
+        </Button>
+        <Button
+          type="primary"
+          style={{ marginLeft: "8px" }}
+          onClick={() => {
+            getEventListParams.current.skip = 0;
+            getList();
+          }}
+        >
           Query
         </Button>
       </div>
@@ -96,14 +131,23 @@ const EventTable: FC<IProps> = props => {
           <span>Event Table</span>
           <span style={{ flex: 1 }}></span>
           <Select
-            defaultValue="Event Name"
+            value={orderBy}
             bordered={false}
             options={[
               {
-                value: "Event Name",
+                value: "id",
+                label: "Id",
+              },
+              {
+                value: "eventName",
                 label: "Event Name",
               },
             ]}
+            onChange={v => {
+              getEventListParams.current.orderBy = v;
+              setOrderBy(v);
+              getList();
+            }}
           ></Select>
           <Button
             icon={<PlusOutlined />}
@@ -120,8 +164,13 @@ const EventTable: FC<IProps> = props => {
         </div>
 
         <Table
+          rowKey="eventId"
+          dataSource={eventItems}
           rowSelection={{
             type: selectionType,
+            // onChange: (selectedKeys: string[]) => {
+            //   setSelectionType(selectedKeys);
+            // },
           }}
           columns={columns}
         ></Table>
