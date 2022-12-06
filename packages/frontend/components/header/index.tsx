@@ -1,7 +1,7 @@
 import { SearchOutlined } from "@ant-design/icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { FC } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useConnect } from "wagmi";
 import styles from "./styles.module.scss";
 
 interface IProps {}
@@ -30,7 +30,11 @@ const Header: FC<IProps> = props => {
         <SearchOutlined />
         <SearchOutlined />
         {isConnected && <div>{address}</div>}
-        {!isConnected && <ConnectButton />}
+        {!isConnected && (
+          <div className={styles.connectButton}>
+            <ConnectButton />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -15,4 +15,11 @@
     margin-right: 25px;
     cursor: pointer;
   }
+  
+  .connectButton {
+    border-radius: 0;
+    :global button {
+      border-radius: 0;
+    }
+  }
 }
