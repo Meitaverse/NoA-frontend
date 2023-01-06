@@ -62,3 +62,31 @@ export const getProfile = params => {
     }
   }	`);
 };
+
+export interface IGetHubs {
+  hubs: {
+    id: string;
+    soulBoundTokenId: string;
+    creator: string;
+    hubId: string;
+    name: string;
+    description: string;
+    imageURI: string;
+    timestamp: string;
+  }[];
+}
+
+export const getHubs = params => {
+  return query<IGetHubs>(`query{
+    hubs(first:100){
+      id,
+      soulBoundTokenId,
+      creator,
+      hubId,
+      name,
+      description,
+      imageURI,
+      timestamp
+    }
+  }	`);
+};

@@ -15,12 +15,16 @@ import {
 import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
-import { getProfile, IGetProfile } from "@/services/graphql";
+import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 interface IProps {}
 
-const columns: ColumnsType<IGetProfile["profiles"][number]> = [
+const columns: ColumnsType<IGetHubs["hubs"][number]> = [
+  {
+    title: "hubId",
+    dataIndex: "hubId",
+  },
   {
     title: "soulBoundTokenId",
     dataIndex: "soulBoundTokenId",
@@ -31,8 +35,12 @@ const columns: ColumnsType<IGetProfile["profiles"][number]> = [
     render: (text: string) => <a>{text}</a>,
   },
   {
-    title: "nickName",
-    dataIndex: "nickName",
+    title: "name",
+    dataIndex: "name",
+  },
+  {
+    title: "description",
+    dataIndex: "description",
   },
   {
     title: "timestamp",
@@ -55,21 +63,26 @@ const CreateEvent: FC<IProps> = props => {
 
   const [manager] = useManagerContract();
 
-  const [nickname, setNickname] = useState("");
+  const [name, setName] = useState("bitSoul");
+  const [description, setDescription] = useState("Bitsoulhub");
+  const [soulBoundTokenId, setSoulBoundTokenId] = useState("");
   const [address, setAddress] = useState("");
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
+  const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
 
   const create = async () => {
     if (!account.address) return;
-    if (!nickname) return;
-
+    if (!name) return;
+    if (!description) return;
+    if (!soulBoundTokenId) return;
     try {
-      const res = await manager.createProfile(
+      const res = await manager.createHub(
         {
-          wallet: account.address,
-          nickName: nickname,
+          soulBoundTokenId,
+          name,
+          description,
           imageURI:
-            "https://ipfs.io/ipfs/Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu",
+            "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy78HwJtLFi6nUFCowTGdzp/11.png",
         },
         {
           from: account.address,
@@ -77,6 +90,7 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("创建成功");
+      getHubsResult();
     } catch (e) {
       console.warn(
         "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"
@@ -90,8 +104,15 @@ const CreateEvent: FC<IProps> = props => {
     setProfiles(res.data.profiles);
   };
 
+  const getHubsResult = async () => {
+    const res = await getHubs({});
+
+    setHubs(res.data.hubs);
+  };
+
   useEffect(() => {
     getProfileResult();
+    getHubsResult();
   }, []);
 
   return (
@@ -109,14 +130,32 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
+            label="soulBoundTokenId"
+            name="soulBoundTokenId"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Select
+              onChange={val => {
+                setSoulBoundTokenId(val);
+              }}
+              options={profiles.map(item => {
+                return {
+                  value: item.soulBoundTokenId,
+                  label: item.soulBoundTokenId,
+                };
+              })}
+            ></Select>
+          </Form.Item>
+
+          <Form.Item
             label="nickName"
             name="nickName"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Input
-              value={nickname}
+              value={name}
               onChange={e => {
-                setNickname(e.target.value);
+                setName(e.target.value);
               }}
             ></Input>
           </Form.Item>
@@ -152,7 +191,7 @@ const CreateEvent: FC<IProps> = props => {
       <br />
 
       <div>
-        <Table rowKey="eventId" dataSource={profiles} columns={columns}></Table>
+        <Table rowKey="eventId" dataSource={hubs} columns={columns}></Table>
       </div>
     </div>
   );

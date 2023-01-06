@@ -38,6 +38,7 @@ function getItem(
 
 const keyRouter = {
   createProfile: "/createProfile",
+  createHub: "/createHub",
   eventTable: "/eventTable",
 };
 
@@ -69,6 +70,7 @@ const Sider: FC<IProps> = props => {
           style={{ minWidth: "160px" }}
           items={[
             getItem("createProfile", "createProfile", ""),
+            getItem("createHub", "createHub", ""),
             getItem("eventTable", "eventTable", ""),
             getItem("Account", "Account", ""),
             getItem("Organize Event", "Organize Event", ""),

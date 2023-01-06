@@ -17,6 +17,11 @@
   },
   {
     "inputs": [],
+    "name": "AmountOnlyIncrease",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "CannotInitImplementation",
     "type": "error"
   },
@@ -338,11 +343,6 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "creator",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
             "name": "soulBoundTokenId",
             "type": "uint256"
@@ -359,7 +359,7 @@
           },
           {
             "internalType": "string",
-            "name": "image",
+            "name": "imageURI",
             "type": "string"
           }
         ],
@@ -385,7 +385,7 @@
         "components": [
           {
             "internalType": "address",
-            "name": "to",
+            "name": "wallet",
             "type": "address"
           },
           {
@@ -577,11 +577,6 @@
       {
         "components": [
           {
-            "internalType": "address",
-            "name": "creator",
-            "type": "address"
-          },
-          {
             "internalType": "uint256",
             "name": "soulBoundTokenId",
             "type": "uint256"
@@ -598,7 +593,7 @@
           },
           {
             "internalType": "string",
-            "name": "image",
+            "name": "imageURI",
             "type": "string"
           }
         ],
@@ -942,7 +937,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "tokenId",
+        "name": "soulBoundTokenId",
         "type": "uint256"
       },
       {

@@ -1,7 +1,8 @@
+import { GRAPHQL_URL } from "./../config";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "http://192.168.20.205:8000/subgraphs/name/NoA/MySubgraph",
+  uri: GRAPHQL_URL,
   cache: new InMemoryCache(),
 });
 
