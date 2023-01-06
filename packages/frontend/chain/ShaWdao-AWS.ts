@@ -1,9 +1,7 @@
-import {
-  Chain,
-} from "@rainbow-me/rainbowkit";
+import { Chain } from "@rainbow-me/rainbowkit";
 
-const ShaWdao:Chain =  {
-  id: 31337,
+const ShaWdao: Chain = {
+  id: 31338,
   name: "ShaWdao",
   nativeCurrency: {
     decimals: 18,
@@ -17,4 +15,4 @@ const ShaWdao:Chain =  {
   // testnet: true,
 };
 
-export default ShaWdao
+export default ShaWdao;

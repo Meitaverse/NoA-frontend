@@ -18,6 +18,7 @@ import { useAtom } from "jotai";
 import { activeMenu } from "@/store/menu";
 import { animated, useSpring } from "@react-spring/web";
 import useMeasure from "react-use-measure";
+import ApiPannel from "./apiPannel";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -80,7 +81,7 @@ const Sider: FC<IProps> = props => {
             });
           }}
         ></Menu>
-
+        {/* <ApiPannel></ApiPannel> */}
         <div
           className={styles.expandArrow}
           onClick={() => {

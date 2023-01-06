@@ -1,5 +1,5 @@
-import { useNoaContract } from "@/hooks/useNoaContract";
 import { useNoaContractEvent } from "@/hooks/useNoaContractEvent";
+import { Manager } from "@/typechain";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Form,
@@ -13,8 +13,9 @@ import {
   message,
 } from "antd";
 import React, { FC } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 import styles from "./index.module.scss";
+import abi from "@/contracts/manager_contracts.json";
 
 interface IProps {}
 
@@ -58,8 +59,19 @@ interface IProps {}
 //   }
 // ]
 
+const managerAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
+
 const CreateEvent: FC<IProps> = props => {
-  const { setContract, getContract } = useNoaContract();
+  // const { setContract, getContract } = useNoaContract();
+  const { data: signerData } = useSigner();
+  const provider = useProvider();
+
+  const manager = useContract<Manager>({
+    addressOrName: managerAddress,
+    contractInterface: abi,
+    signerOrProvider: signerData,
+  });
+
   const account = useAccount();
   const loading = false;
   const uploadButton = (
@@ -69,20 +81,39 @@ const CreateEvent: FC<IProps> = props => {
     </div>
   );
 
-  useNoaContractEvent("EventAdded", (a, b, c, d) => {
-    console.log(a, b, c, d);
-    message.success("创建成功");
-  });
+  // useNoaContractEvent("EventAdded", (a, b, c, d) => {
+  //   console.log(a, b, c, d);
+  //   message.success("创建成功");
+  // });
 
   const create = async () => {
-    setContract.createEvent({
-      organizer: account.address,
-      eventName: "testName",
-      eventDescription: "testDesc",
-      eventImage: "no image",
-      eventMetadataURI: "test",
-      mintMax: 1,
-    });
+    if (!account.address) return;
+    const p = await manager.createProfile(
+      {
+        to: account.address,
+        nickName: "testNickname",
+        imageURI:
+          "https://ipfs.io/ipfs/Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu",
+      },
+      {
+        from: account.address,
+      }
+    );
+    debugger;
+    // const p = await contarct.getGovernance();
+    // setContract.createProfile({
+    //   to: userAddress,
+    //   nickName: 'test-nickname',
+    //   imageURI: "",
+    // })
+    // setContract.createEvent({
+    //   organizer: account.address,
+    //   eventName: "testName",
+    //   eventDescription: "testDesc",
+    //   eventImage: "no image",
+    //   eventMetadataURI: "test",
+    //   mintMax: 1,
+    // });
     // getContract.name();
   };
 
@@ -217,7 +248,7 @@ const CreateEvent: FC<IProps> = props => {
               create();
             }}
           >
-            Creat
+            Create
           </Button>
         </div>
       </div>

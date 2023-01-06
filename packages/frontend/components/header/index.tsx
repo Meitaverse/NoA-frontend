@@ -29,12 +29,13 @@ const Header: FC<IProps> = props => {
         <SearchOutlined />
         <SearchOutlined />
         <SearchOutlined />
-        {isConnected && <div>{address}</div>}
+        {/* {isConnected && <div>{address}</div>}
         {!isConnected && (
           <div className={styles.connectButton}>
             <ConnectButton />
           </div>
-        )}
+        )} */}
+        <ConnectButton></ConnectButton>
       </div>
     </div>
   );
