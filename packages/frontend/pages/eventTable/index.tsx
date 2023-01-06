@@ -65,7 +65,7 @@ const EventTable: FC<IProps> = props => {
   };
 
   useEffect(() => {
-    getList();
+    // getList();
   }, []);
 
   return (

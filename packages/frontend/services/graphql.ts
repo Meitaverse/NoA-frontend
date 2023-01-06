@@ -1,24 +1,30 @@
-import { query } from './apollo'
+import { query } from "./apollo";
 
 export interface IGetEventList {
   eventItems: {
-    eventDescription: string,
-    eventId: string,
-    eventName: string,
-    id: string
-  }[]
+    eventDescription: string;
+    eventId: string;
+    eventName: string;
+    id: string;
+  }[];
 }
 
 export interface IGetEventListParams {
-  skip?: number
+  skip?: number;
   limit?: number;
   eventName?: string;
   eventDescription?: string;
-  orderBy?: string
+  orderBy?: string;
 }
 
 export const getEventList = (params: IGetEventListParams = {}) => {
-  const { limit = 10, skip = 0, eventName = '', eventDescription = '', orderBy = "id" } = params
+  const {
+    limit = 10,
+    skip = 0,
+    eventName = "",
+    eventDescription = "",
+    orderBy = "id",
+  } = params;
 
   return query<IGetEventList>(`
     {
@@ -28,6 +34,31 @@ export const getEventList = (params: IGetEventListParams = {}) => {
         eventName
         eventDescription
       }
-    }`
-  )
+    }`);
+};
+
+export interface IGetProfile {
+  profiles: {
+    id: string;
+    soulBoundTokenId: string;
+    creator: string;
+    wallet: string;
+    nickName: string;
+    imageURI: string;
+    timestamp: string;
+  }[];
 }
+
+export const getProfile = params => {
+  return query<IGetProfile>(`query {
+    profiles(first:100){
+      id,
+      soulBoundTokenId,
+      creator,
+      wallet,
+      nickName,
+      imageURI,
+      timestamp
+    }
+  }	`);
+};

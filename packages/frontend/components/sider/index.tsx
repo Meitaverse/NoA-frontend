@@ -36,6 +36,11 @@ function getItem(
   } as MenuItem;
 }
 
+const keyRouter = {
+  createProfile: "/createProfile",
+  eventTable: "/eventTable",
+};
+
 const Sider: FC<IProps> = props => {
   const router = useRouter();
   const [activeMenuVal, setAactiveMenuVal] = useAtom(activeMenu);
@@ -63,17 +68,13 @@ const Sider: FC<IProps> = props => {
           className={styles.secondLevel}
           style={{ minWidth: "160px" }}
           items={[
-            getItem("Events", "Events", ""),
-            getItem("Memories", "Memories", ""),
+            getItem("createProfile", "createProfile", ""),
+            getItem("eventTable", "eventTable", ""),
             getItem("Account", "Account", ""),
             getItem("Organize Event", "Organize Event", ""),
           ]}
           onSelect={({ key }) => {
-            if (key === "Organize Event") {
-              router.push("/eventTable");
-            } else {
-              router.push("/");
-            }
+            router.push(keyRouter[key] || "/");
 
             setAactiveMenuVal({
               ...activeMenuVal,
