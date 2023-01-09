@@ -40,7 +40,8 @@ const keyRouter = {
   createProfile: "/createProfile",
   createHub: "/createHub",
   createProject: "/createProject",
-  eventTable: "/eventTable",
+  publish: "/publish",
+  // eventTable: "/eventTable",
 };
 
 const Sider: FC<IProps> = props => {
@@ -73,9 +74,10 @@ const Sider: FC<IProps> = props => {
             getItem("createProfile", "createProfile", ""),
             getItem("createHub", "createHub", ""),
             getItem("createProject", "createProject", ""),
-            getItem("eventTable", "eventTable", ""),
-            getItem("Account", "Account", ""),
-            getItem("Organize Event", "Organize Event", ""),
+            getItem("publish", "publish", ""),
+            // getItem("eventTable", "eventTable", ""),
+            // getItem("Account", "Account", ""),
+            // getItem("Organize Event", "Organize Event", ""),
           ]}
           onSelect={({ key }) => {
             router.push(keyRouter[key] || "/");
