@@ -90,3 +90,25 @@ export const getHubs = params => {
     }
   }	`);
 };
+
+export interface IGetProjects {
+  projects: {
+    id: string;
+    projectId: string;
+    soulBoundTokenId: string;
+    derivativeNFT: string;
+    timestamp: string;
+  }[];
+}
+
+export const getProjects = params => {
+  return query<IGetProjects>(`query{
+    projects(first:100){
+      id,
+      projectId,
+      soulBoundTokenId,
+      derivativeNFT,
+      timestamp
+    }
+  }`);
+};

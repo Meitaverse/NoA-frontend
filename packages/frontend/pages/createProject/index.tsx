@@ -1,46 +1,37 @@
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
-import {
-  Form,
-  Input,
-  Select,
-  Upload,
-  DatePicker,
-  Switch,
-  Radio,
-  Button,
-  message,
-  Table,
-} from "antd";
+import { Form, Input, Select, Upload, Button, message, Table } from "antd";
 import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
-import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
+import {
+  getHubs,
+  getProfile,
+  getProjects,
+  IGetHubs,
+  IGetProfile,
+  IGetProjects,
+} from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 interface IProps {}
 
-const columns: ColumnsType<IGetHubs["hubs"][number]> = [
+const columns: ColumnsType<IGetProjects["projects"][number]> = [
   {
-    title: "hubId",
-    dataIndex: "hubId",
+    title: "id",
+    dataIndex: "id",
+  },
+  {
+    title: "projectId",
+    dataIndex: "projectId",
   },
   {
     title: "soulBoundTokenId",
     dataIndex: "soulBoundTokenId",
   },
   {
-    title: "creator",
-    dataIndex: "creator",
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: "name",
-    dataIndex: "name",
-  },
-  {
-    title: "description",
-    dataIndex: "description",
+    title: "derivativeNFT",
+    dataIndex: "derivativeNFT",
   },
   {
     title: "timestamp",
@@ -50,6 +41,16 @@ const columns: ColumnsType<IGetHubs["hubs"][number]> = [
     ),
   },
 ];
+
+// soulBoundTokenId: SECOND_PROFILE_ID,
+// hubId: FIRST_HUB_ID,
+// name: "bitsoul",
+// description: "Hub for bitsoul",
+// image: "image",
+// metadataURI: "metadataURI",
+// descriptor: metadataDescriptor.address,
+// defaultRoyaltyPoints: 0,
+// feeShareType: 0,
 
 const CreateEvent: FC<IProps> = props => {
   const account = useAccount();
@@ -65,10 +66,16 @@ const CreateEvent: FC<IProps> = props => {
 
   const [name, setName] = useState("bitSoul");
   const [description, setDescription] = useState("Bitsoulhub");
+  const [metadataURI, setMetadataURI] = useState("Bitsoulhub");
+  const [defaultRoyaltyPoints, setDefaultRoyaltyPoints] = useState("0");
+  const [feeShareType, setFeeShareType] = useState("0");
   const [soulBoundTokenId, setSoulBoundTokenId] = useState("");
+  const [hubId, setHubId] = useState("");
   const [address, setAddress] = useState("");
+
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
+  const [projects, setProjects] = useState<IGetProjects["projects"]>([]);
 
   const create = async () => {
     if (!account.address) return;
@@ -76,13 +83,18 @@ const CreateEvent: FC<IProps> = props => {
     if (!description) return;
     if (!soulBoundTokenId) return;
     try {
-      const res = await manager.createHub(
+      const res = await manager.createProject(
         {
+          hubId,
           soulBoundTokenId,
           name,
           description,
-          imageURI:
+          descriptor: account.address,
+          image:
             "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy78HwJtLFi6nUFCowTGdzp/11.png",
+          metadataURI,
+          defaultRoyaltyPoints,
+          feeShareType,
         },
         {
           from: account.address,
@@ -90,7 +102,7 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("创建成功");
-      getHubsResult();
+      getProjectsResult();
     } catch (e) {
       console.error(e);
       console.warn(
@@ -111,9 +123,16 @@ const CreateEvent: FC<IProps> = props => {
     setHubs(res.data.hubs);
   };
 
+  const getProjectsResult = async () => {
+    const res = await getProjects({});
+
+    setProjects(res.data.projects);
+  };
+
   useEffect(() => {
     getProfileResult();
     getHubsResult();
+    getProjectsResult();
   }, []);
 
   return (
@@ -142,7 +161,25 @@ const CreateEvent: FC<IProps> = props => {
               options={profiles.map(item => {
                 return {
                   value: item.soulBoundTokenId,
-                  label: item.soulBoundTokenId,
+                  label: item.nickName,
+                };
+              })}
+            ></Select>
+          </Form.Item>
+
+          <Form.Item
+            label="HubId"
+            name="HubId"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Select
+              onChange={val => {
+                setHubId(val);
+              }}
+              options={hubs.map(item => {
+                return {
+                  value: item.hubId,
+                  label: item.name,
                 };
               })}
             ></Select>
@@ -157,6 +194,47 @@ const CreateEvent: FC<IProps> = props => {
               value={name}
               onChange={e => {
                 setName(e.target.value);
+              }}
+            ></Input>
+          </Form.Item>
+
+          <Form.Item
+            label="metadataURI"
+            name="metadataURI"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Input
+              value={metadataURI}
+              onChange={e => {
+                setMetadataURI(e.target.value);
+              }}
+            ></Input>
+          </Form.Item>
+
+          <Form.Item
+            label="defaultRoyaltyPoints"
+            name="defaultRoyaltyPoints"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Input
+              type="number"
+              value={defaultRoyaltyPoints}
+              onChange={e => {
+                setDefaultRoyaltyPoints(e.target.value);
+              }}
+            ></Input>
+          </Form.Item>
+
+          <Form.Item
+            label="feeShareType"
+            name="feeShareType"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Input
+              type="number"
+              value={feeShareType}
+              onChange={e => {
+                setFeeShareType(e.target.value);
               }}
             ></Input>
           </Form.Item>
@@ -192,7 +270,7 @@ const CreateEvent: FC<IProps> = props => {
       <br />
 
       <div>
-        <Table rowKey="eventId" dataSource={hubs} columns={columns}></Table>
+        <Table rowKey="eventId" dataSource={projects} columns={columns}></Table>
       </div>
     </div>
   );

@@ -75,18 +75,26 @@ const CreateEvent: FC<IProps> = props => {
           from: account.address,
         }
       );
-
       message.success("创建成功");
     } catch (e) {
+      console.error(e);
+      console.warn("检查地址是否正确");
       console.warn(
         "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"
       );
     }
   };
 
+  const test = async () => {
+    debugger;
+    const res = await manager.getGovernance({
+      from: account.address,
+    });
+    debugger;
+  };
+
   const getProfileResult = async () => {
     const res = await getProfile({});
-
     setProfiles(res.data.profiles);
   };
 

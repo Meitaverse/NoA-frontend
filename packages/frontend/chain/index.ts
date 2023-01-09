@@ -10,14 +10,7 @@ import BitSoul from "./bitsoul";
 
 const { chains, provider } = configureChains(
   // 扩展不同的网络
-  [
-    chain.mainnet,
-    chain.polygon,
-    chain.optimism,
-    chain.arbitrum,
-    ShaWdao,
-    BitSoul,
-  ],
+  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, BitSoul],
   [alchemyProvider({ apiKey: alchemyId }), publicProvider()]
 );
 
