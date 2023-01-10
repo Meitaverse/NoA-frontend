@@ -142,7 +142,7 @@ const CreateEvent: FC<IProps> = props => {
               options={profiles.map(item => {
                 return {
                   value: item.soulBoundTokenId,
-                  label: item.soulBoundTokenId,
+                  label: item.nickName,
                 };
               })}
             ></Select>
