@@ -15,32 +15,34 @@ import {
 import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
-import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
+import {
+  getHubs,
+  getMintSBTValueHistories,
+  getProfile,
+  IGetHubs,
+  IGetMintSBTValueHistories,
+  IGetProfile,
+} from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { profile } from "console";
 interface IProps {}
 
-const columns: ColumnsType<IGetHubs["hubs"][number]> = [
+const columns: ColumnsType<
+  IGetMintSBTValueHistories["mintSBTValueHistories"][number]
+> = [
   {
-    title: "hubId",
-    dataIndex: "hubId",
+    title: "id",
+    dataIndex: "id",
   },
   {
     title: "soulBoundTokenId",
     dataIndex: "soulBoundTokenId",
   },
   {
-    title: "creator",
-    dataIndex: "creator",
+    title: "value",
+    dataIndex: "value",
     render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: "name",
-    dataIndex: "name",
-  },
-  {
-    title: "description",
-    dataIndex: "description",
   },
   {
     title: "timestamp",
@@ -65,32 +67,42 @@ const CreateEvent: FC<IProps> = props => {
 
   const [name, setName] = useState("bitSoul");
   const [description, setDescription] = useState("Bitsoulhub");
-  const [soulBoundTokenId, setSoulBoundTokenId] = useState("");
-  const [address, setAddress] = useState("");
+  const [selectAddress, setSelectAddress] = useState("");
+  const [chargeAmount, setChargeAmount] = useState("100");
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
-  const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
+  const [mintHistories, setMintHistories] = useState<
+    IGetMintSBTValueHistories["mintSBTValueHistories"]
+  >([]);
 
-  const create = async () => {
-    if (!account.address) return;
-    if (!name) return;
-    if (!description) return;
-    if (!soulBoundTokenId) return;
+  const addresses = [
+    {
+      value: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
+      label: "user",
+    },
+    {
+      value: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+      label: "userTwo",
+    },
+    {
+      value: "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+      label: "userThree",
+    },
+  ];
+
+  const charge = async () => {
+    if (account.address !== "0x70997970C51812dc3A010C7d01b50e0d17dc79C8") {
+      message.error("当前账号不是Governance账号，充值失败");
+      return;
+    }
+
+    if (!selectAddress) return;
     try {
-      const res = await manager.createHub(
-        {
-          soulBoundTokenId,
-          name,
-          description,
-          imageURI:
-            "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy78HwJtLFi6nUFCowTGdzp/11.png",
-        },
-        {
-          from: account.address,
-        }
-      );
+      const res = await manager.mintSBTValue(selectAddress, chargeAmount, {
+        from: account.address,
+      });
 
-      message.success("创建成功");
-      getHubsResult();
+      message.success("充值成功");
+      getMintSBTValueResult();
     } catch (e) {
       console.error(e);
       console.warn(
@@ -105,15 +117,15 @@ const CreateEvent: FC<IProps> = props => {
     setProfiles(res.data.profiles);
   };
 
-  const getHubsResult = async () => {
-    const res = await getHubs({});
-
-    setHubs(res.data.hubs);
+  const getMintSBTValueResult = async () => {
+    const res = await getMintSBTValueHistories({});
+    setMintHistories(res.data.mintSBTValueHistories);
   };
 
   useEffect(() => {
     getProfileResult();
-    getHubsResult();
+    getMintSBTValueResult();
+    // getHubsResult();
   }, []);
 
   return (
@@ -121,56 +133,33 @@ const CreateEvent: FC<IProps> = props => {
       <div className={styles.createEventBoard}>
         <Form>
           <Form.Item
-            label="Upload"
-            name="Upload"
-            rules={[{ required: false, message: "Please upload" }]}
-          >
-            <Upload listType="picture-card" showUploadList={false}>
-              {uploadButton}
-            </Upload>
-          </Form.Item>
-
-          <Form.Item
-            label="soulBoundToken"
-            name="soulBoundToken"
+            label="charge account"
+            name="charge account"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
               onChange={val => {
-                setSoulBoundTokenId(val);
+                setSelectAddress(val);
               }}
               options={profiles.map(item => {
                 return {
                   value: item.soulBoundTokenId,
-                  label: item.soulBoundTokenId,
+                  label: item.wallet,
                 };
               })}
             ></Select>
           </Form.Item>
 
           <Form.Item
-            label="nickName"
-            name="nickName"
+            label="charge amount"
+            name="charge amount"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Input
-              value={name}
+              type="number"
+              value={chargeAmount}
               onChange={e => {
-                setName(e.target.value);
-              }}
-            ></Input>
-          </Form.Item>
-
-          <Form.Item
-            label="toAddress"
-            name="toAddress"
-            rules={[{ required: false, message: "Please upload" }]}
-          >
-            <Input
-              placeholder="default is current account address"
-              value={address}
-              onChange={e => {
-                setAddress(e.target.value);
+                setChargeAmount(e.target.value);
               }}
             ></Input>
           </Form.Item>
@@ -181,10 +170,10 @@ const CreateEvent: FC<IProps> = props => {
           <Button
             style={{ marginLeft: "8px" }}
             onClick={() => {
-              create();
+              charge();
             }}
           >
-            Create
+            Charge
           </Button>
         </div>
       </div>
@@ -192,7 +181,11 @@ const CreateEvent: FC<IProps> = props => {
       <br />
 
       <div>
-        <Table rowKey="eventId" dataSource={hubs} columns={columns}></Table>
+        <Table
+          rowKey="eventId"
+          dataSource={mintHistories}
+          columns={columns}
+        ></Table>
       </div>
     </div>
   );

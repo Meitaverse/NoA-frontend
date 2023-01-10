@@ -8,41 +8,17 @@ import {
   getHubs,
   getProfile,
   getProjects,
+  getPublishHistory,
   IGetHubs,
   IGetProfile,
   IGetProjects,
+  IGetPublishHistory,
 } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
 import { AbiCoder, defaultAbiCoder } from "ethers/lib/utils";
 interface IProps {}
-
-const columns: ColumnsType<IGetProjects["projects"][number]> = [
-  {
-    title: "id",
-    dataIndex: "id",
-  },
-  {
-    title: "projectId",
-    dataIndex: "projectId",
-  },
-  {
-    title: "soulBoundTokenId",
-    dataIndex: "soulBoundTokenId",
-  },
-  {
-    title: "derivativeNFT",
-    dataIndex: "derivativeNFT",
-  },
-  {
-    title: "timestamp",
-    dataIndex: "timestamp",
-    render: (text: string) => (
-      <div>{dayjs(Number(text) * 1000).format("YYYY-MM-DD hh:mm")}</div>
-    ),
-  },
-];
 
 // soulBoundTokenId: SECOND_PROFILE_ID,
 // hubId: FIRST_HUB_ID,
@@ -84,6 +60,82 @@ const CreateEvent: FC<IProps> = props => {
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
   const [projects, setProjects] = useState<IGetProjects["projects"]>([]);
+  const [publishes, setPublishes] = useState<
+    IGetPublishHistory["publishCreatedHistories"]
+  >([]);
+
+  const columns: ColumnsType<
+    IGetPublishHistory["publishCreatedHistories"][number]
+  > = [
+    {
+      title: "id",
+      dataIndex: "id",
+    },
+    {
+      title: "publishId",
+      dataIndex: "publishId",
+    },
+    {
+      title: "hubId",
+      dataIndex: "hubId",
+    },
+    {
+      title: "projectId",
+      dataIndex: "projectId",
+    },
+    {
+      title: "soulBoundTokenId",
+      dataIndex: "soulBoundTokenId",
+    },
+    {
+      title: "newTokenId",
+      dataIndex: "newTokenId",
+    },
+    {
+      title: "amount",
+      dataIndex: "amount",
+    },
+    {
+      title: "timestamp",
+      dataIndex: "timestamp",
+      render: (text: string) => (
+        <div>{dayjs(Number(text) * 1000).format("YYYY-MM-DD hh:mm")}</div>
+      ),
+    },
+    {
+      title: "operation",
+      dataIndex: "operation",
+      render: (val, record) => {
+        return (
+          <div>
+            <Button
+              type="link"
+              onClick={() => {
+                publish(record);
+              }}
+            >
+              Publish
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const publish = async (
+    record: IGetPublishHistory["publishCreatedHistories"][number]
+  ) => {
+    try {
+      const res = await manager.publish(record.publishId, {
+        from: account.address,
+      });
+
+      message.success("发布成功");
+    } catch (e) {
+      console.error(e);
+      message.error("发布失败，可能余额不足，需充值");
+    }
+  };
 
   const create = async () => {
     if (!account.address) return;
@@ -153,10 +205,17 @@ const CreateEvent: FC<IProps> = props => {
     setProjects(res.data.projects);
   };
 
+  const getPublishResult = async () => {
+    const res = await getPublishHistory({});
+
+    setPublishes(res.data.publishCreatedHistories);
+  };
+
   useEffect(() => {
     getProfileResult();
     getHubsResult();
     getProjectsResult();
+    getPublishResult();
   }, []);
 
   return (
@@ -174,8 +233,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="soulBoundTokenId"
-            name="soulBoundTokenId"
+            label="soulBoundToken"
+            name="soulBoundToken"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
@@ -192,8 +251,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="HubId"
-            name="HubId"
+            label="Hub"
+            name="Hub"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
@@ -210,8 +269,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="projectId"
-            name="projectId"
+            label="project"
+            name="project"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
@@ -346,7 +405,7 @@ const CreateEvent: FC<IProps> = props => {
               create();
             }}
           >
-            publish
+            prepare Publish
           </Button>
         </div>
       </div>
@@ -354,7 +413,11 @@ const CreateEvent: FC<IProps> = props => {
       <br />
 
       <div>
-        <Table rowKey="eventId" dataSource={projects} columns={columns}></Table>
+        <Table
+          rowKey="eventId"
+          dataSource={publishes}
+          columns={columns}
+        ></Table>
       </div>
     </div>
   );

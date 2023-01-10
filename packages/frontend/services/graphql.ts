@@ -112,3 +112,53 @@ export const getProjects = params => {
     }
   }`);
 };
+
+export interface IGetPublishHistory {
+  publishCreatedHistories: {
+    id: string;
+    publishId: string;
+    soulBoundTokenId: string;
+    hubId: string;
+    projectId: string;
+    newTokenId: string;
+    amount: string;
+    collectModuleInitData: string;
+    timestamp: string;
+  }[];
+}
+
+export const getPublishHistory = params => {
+  return query<IGetPublishHistory>(`query{
+    publishCreatedHistories(first:100){
+      id,
+      publishId,
+      soulBoundTokenId,
+      hubId,
+      projectId,
+      newTokenId,
+      amount,
+      collectModuleInitData,
+      timestamp
+    }
+  }`);
+};
+
+export interface IGetMintSBTValueHistories {
+  mintSBTValueHistories: {
+    id: string;
+    soulBoundTokenId: string;
+    value: string;
+    timestamp: string;
+  }[];
+}
+
+export const getMintSBTValueHistories = params => {
+  return query<IGetMintSBTValueHistories>(`query {
+    mintSBTValueHistories(first: 100) {
+      id
+      soulBoundTokenId
+      value
+      timestamp
+    }
+  }`);
+};

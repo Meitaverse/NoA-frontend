@@ -150,8 +150,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="soulBoundTokenId"
-            name="soulBoundTokenId"
+            label="soulBoundToken"
+            name="soulBoundToken"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
@@ -168,8 +168,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="HubId"
-            name="HubId"
+            label="Hub"
+            name="Hub"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select

@@ -41,6 +41,7 @@ const keyRouter = {
   createHub: "/createHub",
   createProject: "/createProject",
   publish: "/publish",
+  charge: "/charge",
   // eventTable: "/eventTable",
 };
 
@@ -71,6 +72,7 @@ const Sider: FC<IProps> = props => {
           className={styles.secondLevel}
           style={{ minWidth: "160px" }}
           items={[
+            getItem("charge", "charge", ""),
             getItem("createProfile", "createProfile", ""),
             getItem("createHub", "createHub", ""),
             getItem("createProject", "createProject", ""),
