@@ -212,3 +212,29 @@ export const getMintSBTValueHistories = params => {
     }
   }`);
 };
+
+export interface IGetCollectHistory {
+  feesForCollectHistories: {
+    id: string;
+    collectorSoulBoundTokenId: string;
+    publishId: string;
+    treasuryAmount: string;
+    genesisAmount: string;
+    adjustedAmount: string;
+    timestamp: string;
+  }[];
+}
+
+export const getCollectHistory = params => {
+  return query<IGetCollectHistory>(`query {
+    feesForCollectHistories(first: 100) {
+      id
+      collectorSoulBoundTokenId
+      publishId
+      treasuryAmount
+      genesisAmount
+      adjustedAmount
+      timestamp
+    }
+  }`);
+};
