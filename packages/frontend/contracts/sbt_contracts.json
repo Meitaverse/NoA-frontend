@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidParameter",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "Locked",
     "type": "error"
   },
@@ -42,6 +47,11 @@
   {
     "inputs": [],
     "name": "NotManager",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotProfileOwnerOrDispatcher",
     "type": "error"
   },
   {
@@ -549,25 +559,6 @@
         "type": "uint256"
       }
     ],
-    "name": "balanceOfSBT",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
     "name": "burn",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -704,6 +695,25 @@
         "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      }
+    ],
+    "name": "getSBTIdByWallet",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

@@ -143,6 +143,56 @@ export const getPublishHistory = params => {
   }`);
 };
 
+export interface IGetPreparePublish {
+  publications: {
+    id: string;
+    soulBoundTokenId: string;
+    hubId: string;
+    projectId: string;
+    salePrice: string;
+    royaltyBasisPoints: string;
+    amount: string;
+    name: string;
+    description: string;
+    materialURIs: string;
+    fromTokenIds: string[];
+    collectModule: string;
+    collectModuleInitData: string;
+    publishModule: string;
+    publishModuleInitData: string;
+    publishId: string;
+    previousPublishId: string;
+    publishTaxAmount: string;
+    timestamp: string;
+  }[];
+}
+
+export const getPreparePublish = params => {
+  return query<IGetPreparePublish>(`query {
+    publications(first: 100) {
+      id
+      soulBoundTokenId
+      hubId
+      projectId
+      salePrice
+      royaltyBasisPoints
+      amount
+      name
+      description
+      materialURIs
+      fromTokenIds
+      collectModule
+      collectModuleInitData
+      publishModule
+      publishModuleInitData
+      publishId
+      previousPublishId
+      publishTaxAmount
+      timestamp
+    }
+  }`);
+};
+
 export interface IGetMintSBTValueHistories {
   mintSBTValueHistories: {
     id: string;

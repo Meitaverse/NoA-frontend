@@ -6,10 +6,12 @@ import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
   getHubs,
+  getPreparePublish,
   getProfile,
   getProjects,
   getPublishHistory,
   IGetHubs,
+  IGetPreparePublish,
   IGetProfile,
   IGetProjects,
   IGetPublishHistory,
@@ -64,9 +66,11 @@ const CreateEvent: FC<IProps> = props => {
     IGetPublishHistory["publishCreatedHistories"]
   >([]);
 
-  const columns: ColumnsType<
-    IGetPublishHistory["publishCreatedHistories"][number]
-  > = [
+  const [preparePublish, setPreparePublish] = useState<
+    IGetPreparePublish["publications"]
+  >([]);
+
+  const columns: ColumnsType<IGetPreparePublish["publications"][number]> = [
     {
       title: "id",
       dataIndex: "id",
@@ -88,8 +92,8 @@ const CreateEvent: FC<IProps> = props => {
       dataIndex: "soulBoundTokenId",
     },
     {
-      title: "newTokenId",
-      dataIndex: "newTokenId",
+      title: "name",
+      dataIndex: "name",
     },
     {
       title: "amount",
@@ -113,6 +117,9 @@ const CreateEvent: FC<IProps> = props => {
               onClick={() => {
                 publish(record);
               }}
+              disabled={
+                !!publishes.find(item => item.publishId === record.publishId)
+              }
             >
               Publish
             </Button>
@@ -122,8 +129,44 @@ const CreateEvent: FC<IProps> = props => {
     },
   ];
 
+  const columnsPublish: ColumnsType<
+    IGetPublishHistory["publishCreatedHistories"][number]
+  > = [
+    {
+      title: "id",
+      dataIndex: "id",
+    },
+    {
+      title: "publishId",
+      dataIndex: "publishId",
+    },
+    {
+      title: "hubId",
+      dataIndex: "hubId",
+    },
+    {
+      title: "projectId",
+      dataIndex: "projectId",
+    },
+    {
+      title: "soulBoundTokenId",
+      dataIndex: "soulBoundTokenId",
+    },
+    {
+      title: "amount",
+      dataIndex: "amount",
+    },
+    {
+      title: "timestamp",
+      dataIndex: "timestamp",
+      render: (text: string) => (
+        <div>{dayjs(Number(text) * 1000).format("YYYY-MM-DD hh:mm")}</div>
+      ),
+    },
+  ];
+
   const publish = async (
-    record: IGetPublishHistory["publishCreatedHistories"][number]
+    record: IGetPreparePublish["publications"][number]
   ) => {
     try {
       const res = await manager.publish(record.publishId, {
@@ -211,11 +254,18 @@ const CreateEvent: FC<IProps> = props => {
     setPublishes(res.data.publishCreatedHistories);
   };
 
+  const getPreparePublishResult = async () => {
+    const res = await getPreparePublish({});
+
+    setPreparePublish(res.data.publications);
+  };
+
   useEffect(() => {
     getProfileResult();
     getHubsResult();
     getProjectsResult();
     getPublishResult();
+    getPreparePublishResult();
   }, []);
 
   return (
@@ -413,10 +463,20 @@ const CreateEvent: FC<IProps> = props => {
       <br />
 
       <div>
+        <h1>prepare publish</h1>
+        <Table
+          rowKey="eventId"
+          dataSource={preparePublish}
+          columns={columns}
+        ></Table>
+      </div>
+
+      <div>
+        <h1>published</h1>
         <Table
           rowKey="eventId"
           dataSource={publishes}
-          columns={columns}
+          columns={columnsPublish}
         ></Table>
       </div>
     </div>
