@@ -43,6 +43,7 @@ const keyRouter = {
   publish: "/publish",
   charge: "/charge",
   collect: "/collect",
+  addWhiteList: "/addWhiteList",
   // eventTable: "/eventTable",
 };
 
@@ -74,6 +75,7 @@ const Sider: FC<IProps> = props => {
           style={{ minWidth: "160px" }}
           items={[
             getItem("charge", "charge", ""),
+            getItem("addWhiteList", "addWhiteList", ""),
             getItem("createProfile", "createProfile", ""),
             getItem("createHub", "createHub", ""),
             getItem("createProject", "createProject", ""),

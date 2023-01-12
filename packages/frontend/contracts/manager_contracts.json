@@ -72,6 +72,11 @@
   },
   {
     "inputs": [],
+    "name": "NickNameLengthInvalid",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotGovernance",
     "type": "error"
   },
@@ -179,24 +184,6 @@
       }
     ],
     "name": "burnSBT",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "burnSBTValue",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -868,6 +855,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getTimeLock",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1041,6 +1041,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "retrieve",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -1166,6 +1179,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "timeLock",
+        "type": "address"
+      }
+    ],
+    "name": "setTimeLock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -1179,6 +1205,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "store",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
