@@ -5,11 +5,13 @@ import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
+  getCollectHistory,
   getHubs,
   getPreparePublish,
   getProfile,
   getProjects,
   getPublishHistory,
+  IGetCollectHistory,
   IGetHubs,
   IGetPreparePublish,
   IGetProfile,
@@ -18,8 +20,15 @@ import {
 } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
+import {
+  DERIVATIVE_ADDRESS,
+  FEE_ADDRESS,
+  MANAGER_ADDRESS,
+  PUBLISH_ADDRESS,
+  TEMPLATE_ADDRESS,
+} from "@/config";
 import { AbiCoder, defaultAbiCoder } from "ethers/lib/utils";
+import { useDerivative } from "@/hooks/useDerivativeContact";
 interface IProps {}
 
 // soulBoundTokenId: SECOND_PROFILE_ID,
@@ -43,6 +52,7 @@ const CreateEvent: FC<IProps> = props => {
   );
 
   const [manager] = useManagerContract();
+  const [derivative] = useDerivative();
 
   const [name, setName] = useState("BitSoul");
   const [amount, setAmount] = useState("0");
@@ -57,7 +67,11 @@ const CreateEvent: FC<IProps> = props => {
   const [projectId, setProjectId] = useState("");
   const [address, setAddress] = useState("");
   const [materialURIs, setMaterialURIs] = useState([]);
-  const [fromTokenIds, setFromTokenIds] = useState([]);
+  const [fromTokenIds, setFromTokenIds] = useState<any[]>([]);
+
+  const [collect, setCollect] = useState<
+    IGetCollectHistory["feesForCollectHistories"]
+  >([]);
 
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
@@ -174,6 +188,9 @@ const CreateEvent: FC<IProps> = props => {
       });
 
       message.success("发布成功");
+      setTimeout(() => {
+        getPublishResult();
+      }, 1500);
     } catch (e) {
       console.error(e);
       message.error("发布失败，可能余额不足，需充值");
@@ -188,7 +205,7 @@ const CreateEvent: FC<IProps> = props => {
 
     const collectModuleInitData = defaultAbiCoder.encode(
       ["uint256", "uint16", "uint256", "uint256"],
-      [soulBoundTokenId, "0", salePrice, royaltyBasisPoints]
+      [2, "0", salePrice, royaltyBasisPoints]
     );
 
     const publishModuleInitData = defaultAbiCoder.encode(
@@ -221,7 +238,9 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("预发布成功");
-      getProjectsResult();
+      setTimeout(() => {
+        getPreparePublishResult();
+      }, 1500);
     } catch (e) {
       console.error(e);
       console.warn(
@@ -260,12 +279,27 @@ const CreateEvent: FC<IProps> = props => {
     setPreparePublish(res.data.publications);
   };
 
+  const getCollectResult = async () => {
+    const res = await getCollectHistory({});
+
+    setCollect(res.data.feesForCollectHistories);
+  };
+
+  const approve = async () => {
+    const res = await derivative.setApprovalForAll(DERIVATIVE_ADDRESS, true, {
+      from: account.address,
+    });
+
+    message.success("approve成功");
+  };
+
   useEffect(() => {
     getProfileResult();
     getHubsResult();
     getProjectsResult();
     getPublishResult();
     getPreparePublishResult();
+    getCollectResult();
   }, []);
 
   return (
@@ -331,6 +365,24 @@ const CreateEvent: FC<IProps> = props => {
                 return {
                   value: item.projectId,
                   label: item.id,
+                };
+              })}
+            ></Select>
+          </Form.Item>
+
+          <Form.Item
+            label="from tokens"
+            name="from tokens"
+            rules={[{ required: true, message: "Please upload" }]}
+          >
+            <Select
+              onChange={val => {
+                setFromTokenIds([val]);
+              }}
+              options={collect.map(item => {
+                return {
+                  value: 2,
+                  label: 2,
                 };
               })}
             ></Select>
@@ -457,6 +509,7 @@ const CreateEvent: FC<IProps> = props => {
           >
             prepare Publish
           </Button>
+          <Button onClick={approve}>approve</Button>
         </div>
       </div>
 

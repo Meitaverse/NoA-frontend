@@ -76,6 +76,10 @@ const CreateEvent: FC<IProps> = props => {
         }
       );
       message.success("创建成功");
+
+      setTimeout(() => {
+        getProfileResult();
+      }, 1500);
     } catch (e) {
       console.error(e);
       console.warn("检查地址是否正确");

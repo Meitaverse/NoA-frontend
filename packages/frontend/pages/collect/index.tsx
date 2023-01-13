@@ -106,7 +106,6 @@ const CreateEvent: FC<IProps> = props => {
     if (!name) return;
     if (!description) return;
     if (!soulBoundTokenId) return;
-
     try {
       const res = await manager.collect(
         {

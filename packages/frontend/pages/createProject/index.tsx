@@ -102,7 +102,7 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("创建成功");
-      getProjectsResult();
+      setTimeout(() => getProjectsResult(), 1500);
     } catch (e) {
       console.error(e);
       console.warn(

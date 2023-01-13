@@ -1,3 +1,5 @@
+import { DERIVATIVE_ADDRESS, MANAGER_ADDRESS } from "@/config";
+import { useDerivative } from "@/hooks/useDerivativeContact";
 import { useSBTContract } from "@/hooks/useSBTContract";
 import { getProfile, IGetProfile } from "@/services/graphql";
 import { RightOutlined, SearchOutlined } from "@ant-design/icons";
@@ -12,6 +14,7 @@ interface IProps {}
 const Header: FC<IProps> = props => {
   const { address, isConnected } = useAccount();
   const [_, prov] = useSBTContract();
+  const [__, prov2] = useDerivative();
 
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
 
@@ -31,11 +34,21 @@ const Header: FC<IProps> = props => {
       setCurrentBalance(0);
       return;
     }
+
+    await new Promise(resolve => {
+      setTimeout(resolve, 2500);
+    });
+
     const res = await prov["balanceOf(uint256)"](profile.soulBoundTokenId, {
       from: address,
     });
 
     setCurrentBalance(+res);
+    // const res = await prov2.allowance(2, DERIVATIVE_ADDRESS, {
+    //   from: address,
+    // });
+
+    // setCurrentBalance(+res);
   };
 
   const currentProfile = useMemo(() => {

@@ -90,7 +90,9 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("创建成功");
-      getHubsResult();
+      setTimeout(() => {
+        getHubsResult();
+      }, 1500);
     } catch (e) {
       message.error("创建失败，该账号可能未加入白名单");
       console.error(e);
