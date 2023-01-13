@@ -44,11 +44,6 @@ const Header: FC<IProps> = props => {
     });
 
     setCurrentBalance(+res);
-    // const res = await prov2.allowance(2, DERIVATIVE_ADDRESS, {
-    //   from: address,
-    // });
-
-    // setCurrentBalance(+res);
   };
 
   const currentProfile = useMemo(() => {
