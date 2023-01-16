@@ -12,7 +12,7 @@ import {
   message,
   Table,
 } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
@@ -74,20 +74,7 @@ const CreateEvent: FC<IProps> = props => {
     IGetMintSBTValueHistories["mintSBTValueHistories"]
   >([]);
 
-  const addresses = [
-    {
-      value: "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-      label: "user",
-    },
-    {
-      value: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-      label: "userTwo",
-    },
-    {
-      value: "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-      label: "userThree",
-    },
-  ];
+  const cycle = useRef<ReturnType<typeof setInterval>>();
 
   const charge = async () => {
     if (account.address !== "0x70997970C51812dc3A010C7d01b50e0d17dc79C8") {
@@ -125,7 +112,14 @@ const CreateEvent: FC<IProps> = props => {
   useEffect(() => {
     getProfileResult();
     getMintSBTValueResult();
-    // getHubsResult();
+
+    cycle.current = setInterval(() => {
+      getMintSBTValueResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (

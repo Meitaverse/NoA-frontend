@@ -1,7 +1,7 @@
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Select, Upload, Button, message, Table } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
@@ -59,7 +59,6 @@ const CreateEvent: FC<IProps> = props => {
   const [salePrice, setSalePrice] = useState("10");
   const [royaltyBasisPoints, setRoyaltyBasisPoints] = useState("50");
   const [description, setDescription] = useState("Bitsoulhub");
-  const [metadataURI, setMetadataURI] = useState("Bitsoulhub");
   const [defaultRoyaltyPoints, setDefaultRoyaltyPoints] = useState("0");
   const [feeShareType, setFeeShareType] = useState("0");
   const [soulBoundTokenId, setSoulBoundTokenId] = useState("");
@@ -83,6 +82,8 @@ const CreateEvent: FC<IProps> = props => {
   const [preparePublish, setPreparePublish] = useState<
     IGetPreparePublish["publications"]
   >([]);
+
+  const cycle = useRef<ReturnType<typeof setInterval>>();
 
   const columns: ColumnsType<IGetPreparePublish["publications"][number]> = [
     {
@@ -212,7 +213,6 @@ const CreateEvent: FC<IProps> = props => {
       ["address", "uint256"],
       [TEMPLATE_ADDRESS, 1]
     );
-
     try {
       const res = await manager.prePublish(
         {
@@ -300,6 +300,15 @@ const CreateEvent: FC<IProps> = props => {
     getPublishResult();
     getPreparePublishResult();
     getCollectResult();
+
+    cycle.current = setInterval(() => {
+      getPreparePublishResult();
+      getPublishResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (
@@ -370,11 +379,7 @@ const CreateEvent: FC<IProps> = props => {
             ></Select>
           </Form.Item>
 
-          <Form.Item
-            label="from tokens"
-            name="from tokens"
-            rules={[{ required: true, message: "Please upload" }]}
-          >
+          <Form.Item label="from tokens" name="from tokens">
             <Select
               onChange={val => {
                 setFromTokenIds([val]);
@@ -448,12 +453,55 @@ const CreateEvent: FC<IProps> = props => {
             name="metadataURI"
             rules={[{ required: true, message: "Please upload" }]}
           >
-            <Input
-              value={metadataURI}
-              onChange={e => {
-                setMetadataURI(e.target.value);
+            <Select
+              value={materialURIs}
+              onChange={items => {
+                setMaterialURIs(items);
               }}
-            ></Input>
+              mode="multiple"
+              options={[
+                {
+                  value:
+                    "https://img1.baidu.com/it/u=38231409,2215725747&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500",
+                  label: (
+                    <img
+                      src="https://img1.baidu.com/it/u=38231409,2215725747&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://upload.pig66.com/uploadfile/2017/0511/20170511075802322.jpg",
+                  label: (
+                    <img
+                      src="https://upload.pig66.com/uploadfile/2017/0511/20170511075802322.jpg"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://img2.baidu.com/it/u=3202947311,1179654885&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
+                  label: (
+                    <img
+                      src="https://img2.baidu.com/it/u=3202947311,1179654885&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://img1.baidu.com/it/u=1960110688,1786190632&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281",
+                  label: (
+                    <img
+                      src="https://img1.baidu.com/it/u=1960110688,1786190632&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+              ]}
+            ></Select>
           </Form.Item>
 
           <Form.Item

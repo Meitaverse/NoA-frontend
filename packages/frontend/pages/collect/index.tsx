@@ -1,7 +1,7 @@
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Select, Upload, Button, message, Table } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
@@ -56,7 +56,7 @@ const CreateEvent: FC<IProps> = props => {
   const [collectValue, setCollectValue] = useState("0");
   const [soulBoundTokenId, setSoulBoundTokenId] = useState("");
   const [publishId, setPublishId] = useState("");
-
+  const cycle = useRef<ReturnType<typeof setInterval>>();
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [publishes, setPublishes] = useState<
     IGetPublishHistory["publishCreatedHistories"]
@@ -151,6 +151,14 @@ const CreateEvent: FC<IProps> = props => {
     getProfileResult();
     getPublishResult();
     getCollectResult();
+
+    cycle.current = setInterval(() => {
+      getCollectResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (

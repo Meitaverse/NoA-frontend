@@ -12,7 +12,7 @@ import {
   message,
   Table,
 } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import { getProfile, IGetProfile } from "@/services/graphql";
@@ -59,6 +59,8 @@ const CreateEvent: FC<IProps> = props => {
   const [address, setAddress] = useState("");
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
 
+  const cycle = useRef<ReturnType<typeof setInterval>>();
+
   const create = async () => {
     if (!account.address) return;
     if (!nickname) return;
@@ -89,14 +91,6 @@ const CreateEvent: FC<IProps> = props => {
     }
   };
 
-  const test = async () => {
-    debugger;
-    const res = await manager.getGovernance({
-      from: account.address,
-    });
-    debugger;
-  };
-
   const getProfileResult = async () => {
     const res = await getProfile({});
     setProfiles(res.data.profiles);
@@ -104,6 +98,14 @@ const CreateEvent: FC<IProps> = props => {
 
   useEffect(() => {
     getProfileResult();
+
+    cycle.current = setInterval(() => {
+      getProfileResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (

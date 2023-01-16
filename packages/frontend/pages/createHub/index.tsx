@@ -12,7 +12,7 @@ import {
   message,
   Table,
 } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
@@ -69,7 +69,7 @@ const CreateEvent: FC<IProps> = props => {
   const [address, setAddress] = useState("");
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
-
+  const cycle = useRef<ReturnType<typeof setInterval>>();
   const create = async () => {
     if (!account.address) return;
     if (!name) return;
@@ -90,9 +90,6 @@ const CreateEvent: FC<IProps> = props => {
       );
 
       message.success("创建成功");
-      setTimeout(() => {
-        getHubsResult();
-      }, 1500);
     } catch (e) {
       message.error("创建失败，该账号可能未加入白名单");
       console.error(e);
@@ -117,6 +114,13 @@ const CreateEvent: FC<IProps> = props => {
   useEffect(() => {
     getProfileResult();
     getHubsResult();
+    cycle.current = setInterval(() => {
+      getHubsResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (
@@ -152,8 +156,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="nickName"
-            name="nickName"
+            label="hub name"
+            name="hub name"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Input

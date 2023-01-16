@@ -1,7 +1,7 @@
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Select, Upload, Button, message, Table } from "antd";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
@@ -77,6 +77,8 @@ const CreateEvent: FC<IProps> = props => {
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
   const [projects, setProjects] = useState<IGetProjects["projects"]>([]);
 
+  const cycle = useRef<ReturnType<typeof setInterval>>();
+
   const create = async () => {
     if (!account.address) return;
     if (!name) return;
@@ -133,6 +135,14 @@ const CreateEvent: FC<IProps> = props => {
     getProfileResult();
     getHubsResult();
     getProjectsResult();
+
+    cycle.current = setInterval(() => {
+      getProjectsResult();
+    }, 500);
+
+    return () => {
+      clearInterval(cycle.current);
+    };
   }, []);
 
   return (
