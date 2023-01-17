@@ -18,6 +18,7 @@ import styles from "./index.module.scss";
 import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useModuleGlobalContract } from "@/hooks/useModuleGlobalContract";
 interface IProps {}
 
 const columns: ColumnsType<IGetHubs["hubs"][number]> = [
@@ -62,6 +63,7 @@ const CreateEvent: FC<IProps> = props => {
   );
 
   const [manager] = useManagerContract();
+  const [_, moduleGlobalProv] = useModuleGlobalContract();
 
   const [name, setName] = useState("bitSoul");
   const [description, setDescription] = useState("Bitsoulhub");
@@ -102,12 +104,26 @@ const CreateEvent: FC<IProps> = props => {
   const getProfileResult = async () => {
     const res = await getProfile({});
 
-    setProfiles(res.data.profiles);
+    const filterd: IGetProfile["profiles"] = [];
+
+    for (let item of res.data.profiles) {
+      const isHubCreator = await moduleGlobalProv.isWhitelistHubCreator(
+        item.soulBoundTokenId,
+        {
+          from: account.address,
+        }
+      );
+
+      if (isHubCreator) {
+        filterd.push(item);
+      }
+    }
+
+    setProfiles(filterd);
   };
 
   const getHubsResult = async () => {
     const res = await getHubs({});
-
     setHubs(res.data.hubs);
   };
 

@@ -6,12 +6,14 @@ import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
   getCollectHistory,
+  getDerivativeNFTAssets,
   getHubs,
   getPreparePublish,
   getProfile,
   getProjects,
   getPublishHistory,
   IGetCollectHistory,
+  IGetDerivativeNFTAssets,
   IGetHubs,
   IGetPreparePublish,
   IGetProfile,
@@ -76,12 +78,18 @@ const CreateEvent: FC<IProps> = props => {
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
   const [projects, setProjects] = useState<IGetProjects["projects"]>([]);
   const [publishes, setPublishes] = useState<
-    IGetPublishHistory["publishCreatedHistories"]
+    IGetPublishHistory["publishRecords"]
   >([]);
 
   const [preparePublish, setPreparePublish] = useState<
     IGetPreparePublish["publications"]
   >([]);
+
+  const [NFTAssets, setNFTAssets] = useState<
+    IGetDerivativeNFTAssets["derivativeNFTAssets"]
+  >([]);
+
+  const [collectModuleSBTID, setCollectModuleSBTID] = useState("");
 
   const cycle = useRef<ReturnType<typeof setInterval>>();
 
@@ -145,7 +153,7 @@ const CreateEvent: FC<IProps> = props => {
   ];
 
   const columnsPublish: ColumnsType<
-    IGetPublishHistory["publishCreatedHistories"][number]
+    IGetPublishHistory["publishRecords"][number]
   > = [
     {
       title: "id",
@@ -204,9 +212,19 @@ const CreateEvent: FC<IProps> = props => {
     if (!description) return;
     if (!soulBoundTokenId) return;
 
+    if (preparePublish.find(x => x.name === name)) {
+      message.error("已有相同名称，请更换名称");
+      return;
+    }
+
     const collectModuleInitData = defaultAbiCoder.encode(
       ["uint256", "uint16", "uint256", "uint256"],
-      [2, "0", salePrice, royaltyBasisPoints]
+      [
+        +collectModuleSBTID || +soulBoundTokenId,
+        "0",
+        salePrice,
+        royaltyBasisPoints,
+      ]
     );
 
     const publishModuleInitData = defaultAbiCoder.encode(
@@ -270,7 +288,7 @@ const CreateEvent: FC<IProps> = props => {
   const getPublishResult = async () => {
     const res = await getPublishHistory({});
 
-    setPublishes(res.data.publishCreatedHistories);
+    setPublishes(res.data.publishRecords);
   };
 
   const getPreparePublishResult = async () => {
@@ -283,6 +301,19 @@ const CreateEvent: FC<IProps> = props => {
     const res = await getCollectHistory({});
 
     setCollect(res.data.feesForCollectHistories);
+  };
+
+  const getNFTAssets = async () => {
+    const res = await getDerivativeNFTAssets({});
+
+    setNFTAssets(
+      res.data.derivativeNFTAssets.filter(val => {
+        return (
+          val.wallet.toLowerCase() === account.address?.toLowerCase() &&
+          +val.value > 0
+        );
+      })
+    );
   };
 
   const approve = async () => {
@@ -300,7 +331,7 @@ const CreateEvent: FC<IProps> = props => {
     getPublishResult();
     getPreparePublishResult();
     getCollectResult();
-
+    getNFTAssets();
     cycle.current = setInterval(() => {
       getPreparePublishResult();
       getPublishResult();
@@ -334,12 +365,18 @@ const CreateEvent: FC<IProps> = props => {
               onChange={val => {
                 setSoulBoundTokenId(val);
               }}
-              options={profiles.map(item => {
-                return {
-                  value: item.soulBoundTokenId,
-                  label: item.nickName,
-                };
-              })}
+              options={profiles
+                .filter(item => {
+                  return (
+                    item.wallet.toLowerCase() === account.address?.toLowerCase()
+                  );
+                })
+                .map(item => {
+                  return {
+                    value: item.soulBoundTokenId,
+                    label: item.nickName,
+                  };
+                })}
             ></Select>
           </Form.Item>
 
@@ -374,20 +411,6 @@ const CreateEvent: FC<IProps> = props => {
                 return {
                   value: item.projectId,
                   label: item.id,
-                };
-              })}
-            ></Select>
-          </Form.Item>
-
-          <Form.Item label="from tokens" name="from tokens">
-            <Select
-              onChange={val => {
-                setFromTokenIds([val]);
-              }}
-              options={collect.map(item => {
-                return {
-                  value: 2,
-                  label: 2,
                 };
               })}
             ></Select>
@@ -545,6 +568,39 @@ const CreateEvent: FC<IProps> = props => {
               }}
             ></Input>
           </Form.Item>
+
+          <div>二创需填写字段：</div>
+
+          <Form.Item label="from tokens" name="from tokens">
+            <Select
+              onChange={val => {
+                setFromTokenIds([val]);
+              }}
+              options={NFTAssets.map(item => {
+                return {
+                  value: item.tokenId,
+                  label: item.tokenId,
+                };
+              })}
+            ></Select>
+          </Form.Item>
+
+          <Form.Item
+            label="collectSoulBoundTokenId(选择一创对应的sbt)"
+            name="collectSoulBoundTokenId"
+          >
+            <Select
+              onChange={val => {
+                setCollectModuleSBTID(val);
+              }}
+              options={profiles.map(item => {
+                return {
+                  value: item.soulBoundTokenId,
+                  label: item.nickName,
+                };
+              })}
+            ></Select>
+          </Form.Item>
         </Form>
 
         <div style={{ display: "flex" }}>
@@ -557,7 +613,9 @@ const CreateEvent: FC<IProps> = props => {
           >
             prepare Publish
           </Button>
-          <Button onClick={approve}>approve</Button>
+          <Button onClick={approve} style={{ marginLeft: "10px" }}>
+            二创需要先 approve
+          </Button>
         </div>
       </div>
 

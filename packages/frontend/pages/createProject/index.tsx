@@ -127,7 +127,6 @@ const CreateEvent: FC<IProps> = props => {
 
   const getProjectsResult = async () => {
     const res = await getProjects({});
-
     setProjects(res.data.projects);
   };
 
@@ -168,12 +167,18 @@ const CreateEvent: FC<IProps> = props => {
               onChange={val => {
                 setSoulBoundTokenId(val);
               }}
-              options={profiles.map(item => {
-                return {
-                  value: item.soulBoundTokenId,
-                  label: item.nickName,
-                };
-              })}
+              options={profiles
+                .filter(item => {
+                  return (
+                    item.wallet.toLowerCase() === account.address?.toLowerCase()
+                  );
+                })
+                .map(item => {
+                  return {
+                    value: item.soulBoundTokenId,
+                    label: item.nickName,
+                  };
+                })}
             ></Select>
           </Form.Item>
 
@@ -196,8 +201,8 @@ const CreateEvent: FC<IProps> = props => {
           </Form.Item>
 
           <Form.Item
-            label="nickName"
-            name="nickName"
+            label="project name"
+            name="project name"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Input
@@ -213,12 +218,60 @@ const CreateEvent: FC<IProps> = props => {
             name="metadataURI"
             rules={[{ required: true, message: "Please upload" }]}
           >
-            <Input
+            <Select
+              value={metadataURI}
+              onChange={item => {
+                setMetadataURI(item);
+              }}
+              options={[
+                {
+                  value:
+                    "https://img1.baidu.com/it/u=38231409,2215725747&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500",
+                  label: (
+                    <img
+                      src="https://img1.baidu.com/it/u=38231409,2215725747&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://upload.pig66.com/uploadfile/2017/0511/20170511075802322.jpg",
+                  label: (
+                    <img
+                      src="https://upload.pig66.com/uploadfile/2017/0511/20170511075802322.jpg"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://img2.baidu.com/it/u=3202947311,1179654885&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500",
+                  label: (
+                    <img
+                      src="https://img2.baidu.com/it/u=3202947311,1179654885&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=500"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+                {
+                  value:
+                    "https://img1.baidu.com/it/u=1960110688,1786190632&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281",
+                  label: (
+                    <img
+                      src="https://img1.baidu.com/it/u=1960110688,1786190632&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=281"
+                      style={{ width: "140px" }}
+                    />
+                  ),
+                },
+              ]}
+            ></Select>
+            {/* <Input
               value={metadataURI}
               onChange={e => {
                 setMetadataURI(e.target.value);
               }}
-            ></Input>
+            ></Input> */}
           </Form.Item>
 
           <Form.Item

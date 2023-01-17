@@ -47,6 +47,16 @@
   },
   {
     "inputs": [],
+    "name": "HubNotExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "HubOnlyCreateOne",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InitParamsInvalid",
     "type": "error"
   },
@@ -113,6 +123,11 @@
   {
     "inputs": [],
     "name": "ProjectExisted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PublicationIsExisted",
     "type": "error"
   },
   {
@@ -602,6 +617,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId_",
+        "type": "uint256"
+      },
       {
         "internalType": "uint256",
         "name": "tokenId_",
@@ -1224,59 +1244,26 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "projectId",
+        "name": "soulBoundTokenId",
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "fromSoulBoundTokenId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "toSoulBoundTokenId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
       },
       {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "imageURI",
+        "type": "string"
       }
     ],
-    "name": "transferDerivativeNFT",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "projectId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "fromSoulBoundTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "toSoulBoundTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "transferValueDerivativeNFT",
+    "name": "updateHub",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -75,7 +75,10 @@ const CreateEvent: FC<IProps> = props => {
   >([]);
 
   const setWhite = async () => {
-    if (account.address !== "0x70997970C51812dc3A010C7d01b50e0d17dc79C8") {
+    if (
+      account.address?.toLowerCase() !==
+      "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".toLowerCase()
+    ) {
       message.error("当前账号不是Governance账号，添加到白名单失败");
       return;
     }

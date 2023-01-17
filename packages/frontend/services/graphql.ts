@@ -1,4 +1,4 @@
-import { query } from "./apollo";
+import { query, queryDe } from "./apollo";
 
 export interface IGetEventList {
   eventItems: {
@@ -114,7 +114,7 @@ export const getProjects = params => {
 };
 
 export interface IGetPublishHistory {
-  publishCreatedHistories: {
+  publishRecords: {
     id: string;
     publishId: string;
     soulBoundTokenId: string;
@@ -129,7 +129,7 @@ export interface IGetPublishHistory {
 
 export const getPublishHistory = params => {
   return query<IGetPublishHistory>(`query{
-    publishCreatedHistories(first:100){
+    publishRecords(first:100){
       id,
       publishId,
       soulBoundTokenId,
@@ -234,6 +234,28 @@ export const getCollectHistory = params => {
       treasuryAmount
       genesisAmount
       adjustedAmount
+      timestamp
+    }
+  }`);
+};
+
+export interface IGetDerivativeNFTAssets {
+  derivativeNFTAssets: {
+    id: string;
+    wallet: string;
+    tokenId: string;
+    value: string;
+    timestamp: string;
+  }[];
+}
+
+export const getDerivativeNFTAssets = params => {
+  return queryDe<IGetDerivativeNFTAssets>(`query{
+    derivativeNFTAssets(first: 100) {
+      id
+      wallet
+      tokenId
+      value
       timestamp
     }
   }`);

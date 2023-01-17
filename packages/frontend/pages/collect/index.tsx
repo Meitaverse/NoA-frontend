@@ -59,7 +59,7 @@ const CreateEvent: FC<IProps> = props => {
   const cycle = useRef<ReturnType<typeof setInterval>>();
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [publishes, setPublishes] = useState<
-    IGetPublishHistory["publishCreatedHistories"]
+    IGetPublishHistory["publishRecords"]
   >([]);
   const [collect, setCollect] = useState<
     IGetCollectHistory["feesForCollectHistories"]
@@ -132,13 +132,17 @@ const CreateEvent: FC<IProps> = props => {
   const getProfileResult = async () => {
     const res = await getProfile({});
 
-    setProfiles(res.data.profiles);
+    const filterd = res.data.profiles.filter(item => {
+      return item.wallet.toLowerCase() === account.address?.toLowerCase();
+    });
+
+    setProfiles(filterd);
   };
 
   const getPublishResult = async () => {
     const res = await getPublishHistory({});
 
-    setPublishes(res.data.publishCreatedHistories);
+    setPublishes(res.data.publishRecords);
   };
 
   const getCollectResult = async () => {
