@@ -43,7 +43,8 @@ const keyRouter = {
   publish: "/publish",
   charge: "/charge",
   collect: "/collect",
-  addWhiteList: "/addWhiteList",
+  addWhiteListProfile: "/addWhiteListProfile",
+  addWhiteListHub: "/addWhiteList",
   // eventTable: "/eventTable",
 };
 
@@ -64,27 +65,40 @@ const Sider: FC<IProps> = props => {
             width: "47px",
           }}
           items={[
-            getItem("", "1", <MailOutlined />),
-            getItem("", "2", <CalendarOutlined />),
+            getItem("", "Governance", <MailOutlined />),
+            getItem("", "User", <CalendarOutlined />),
           ]}
+          onSelect={({ key }) => {
+            setAactiveMenuVal({
+              ...activeMenuVal,
+              firstLevel: key,
+            });
+          }}
+          selectedKeys={[activeMenuVal.firstLevel]}
         ></Menu>
 
         <Menu
           selectedKeys={[activeMenuVal.secondLevel]}
           className={styles.secondLevel}
           style={{ minWidth: "160px" }}
-          items={[
-            getItem("charge", "charge", ""),
-            getItem("addWhiteList", "addWhiteList", ""),
-            getItem("createProfile", "createProfile", ""),
-            getItem("createHub", "createHub", ""),
-            getItem("createProject", "createProject", ""),
-            getItem("publish", "publish", ""),
-            getItem("collect", "collect", ""),
-            // getItem("eventTable", "eventTable", ""),
-            // getItem("Account", "Account", ""),
-            // getItem("Organize Event", "Organize Event", ""),
-          ]}
+          items={
+            activeMenuVal.firstLevel === "Governance"
+              ? [
+                  getItem("charge", "charge", ""),
+                  getItem("addWhiteListProfile", "addWhiteListProfile", ""),
+                  getItem("addWhiteListHub", "addWhiteListHub", ""),
+                ]
+              : [
+                  getItem("createProfile", "createProfile", ""),
+                  getItem("createHub", "createHub", ""),
+                  getItem("createProject", "createProject", ""),
+                  getItem("publish", "publish", ""),
+                  getItem("collect", "collect", ""),
+                  // getItem("eventTable", "eventTable", ""),
+                  // getItem("Account", "Account", ""),
+                  // getItem("Organize Event", "Organize Event", ""),
+                ]
+          }
           onSelect={({ key }) => {
             router.push(keyRouter[key] || "/");
 

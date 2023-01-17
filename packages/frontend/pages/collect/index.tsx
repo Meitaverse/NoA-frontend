@@ -111,7 +111,7 @@ const CreateEvent: FC<IProps> = props => {
         {
           publishId,
           collectorSoulBoundTokenId: soulBoundTokenId,
-          collectValue,
+          collectUnits: collectValue,
           data: [],
         },
         {
@@ -158,7 +158,7 @@ const CreateEvent: FC<IProps> = props => {
 
     cycle.current = setInterval(() => {
       getCollectResult();
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(cycle.current);

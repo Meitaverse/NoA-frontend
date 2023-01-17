@@ -1,4 +1,3 @@
-import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Form,
@@ -12,7 +11,7 @@ import {
   message,
   Table,
 } from "antd";
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 import {
@@ -26,6 +25,7 @@ import {
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { profile } from "console";
+import { useModuleGlobalContract } from "@/hooks/useModuleGlobalContract";
 interface IProps {}
 
 const columns: ColumnsType<
@@ -63,36 +63,37 @@ const CreateEvent: FC<IProps> = props => {
     </div>
   );
 
-  const [manager] = useManagerContract();
+  const [moduleGlobal] = useModuleGlobalContract();
 
   const [name, setName] = useState("bitSoul");
   const [description, setDescription] = useState("Bitsoulhub");
   const [selectAddress, setSelectAddress] = useState("");
-  const [chargeAmount, setChargeAmount] = useState("100");
+  const [whiteStatus, setWhiteStatus] = useState<boolean>(true);
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
   const [mintHistories, setMintHistories] = useState<
     IGetMintSBTValueHistories["mintSBTValueHistories"]
   >([]);
 
-  const cycle = useRef<ReturnType<typeof setInterval>>();
-
-  const charge = async () => {
+  const setWhite = async () => {
     if (
       account.address?.toLowerCase() !==
       "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".toLowerCase()
     ) {
-      message.error("当前账号不是Governance账号，充值失败");
+      message.error("当前账号不是Governance账号，添加到白名单失败");
       return;
     }
 
     if (!selectAddress) return;
     try {
-      const res = await manager.mintSBTValue(selectAddress, chargeAmount, {
-        from: account.address,
-      });
+      const res = await moduleGlobal.whitelistProfileCreator(
+        selectAddress,
+        whiteStatus,
+        {
+          from: account.address,
+        }
+      );
 
-      message.success("充值成功");
-      getMintSBTValueResult();
+      message.success("添加成功");
     } catch (e) {
       console.error(e);
       console.warn(
@@ -115,14 +116,7 @@ const CreateEvent: FC<IProps> = props => {
   useEffect(() => {
     getProfileResult();
     getMintSBTValueResult();
-
-    cycle.current = setInterval(() => {
-      getMintSBTValueResult();
-    }, 1000);
-
-    return () => {
-      clearInterval(cycle.current);
-    };
+    // getHubsResult();
   }, []);
 
   return (
@@ -130,11 +124,17 @@ const CreateEvent: FC<IProps> = props => {
       <div className={styles.createEventBoard}>
         <Form>
           <Form.Item
-            label="charge account"
-            name="charge account"
+            label="account"
+            name="account"
             rules={[{ required: true, message: "Please upload" }]}
           >
-            <Select
+            <Input
+              value={selectAddress}
+              onChange={e => {
+                setSelectAddress(e.target.value);
+              }}
+            ></Input>
+            {/* <Select
               onChange={val => {
                 setSelectAddress(val);
               }}
@@ -144,21 +144,30 @@ const CreateEvent: FC<IProps> = props => {
                   label: item.wallet,
                 };
               })}
-            ></Select>
+            ></Select> */}
           </Form.Item>
 
           <Form.Item
-            label="charge amount"
-            name="charge amount"
+            label="white status"
+            name="white status"
             rules={[{ required: true, message: "Please upload" }]}
           >
-            <Input
-              type="number"
-              value={chargeAmount}
-              onChange={e => {
-                setChargeAmount(e.target.value);
+            <Select
+              value={whiteStatus}
+              onChange={val => {
+                setWhiteStatus(val);
               }}
-            ></Input>
+              options={[
+                {
+                  value: true,
+                  label: "添加到白名单",
+                },
+                {
+                  value: false,
+                  label: "从白名单移除",
+                },
+              ]}
+            ></Select>
           </Form.Item>
         </Form>
 
@@ -167,23 +176,23 @@ const CreateEvent: FC<IProps> = props => {
           <Button
             style={{ marginLeft: "8px" }}
             onClick={() => {
-              charge();
+              setWhite();
             }}
           >
-            Charge
+            setWhite
           </Button>
         </div>
       </div>
 
       <br />
 
-      <div>
+      {/* <div>
         <Table
           rowKey="eventId"
           dataSource={mintHistories}
           columns={columns}
         ></Table>
-      </div>
+      </div> */}
     </div>
   );
 };

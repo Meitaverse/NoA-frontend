@@ -4,6 +4,11 @@ import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 const client = new ApolloClient({
   uri: GRAPHQL_URL,
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "network-only",
+    },
+  },
 });
 
 const query = async <T = any>(query): Promise<{ data: T; status: number }> => {
@@ -22,6 +27,11 @@ const query = async <T = any>(query): Promise<{ data: T; status: number }> => {
 const clientDe = new ApolloClient({
   uri: GRAPHQL_DERIVATIVENFT_URL,
   cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: "network-only",
+    },
+  },
 });
 
 const queryDe = async <T = any>(

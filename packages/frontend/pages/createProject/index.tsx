@@ -137,7 +137,7 @@ const CreateEvent: FC<IProps> = props => {
 
     cycle.current = setInterval(() => {
       getProjectsResult();
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(cycle.current);

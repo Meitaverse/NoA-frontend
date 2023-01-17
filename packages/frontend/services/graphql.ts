@@ -246,6 +246,7 @@ export interface IGetDerivativeNFTAssets {
     tokenId: string;
     value: string;
     timestamp: string;
+    publishId: string;
   }[];
 }
 
@@ -257,6 +258,7 @@ export const getDerivativeNFTAssets = params => {
       tokenId
       value
       timestamp
+      publishId
     }
   }`);
 };

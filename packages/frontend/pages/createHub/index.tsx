@@ -132,7 +132,7 @@ const CreateEvent: FC<IProps> = props => {
     getHubsResult();
     cycle.current = setInterval(() => {
       getHubsResult();
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(cycle.current);

@@ -335,7 +335,7 @@ const CreateEvent: FC<IProps> = props => {
     cycle.current = setInterval(() => {
       getPreparePublishResult();
       getPublishResult();
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(cycle.current);
@@ -579,7 +579,7 @@ const CreateEvent: FC<IProps> = props => {
               options={NFTAssets.map(item => {
                 return {
                   value: item.tokenId,
-                  label: item.tokenId,
+                  label: `${item.tokenId} - pubid: ${item.publishId}`,
                 };
               })}
             ></Select>

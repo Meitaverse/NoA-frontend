@@ -101,7 +101,7 @@ const CreateEvent: FC<IProps> = props => {
 
     cycle.current = setInterval(() => {
       getProfileResult();
-    }, 500);
+    }, 1000);
 
     return () => {
       clearInterval(cycle.current);

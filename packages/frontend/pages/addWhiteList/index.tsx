@@ -124,8 +124,8 @@ const CreateEvent: FC<IProps> = props => {
       <div className={styles.createEventBoard}>
         <Form>
           <Form.Item
-            label="charge account"
-            name="charge account"
+            label="account"
+            name="account"
             rules={[{ required: true, message: "Please upload" }]}
           >
             <Select
