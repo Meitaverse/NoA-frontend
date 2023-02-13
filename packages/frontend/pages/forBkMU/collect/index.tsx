@@ -130,7 +130,7 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const getProfileResult = async () => {
-    const res = await getProfile({});
+    const res = await getProfile();
 
     const filterd = res.data.profiles.filter(item => {
       return item.wallet.toLowerCase() === account.address?.toLowerCase();

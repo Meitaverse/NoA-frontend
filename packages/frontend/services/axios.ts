@@ -61,7 +61,7 @@ const loadingPlugin: Plugin = {
   response: data => {
     const config = data.config as Config;
     if (config.loading) {
-      message.destroy("loadingPluginKey+");
+      message.destroy("loadingPluginKey");
     }
     return data;
   },

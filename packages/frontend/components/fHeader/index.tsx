@@ -1,16 +1,23 @@
-import { signin } from "@/services/sign";
+import {
+  bindAccount,
+  getUserInfo,
+  sendValidateCode,
+  signin,
+} from "@/services/sign";
 import { activeTab } from "@/store/tabs";
-import { isLogin } from "@/store/userDetail";
+import { isLogin, userDetail } from "@/store/userDetail";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { useUpdate } from "ahooks";
-import { MenuProps, message } from "antd";
+import { Input, InputNumber, MenuProps, message } from "antd";
 import { Button, Dropdown, Modal, Tabs, TabsProps } from "antd";
 import { useAtom, useAtomValue } from "jotai";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import LogoImg from "@/images/logo.jpeg";
 import styles from "./index.module.scss";
+import { useManagerContract } from "@/hooks/useManagerContract";
+import { getProfile } from "@/services/graphql";
 
 interface IProps {}
 
@@ -36,12 +43,25 @@ const items: TabsProps["items"] = [
 const FHeader: FC<IProps> = props => {
   const [actTab, setActTab] = useAtom(activeTab);
   const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
+  const [userInfo, setUserInfo] = useAtom(userDetail);
   const { address, isConnected } = useAccount();
   const connect = useConnect();
   const { disconnect } = useDisconnect();
   const [metaMask] = useState(new MetaMaskConnector());
+  // const [walletConnector] = useState(new WalletConnectConnector({
+
+  // }));
   const [openConnectModal, setOpenConnectModal] = useState(false);
+  const [showSignInDialog, setShowSignInDialog] = useState(false);
+  const [verifyStage, setVerifyStage] = useState<
+    "SignIn" | "InputEmail" | "Verify"
+  >("SignIn");
+  const [verifyEmail, setVerifyEmail] = useState("");
+  const [verifyCode, setVerifyCode] = useState(new Array(6).fill(""));
+  const verifyRefs = useRef<any[]>([]);
   const { status, signMessageAsync } = useSignMessage();
+  const [manager] = useManagerContract();
+  const loginLoading = useRef(false);
 
   const update = useUpdate();
 
@@ -62,47 +82,103 @@ const FHeader: FC<IProps> = props => {
     },
   ];
 
-  const signinWeb2 = async () => {
+  const initUserInfo = async () => {
+    if (loginLoading.current) return;
+    loginLoading.current = true;
+    // 存在token的情况下尝试进行登录
+    // 检查及登录步骤：
+    //    调用接口获取用户信息失败则signinWeb2
+    //    成功则setLoginStatus和userInfo。
+    try {
+      if (localStorage.getItem("token")) {
+        const { data } = await getUserInfo();
+
+        if (data.soul_bound_token_id) {
+          setIsLoginStatus(true);
+          setUserInfo(data);
+          return true;
+        }
+      }
+    } finally {
+      loginLoading.current = false;
+    }
+
+    return false;
+  };
+
+  const signinWeb2 = async (account?: string) => {
     const timestamp = +new Date();
     try {
       const signMsg = await signMessageAsync({
         message: `signin${timestamp}AABBCC`,
       });
       const { data, err_code } = await signin({
-        wallet_address: address || "",
+        wallet_address: address || account || "",
         timestamp,
         nonce: "AABBCC",
         signed: signMsg,
       });
       if (err_code === 0) {
-        setIsLoginStatus(true);
         localStorage.setItem("token", data.jwt || "");
-        message.success("登录成功");
+        return true;
       }
     } catch (e) {
       message.error("签名已拒绝");
+      return false;
     }
   };
 
   const initLogin = async () => {
-    // 存在token的情况下尝试进行登录
-    // 检查及登录步骤：
-    //    调用接口获取用户信息失败则signinWeb2
-    //    成功则setLoginStatus和userInfo。
-    if (localStorage.getItem("token")) {
-      return;
+    signinWeb2();
+
+    await initUserInfo();
+  };
+
+  const sendValidate = async () => {
+    const { err_code } = await sendValidateCode(
+      {
+        account: address || "",
+        account_type: "email",
+        scene: "bindAccount",
+      },
+      {
+        loading: true,
+      }
+    );
+    if (err_code === 0) {
+      return true;
     }
 
-    signinWeb2();
+    return false;
+  };
+
+  const bindAccountAsync = async () => {
+    const { err_code } = await bindAccount({
+      account_type: "email",
+      code: verifyCode.join(""),
+    });
+
+    if (err_code === 0) {
+      debugger;
+      // const hash = await manager.createProfile(
+      //   {
+      //     nickName: "",
+      //     imageURI: "",
+      //     wallet: address || "",
+      //   },
+      //   {
+      //     from: address,
+      //   }
+      // );
+    }
   };
 
   useEffect(() => {
     if (isConnected) {
       setOpenConnectModal(false);
 
-      // 这里也需要考虑到调起签名失败的情况如何让用户重试。
       if (!isLoginStatus) {
-        setTimeout(initLogin, 1000);
+        initUserInfo();
       }
     }
   }, [isConnected, isLoginStatus]);
@@ -127,7 +203,7 @@ const FHeader: FC<IProps> = props => {
         ></Tabs>
       </div>
 
-      {!isConnected && (
+      {!isLoginStatus && (
         <Button
           style={{
             border: "none",
@@ -140,14 +216,19 @@ const FHeader: FC<IProps> = props => {
             color: "#FFF",
           }}
           onClick={() => {
-            setOpenConnectModal(true);
+            if (!isConnected) {
+              setOpenConnectModal(true);
+              return;
+            }
+
+            setShowSignInDialog(true);
           }}
         >
           Connect
         </Button>
       )}
 
-      {!isConnected && (
+      {!isLoginStatus && (
         <Modal
           className={styles.connectModal}
           open={openConnectModal}
@@ -186,21 +267,241 @@ const FHeader: FC<IProps> = props => {
               <Button
                 className={styles.connectButton}
                 style={{ marginBottom: "20px" }}
-                onClick={() => {
-                  connect.connect({
+                onClick={async () => {
+                  const connectorInfo = await connect.connectAsync({
                     connector: metaMask,
                   });
+
+                  const profile = await getProfile(
+                    `first: 1 where: {wallet: "${connectorInfo.account}"}`
+                  );
+                  // 不存在profile的话则走验证verify的流程。
+                  if (!profile?.data?.profiles?.length) {
+                    setShowSignInDialog(true);
+                  } else {
+                    // 存在就走签名
+                    initLogin();
+                  }
                 }}
               >
                 Metamask
               </Button>
-              <Button className={styles.connectButton}>Wallet Connect</Button>
+              <Button
+                className={styles.connectButton}
+                // onClick={async () => {
+                //   await connect.connectAsync({
+                //     connector: wall,
+                //   });
+
+                //   setShowSignInDialog(true);
+                // }}
+              >
+                Wallet Connect
+              </Button>
             </div>
           </div>
         </Modal>
       )}
 
-      {isConnected && (
+      {/* TODO: 下面这个组件应该抽离出去，可预见的需要复用，后面再说。 */}
+      {!isLoginStatus && isConnected && (
+        <Modal
+          className={styles.verifyDialog}
+          width={600}
+          open={showSignInDialog}
+          closable
+          footer={null}
+          onCancel={() => {
+            setShowSignInDialog(false);
+            setVerifyStage("SignIn");
+            setVerifyEmail("");
+            setVerifyCode(new Array(6).fill(""));
+          }}
+        >
+          {verifyStage === "SignIn" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  marginBottom: "24px",
+                }}
+              >
+                Sign In
+              </div>
+              <div style={{ fontSize: "20px", marginBottom: "48px" }}>
+                You need to sign a message to prove ownership of the Ethreum
+                address you are connected with.
+              </div>
+              <div style={{ fontSize: "24px" }}>Signing with this address:</div>
+
+              <div
+                style={{
+                  color: "#609FFF",
+                  fontSize: "24px",
+                  fontWeight: "800",
+                  marginBottom: "48px",
+                }}
+              >
+                {address?.slice(0, 6)}...
+                {address?.slice(address.length - 4, address.length)}
+              </div>
+
+              <Button
+                style={{
+                  border: "none",
+                  background:
+                    "linear-gradient(117.55deg, #1E50FF -3.37%, #00DFB7 105.51%)",
+                  height: "56px",
+                  width: "400px",
+                  borderRadius: "16px",
+                  fontSize: "20px",
+                  color: "#FFF",
+                }}
+                onClick={async () => {
+                  const u = await signinWeb2();
+                  if (u) {
+                    setVerifyStage("InputEmail");
+                  }
+                }}
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+          {verifyStage === "InputEmail" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  marginBottom: "24px",
+                }}
+              >
+                Verify Mail
+              </div>
+              <div style={{ fontSize: "20px", marginBottom: "48px" }}>
+                Please verify your mail to generate your soul bonding profile
+                and get your soul reward
+              </div>
+
+              <Input
+                className={styles.inputVerify}
+                placeholder="Email Address"
+                value={verifyEmail}
+                onChange={e => {
+                  setVerifyEmail(e.target.value);
+                }}
+              ></Input>
+
+              <Button
+                className={styles.sendButton}
+                disabled={!verifyEmail.includes("@")}
+                onClick={async () => {
+                  const u = await sendValidate();
+                  if (u) {
+                    setVerifyStage("Verify");
+                  }
+                }}
+              >
+                Send
+              </Button>
+            </div>
+          )}
+          {verifyStage === "Verify" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                  marginBottom: "24px",
+                }}
+              >
+                Verify Mail
+              </div>
+              <div style={{ fontSize: "20px", marginBottom: "48px" }}>
+                Please input the numbers in the mail you received
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {new Array(6).fill("").map((_, index) => {
+                  return (
+                    <InputNumber
+                      key={index}
+                      ref={el => (verifyRefs.current[index] = el)}
+                      className={styles.inputVerifyCode}
+                      value={verifyCode[index]}
+                      min={0}
+                      max={9}
+                      maxLength={1}
+                      autoFocus={index === 0}
+                      onChange={val => {
+                        const newV = verifyCode.slice();
+                        newV[index] = val;
+                        setVerifyCode(newV);
+
+                        if (newV[index] && verifyRefs.current[index + 1]) {
+                          verifyRefs.current[index + 1].focus();
+                        }
+                      }}
+                      controls={false}
+                    ></InputNumber>
+                  );
+                })}
+              </div>
+
+              <Button
+                className={styles.verifyButton}
+                disabled={!verifyEmail.includes("@")}
+                onClick={async () => {
+                  await bindAccountAsync();
+                }}
+              >
+                Verify
+              </Button>
+
+              <div
+                style={{
+                  color: "rgba(255, 255, 255, 0.8)",
+                  fontSize: "20px",
+                  marginTop: "20px",
+                }}
+              >
+                You don't received?{" "}
+                <span style={{ color: "#2C9AFF", cursor: "pointer" }}>
+                  Resend
+                </span>
+              </div>
+            </div>
+          )}
+        </Modal>
+      )}
+
+      {isLoginStatus && (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
             src=""

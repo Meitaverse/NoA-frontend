@@ -49,9 +49,9 @@ export interface IGetProfile {
   }[];
 }
 
-export const getProfile = params => {
+export const getProfile = (params = "first:100") => {
   return query<IGetProfile>(`query {
-    profiles(first:100){
+    profiles(${params}){
       id,
       soulBoundTokenId,
       creator,

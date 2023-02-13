@@ -1,4 +1,3 @@
-import contracts from "@/contracts/noa_contracts.json";
 import { Manager } from "@/typechain";
 import { useContract, useProvider, useSigner } from "wagmi";
 
