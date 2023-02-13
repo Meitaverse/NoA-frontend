@@ -12,15 +12,22 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { useIsMounted } from "../hooks";
 import { chains, wagmiClient } from "@/chain";
 
+// 这些组件可以动态导入来优化，懒得搞了。
 import CommonHeader from "@/components/header/index";
-import "./index.scss";
 import Sider from "@/components/sider";
 import CurrentPanel from "@/components/currentPanel";
 import client from "@/services/apollo";
 import { ApolloProvider } from "@apollo/client";
+import { useRouter } from "next/router";
+import FHeader from "@/components/fHeader";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
+  const { pathname } = useRouter();
+
+  const isManagerRoute = React.useMemo(() => {
+    return pathname.includes("forBkMU");
+  }, [pathname]);
 
   if (!isMounted) return null;
   return (
@@ -41,19 +48,47 @@ const App = ({ Component, pageProps }: AppProps) => {
               side side 
               side side
             */}
-            <CommonHeader></CommonHeader>
-            <div
-              className="main"
-              style={{ flex: 1, display: "flex", background: "#F5f5f5" }}
-            >
-              <Sider></Sider>
+            {isManagerRoute && (
               <div
-                style={{ display: "flex", flexDirection: "column", flex: 1 }}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: "100vh",
+                }}
               >
-                <CurrentPanel></CurrentPanel>
-                <Component {...pageProps} />
+                <CommonHeader></CommonHeader>
+                <div
+                  className="main"
+                  style={{ flex: 1, display: "flex", background: "#F5f5f5" }}
+                >
+                  <Sider></Sider>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flex: 1,
+                    }}
+                  >
+                    <CurrentPanel></CurrentPanel>
+                    <Component {...pageProps} />
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+
+            {!isManagerRoute && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: "100vh",
+                  background:
+                    "linear-gradient(180deg, rgba(16, 20, 78, 0.2) 18.01%, rgba(0, 0, 0, 0) 100%), #0C1048",
+                }}
+              >
+                <FHeader></FHeader>
+              </div>
+            )}
           </div>
         </RainbowKitProvider>
       </WagmiConfig>

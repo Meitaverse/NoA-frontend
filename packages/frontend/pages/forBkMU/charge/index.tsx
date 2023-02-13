@@ -26,6 +26,7 @@ import {
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { profile } from "console";
+import { useBankTreasury } from "@/hooks/useBankTreasury";
 interface IProps {}
 
 const columns: ColumnsType<
@@ -63,7 +64,8 @@ const CreateEvent: FC<IProps> = props => {
     </div>
   );
 
-  const [manager] = useManagerContract();
+  // const [manager] = useManagerContract();
+  const [bankTreasury] = useBankTreasury();
 
   const [name, setName] = useState("bitSoul");
   const [description, setDescription] = useState("Bitsoulhub");
@@ -77,19 +79,26 @@ const CreateEvent: FC<IProps> = props => {
   const cycle = useRef<ReturnType<typeof setInterval>>();
 
   const charge = async () => {
-    if (
-      account.address?.toLowerCase() !==
-      "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".toLowerCase()
-    ) {
-      message.error("当前账号不是Governance账号，充值失败");
-      return;
-    }
+    // if (
+    //   account.address?.toLowerCase() !==
+    //   "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".toLowerCase()
+    // ) {
+    //   message.error("当前账号不是Governance账号，充值失败");
+    //   return;
+    // }
 
     if (!selectAddress) return;
     try {
-      const res = await manager.mintSBTValue(selectAddress, chargeAmount, {
+      // const res = await manager.mintSBTValue(selectAddress, chargeAmount, {
+      //   from: account.address,
+      // });
+      const res = await bankTreasury.buySBT("4", {
+        value: 100000,
         from: account.address,
       });
+      // {
+      //   from: account.address,
+      // }
 
       message.success("充值成功");
       getMintSBTValueResult();
@@ -114,11 +123,11 @@ const CreateEvent: FC<IProps> = props => {
 
   useEffect(() => {
     getProfileResult();
-    getMintSBTValueResult();
+    // getMintSBTValueResult();
 
-    cycle.current = setInterval(() => {
-      getMintSBTValueResult();
-    }, 1000);
+    // cycle.current = setInterval(() => {
+    //   getMintSBTValueResult();
+    // }, 1000);
 
     return () => {
       clearInterval(cycle.current);

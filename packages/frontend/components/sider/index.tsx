@@ -37,14 +37,14 @@ function getItem(
 }
 
 const keyRouter = {
-  createProfile: "/createProfile",
-  createHub: "/createHub",
-  createProject: "/createProject",
-  publish: "/publish",
-  charge: "/charge",
-  collect: "/collect",
-  addWhiteListProfile: "/addWhiteListProfile",
-  addWhiteListHub: "/addWhiteList",
+  createProfile: "/forBkMU/createProfile",
+  createHub: "/forBkMU/createHub",
+  createProject: "/forBkMU/createProject",
+  publish: "/forBkMU/publish",
+  charge: "/forBkMU/charge",
+  collect: "/forBkMU/collect",
+  addWhiteListProfile: "/forBkMU/addWhiteListProfile",
+  addWhiteListHub: "/forBkMU/addWhiteList",
   // eventTable: "/eventTable",
 };
 

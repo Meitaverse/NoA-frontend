@@ -85,7 +85,7 @@ const CreateEvent: FC<IProps> = props => {
 
     if (!selectAddress) return;
     try {
-      const res = await moduleGlobal.whitelistHubCreator(
+      const res = await moduleGlobal.whitelistProfileCreator(
         selectAddress,
         whiteStatus,
         {
@@ -115,7 +115,7 @@ const CreateEvent: FC<IProps> = props => {
 
   useEffect(() => {
     getProfileResult();
-    getMintSBTValueResult();
+    // getMintSBTValueResult();
     // getHubsResult();
   }, []);
 
@@ -128,7 +128,13 @@ const CreateEvent: FC<IProps> = props => {
             name="account"
             rules={[{ required: true, message: "Please upload" }]}
           >
-            <Select
+            <Input
+              value={selectAddress}
+              onChange={e => {
+                setSelectAddress(e.target.value);
+              }}
+            ></Input>
+            {/* <Select
               onChange={val => {
                 setSelectAddress(val);
               }}
@@ -138,7 +144,7 @@ const CreateEvent: FC<IProps> = props => {
                   label: item.wallet,
                 };
               })}
-            ></Select>
+            ></Select> */}
           </Form.Item>
 
           <Form.Item

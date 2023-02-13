@@ -17,6 +17,11 @@
   },
   {
     "inputs": [],
+    "name": "AmountIsZero",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "AmountOnlyIncrease",
     "type": "error"
   },
@@ -57,6 +62,11 @@
   },
   {
     "inputs": [],
+    "name": "HubOwnerNotPermitPublish",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InitParamsInvalid",
     "type": "error"
   },
@@ -73,6 +83,11 @@
   {
     "inputs": [],
     "name": "InvalidParameter",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidProjectId",
     "type": "error"
   },
   {
@@ -98,6 +113,11 @@
   {
     "inputs": [],
     "name": "NotHubOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotProfileOwner",
     "type": "error"
   },
   {
@@ -133,6 +153,16 @@
   {
     "inputs": [],
     "name": "PublishModuleNotWhitelisted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PublisherSetCanNotCollect",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PublishingPaused",
     "type": "error"
   },
   {
@@ -388,6 +418,11 @@
             "internalType": "enum DataTypes.FeeShareType",
             "name": "feeShareType",
             "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "permitByHubOwner",
+            "type": "bool"
           }
         ],
         "internalType": "struct DataTypes.ProjectData",
@@ -414,11 +449,43 @@
         "type": "uint256"
       }
     ],
+    "name": "deleteDefaultRoyalty",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      }
+    ],
     "name": "getDerivativeNFT",
     "outputs": [
       {
         "internalType": "address",
         "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDeverivateNFTAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "deverivateNFTInstance",
         "type": "address"
       }
     ],
@@ -439,6 +506,45 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getGenesisAndPreviousInfo",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -507,6 +613,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "hubOwner",
+            "type": "address"
+          },
+          {
             "internalType": "string",
             "name": "name",
             "type": "string"
@@ -522,7 +633,7 @@
             "type": "string"
           }
         ],
-        "internalType": "struct DataTypes.HubData",
+        "internalType": "struct DataTypes.HubInfoData",
         "name": "",
         "type": "tuple"
       }
@@ -605,9 +716,115 @@
             "internalType": "enum DataTypes.FeeShareType",
             "name": "feeShareType",
             "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "permitByHubOwner",
+            "type": "bool"
           }
         ],
         "internalType": "struct DataTypes.ProjectData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "publishId_",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPublication",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "soulBoundTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hubId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "projectId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "salePrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "royaltyBasisPoints",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "currency",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "canCollect",
+            "type": "bool"
+          },
+          {
+            "internalType": "string[]",
+            "name": "materialURIs",
+            "type": "string[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "fromTokenIds",
+            "type": "uint256[]"
+          },
+          {
+            "internalType": "address",
+            "name": "collectModule",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "collectModuleInitData",
+            "type": "bytes"
+          },
+          {
+            "internalType": "address",
+            "name": "publishModule",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "publishModuleInitData",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct DataTypes.Publication",
         "name": "",
         "type": "tuple"
       }
@@ -663,6 +880,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "currency",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
@@ -676,6 +898,11 @@
             "internalType": "string",
             "name": "description",
             "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "canCollect",
+            "type": "bool"
           },
           {
             "internalType": "string[]",
@@ -756,6 +983,11 @@
                 "type": "uint256"
               },
               {
+                "internalType": "address",
+                "name": "currency",
+                "type": "address"
+              },
+              {
                 "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
@@ -769,6 +1001,11 @@
                 "internalType": "string",
                 "name": "description",
                 "type": "string"
+              },
+              {
+                "internalType": "bool",
+                "name": "canCollect",
+                "type": "bool"
               },
               {
                 "internalType": "string[]",
@@ -909,12 +1146,17 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "governance",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "publishId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isPermit",
+        "type": "bool"
       }
     ],
-    "name": "initialize",
+    "name": "hubOwnerPermitPublishId",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -922,17 +1164,12 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "soulBoundTokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "governance",
+        "type": "address"
       }
     ],
-    "name": "mintSBTValue",
+    "name": "initialize",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -980,6 +1217,11 @@
             "type": "uint256"
           },
           {
+            "internalType": "address",
+            "name": "currency",
+            "type": "address"
+          },
+          {
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
@@ -993,6 +1235,11 @@
             "internalType": "string",
             "name": "description",
             "type": "string"
+          },
+          {
+            "internalType": "bool",
+            "name": "canCollect",
+            "type": "bool"
           },
           {
             "internalType": "string[]",
@@ -1061,16 +1308,62 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "retrieve",
-    "outputs": [
+    "inputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "publishId",
         "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "canCollect",
+        "type": "bool"
       }
     ],
-    "stateMutability": "view",
+    "name": "publisherSetCanCollect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint96",
+        "name": "fraction",
+        "type": "uint96"
+      }
+    ],
+    "name": "setDefaultRoyalty",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "metadataDescriptor",
+        "type": "address"
+      }
+    ],
+    "name": "setDerivativeNFTMetadataDescriptor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1087,6 +1380,24 @@
       }
     ],
     "name": "setDerivativeNFTState",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "soulBoundTokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "dispatcher",
+        "type": "address"
+      }
+    ],
+    "name": "setDispatcher",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1164,7 +1475,7 @@
         "type": "address"
       }
     ],
-    "name": "setGlobalModule",
+    "name": "setGlobalModules",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1231,25 +1542,12 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "newValue",
-        "type": "uint256"
-      }
-    ],
-    "name": "store",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "soulBoundTokenId",
+        "name": "hubId",
         "type": "uint256"
       },
       {
         "internalType": "string",
-        "name": "name",
+        "name": "hubName",
         "type": "string"
       },
       {

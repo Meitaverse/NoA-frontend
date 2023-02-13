@@ -1,10 +1,12 @@
 import { DERIVATIVE_ADDRESS, MANAGER_ADDRESS } from "@/config";
+import { useBankTreasury } from "@/hooks/useBankTreasury";
 import { useDerivative } from "@/hooks/useDerivativeContact";
 import { useSBTContract } from "@/hooks/useSBTContract";
 import { getProfile, IGetProfile } from "@/services/graphql";
 import { RightOutlined, SearchOutlined } from "@ant-design/icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMount } from "ahooks";
+import { Button, message } from "antd";
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useAccount, useConnect } from "wagmi";
 import styles from "./styles.module.scss";
@@ -15,6 +17,7 @@ const Header: FC<IProps> = props => {
   const { address, isConnected } = useAccount();
   const [_, prov] = useSBTContract();
   const [__, prov2] = useDerivative();
+  const [bankTreasury] = useBankTreasury();
 
   const [profiles, setProfiles] = useState<IGetProfile["profiles"]>([]);
 
@@ -27,23 +30,40 @@ const Header: FC<IProps> = props => {
   };
 
   const getBalance = async () => {
-    const profile = profiles.find(
-      item => item.wallet.toLowerCase() === address?.toLowerCase()
-    );
-    if (!profile) {
-      setCurrentBalance(0);
-      return;
+    return;
+    // const profile = profiles.find(
+    //   item => item.wallet.toLowerCase() === address?.toLowerCase()
+    // );
+    // if (!profile) {
+    //   setCurrentBalance(0);
+    //   return;
+    // }
+
+    // await new Promise(resolve => {
+    //   setTimeout(resolve, 2500);
+    // });
+
+    // const res = await prov["balanceOf(uint256)"](profile.soulBoundTokenId, {
+    //   from: address,
+    // });
+
+    // setCurrentBalance(+res);
+  };
+
+  const charge = async () => {
+    try {
+      const res = await bankTreasury.buySBT(4, {
+        value: 10000000,
+        from: address,
+      });
+
+      message.success("充值成功");
+    } catch (e) {
+      console.error(e);
+      console.warn(
+        "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"
+      );
     }
-
-    await new Promise(resolve => {
-      setTimeout(resolve, 2500);
-    });
-
-    const res = await prov["balanceOf(uint256)"](profile.soulBoundTokenId, {
-      from: address,
-    });
-
-    setCurrentBalance(+res);
   };
 
   const currentProfile = useMemo(() => {
@@ -95,6 +115,9 @@ const Header: FC<IProps> = props => {
           <RightOutlined />
         </div>
 
+        <Button style={{ marginLeft: "10px" }} onClick={charge}>
+          Charge
+        </Button>
         {/* {isConnected && <div>{address}</div>}
         {!isConnected && (
           <div className={styles.connectButton}>

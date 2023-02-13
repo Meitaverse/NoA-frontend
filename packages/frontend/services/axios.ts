@@ -1,4 +1,5 @@
-import { message } from 'antd';
+import { API_URL } from "@/config";
+import { message } from "antd";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 type Config = AxiosRequestConfig & {
@@ -8,7 +9,7 @@ type Config = AxiosRequestConfig & {
 };
 
 export type CommonRes<T = any> = {
-  status: "success" | "fail" | "unauth";
+  err_code: number;
   msg?: string;
   data: T;
 };
@@ -19,7 +20,7 @@ type Plugin = {
 };
 
 const instance = axios.create({
-  baseURL: '',
+  baseURL: API_URL,
 });
 
 const usePlugin = (plugin: Plugin) => {
@@ -36,26 +37,32 @@ const loginPlugin: Plugin = {
   request: config => {
     config.headers = {
       ...config.headers,
-      Authorization: localStorage.getItem("token") || "",
+      token: localStorage.getItem("token") || "",
     };
     return config;
   },
   response: data => {
-    return data
+    return data;
   },
 };
 
 const loadingPlugin: Plugin = {
   request: config => {
     if (config.loading) {
-      message.loading(config.loadingText || "加载中...");
+      message.loading({
+        content: config.loadingText || "加载中...",
+        duration: 0,
+        key: "loadingPluginKey",
+      });
     }
 
     return config;
   },
   response: data => {
     const config = data.config as Config;
-
+    if (config.loading) {
+      message.destroy("loadingPluginKey+");
+    }
     return data;
   },
 };
@@ -64,7 +71,7 @@ const alertPlugin: Plugin = {
   response: data => {
     const config = data.config as Config;
     if (config.alert === true) {
-      if (data.data.status !== "success") {
+      if (data.data.err_code !== 0) {
         message.error({
           content: data.data.msg,
         });
@@ -78,17 +85,20 @@ usePlugin(loadingPlugin);
 usePlugin(alertPlugin);
 usePlugin(loginPlugin);
 
+// Plugin保证所有的data和response一致。
 const afterResponse = (res: AxiosResponse<CommonRes>): CommonRes => {
   return {
-    status: res.data.status,
-    data: res.data.data,
+    ...res.data,
   };
 };
 
 instance.interceptors.response.use(afterResponse);
 
 type Request<R, T> = (params?: T, config?: Config) => Promise<CommonRes<R>>;
-type RequestMethod = <R, T = any>(url: string, config?: Config) => Request<R, T>;
+type RequestMethod = <R, T = any>(
+  url: string,
+  config?: Config
+) => Request<R, T>;
 
 const wrapperRequest = (method: Method): RequestMethod => {
   // 默认如果有错误会自动弹出toast，后面也可以关闭。
