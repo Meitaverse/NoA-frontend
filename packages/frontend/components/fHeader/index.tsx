@@ -18,6 +18,7 @@ import LogoImg from "@/images/logo.jpeg";
 import styles from "./index.module.scss";
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { getProfile } from "@/services/graphql";
+import { useRouter } from "next/router";
 
 interface IProps {}
 
@@ -40,10 +41,16 @@ const items: TabsProps["items"] = [
   },
 ];
 
+const navRouter = {
+  Home: "/home",
+  Dashboard: "/dashboard",
+};
+
 const FHeader: FC<IProps> = props => {
+  const router = useRouter();
   const [actTab, setActTab] = useAtom(activeTab);
   const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
-  const [userInfo, setUserInfo] = useAtom(userDetail);
+  const [, setUserInfo] = useAtom(userDetail);
   const { address, isConnected } = useAccount();
   const connect = useConnect();
   const { disconnect } = useDisconnect();
@@ -71,9 +78,7 @@ const FHeader: FC<IProps> = props => {
       label: (
         <span
           onClick={() => {
-            disconnect();
-            localStorage.removeItem("token");
-            setIsLoginStatus(false);
+            logOut();
           }}
         >
           log out
@@ -82,7 +87,7 @@ const FHeader: FC<IProps> = props => {
     },
   ];
 
-  const initUserInfo = async () => {
+  const initUserInfo = async (adr = "") => {
     if (loginLoading.current) return;
     loginLoading.current = true;
     // 存在token的情况下尝试进行登录
@@ -91,12 +96,14 @@ const FHeader: FC<IProps> = props => {
     //    成功则setLoginStatus和userInfo。
     try {
       if (localStorage.getItem("token")) {
-        const { data } = await getUserInfo();
+        const { data } = await getUserInfo({
+          walletAddress: address || adr,
+        });
 
-        if (data.soul_bound_token_id) {
+        if (data.wallet_address) {
           setIsLoginStatus(true);
           setUserInfo(data);
-          return true;
+          return data;
         }
       }
     } finally {
@@ -137,7 +144,7 @@ const FHeader: FC<IProps> = props => {
   const sendValidate = async () => {
     const { err_code } = await sendValidateCode(
       {
-        account: address || "",
+        account: verifyEmail,
         account_type: "email",
         scene: "bindAccount",
       },
@@ -159,18 +166,19 @@ const FHeader: FC<IProps> = props => {
     });
 
     if (err_code === 0) {
-      debugger;
-      // const hash = await manager.createProfile(
-      //   {
-      //     nickName: "",
-      //     imageURI: "",
-      //     wallet: address || "",
-      //   },
-      //   {
-      //     from: address,
-      //   }
-      // );
+      message.success("verify success");
+      router.push("/dashboard");
+      setShowSignInDialog(false);
+      setVerifyStage("InputEmail");
+
+      initUserInfo();
     }
+  };
+
+  const logOut = () => {
+    disconnect();
+    localStorage.removeItem("token");
+    setIsLoginStatus(false);
   };
 
   useEffect(() => {
@@ -182,6 +190,12 @@ const FHeader: FC<IProps> = props => {
       }
     }
   }, [isConnected, isLoginStatus]);
+
+  useEffect(() => {
+    if (router.pathname.includes("dashboard")) {
+      setActTab("Dashboard");
+    }
+  }, []);
 
   return (
     <div className={styles.fHeader}>
@@ -199,6 +213,7 @@ const FHeader: FC<IProps> = props => {
           items={items}
           onChange={key => {
             setActTab(key);
+            router.push(navRouter[key] || "");
           }}
         ></Tabs>
       </div>
@@ -228,83 +243,83 @@ const FHeader: FC<IProps> = props => {
         </Button>
       )}
 
-      {!isLoginStatus && (
-        <Modal
-          className={styles.connectModal}
-          open={openConnectModal}
-          closeIcon={<CloseCircleOutlined style={{ fontSize: "22px" }} />}
-          closable
-          footer={null}
-          onCancel={() => {
-            setOpenConnectModal(false);
-          }}
-          width={1200}
-        >
-          <div className={styles.connectInner}>
-            <div className={styles.connectLeft}>这里应该放一张图片</div>
+      <Modal
+        className={styles.connectModal}
+        open={openConnectModal}
+        closeIcon={<CloseCircleOutlined style={{ fontSize: "22px" }} />}
+        closable
+        footer={null}
+        onCancel={() => {
+          setOpenConnectModal(false);
+        }}
+        width={1200}
+      >
+        <div className={styles.connectInner}>
+          <div className={styles.connectLeft}>这里应该放一张图片</div>
 
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div
-                style={{
-                  fontSize: "64px",
-                  lineHeight: "80px",
-                  marginBottom: "8px",
-                }}
-              >
-                Connect wallet
-              </div>
-
-              <div
-                style={{
-                  fontSize: "22px",
-                  lineHeight: "160%",
-                  marginBottom: "30px",
-                }}
-              >
-                Choose a wallet you want to connect
-              </div>
-
-              <Button
-                className={styles.connectButton}
-                style={{ marginBottom: "20px" }}
-                onClick={async () => {
-                  const connectorInfo = await connect.connectAsync({
-                    connector: metaMask,
-                  });
-
-                  const profile = await getProfile(
-                    `first: 1 where: {wallet: "${connectorInfo.account}"}`
-                  );
-                  // 不存在profile的话则走验证verify的流程。
-                  if (!profile?.data?.profiles?.length) {
-                    setShowSignInDialog(true);
-                  } else {
-                    // 存在就走签名
-                    initLogin();
-                  }
-                }}
-              >
-                Metamask
-              </Button>
-              <Button
-                className={styles.connectButton}
-                // onClick={async () => {
-                //   await connect.connectAsync({
-                //     connector: wall,
-                //   });
-
-                //   setShowSignInDialog(true);
-                // }}
-              >
-                Wallet Connect
-              </Button>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                fontSize: "64px",
+                lineHeight: "80px",
+                marginBottom: "8px",
+              }}
+            >
+              Connect wallet
             </div>
+
+            <div
+              style={{
+                fontSize: "22px",
+                lineHeight: "160%",
+                marginBottom: "30px",
+              }}
+            >
+              Choose a wallet you want to connect
+            </div>
+
+            <Button
+              className={styles.connectButton}
+              style={{ marginBottom: "20px" }}
+              onClick={async () => {
+                const connectorInfo = await connect.connectAsync({
+                  connector: metaMask,
+                });
+
+                // const profile = await getProfile(
+                //   `first: 1 where: {wallet: "${connectorInfo.account}"}`
+                // );
+                await signinWeb2(connectorInfo.account);
+                const userInfo = await initUserInfo(connectorInfo.account);
+                if (!userInfo) {
+                  return;
+                }
+                // 不存在email的话则走验证verify的流程。
+                if (!userInfo.email) {
+                  setShowSignInDialog(true);
+                }
+              }}
+            >
+              Metamask
+            </Button>
+            <Button
+              className={styles.connectButton}
+              // onClick={async () => {
+              //   await connect.connectAsync({
+              //     connector: wall,
+              //   });
+
+              //   setShowSignInDialog(true);
+              // }}
+            >
+              Wallet Connect
+            </Button>
           </div>
-        </Modal>
-      )}
+        </div>
+      </Modal>
 
       {/* TODO: 下面这个组件应该抽离出去，可预见的需要复用，后面再说。 */}
-      {!isLoginStatus && isConnected && (
+      {isConnected && (
         <Modal
           className={styles.verifyDialog}
           width={600}
@@ -316,6 +331,7 @@ const FHeader: FC<IProps> = props => {
             setVerifyStage("SignIn");
             setVerifyEmail("");
             setVerifyCode(new Array(6).fill(""));
+            logOut();
           }}
         >
           {verifyStage === "SignIn" && (
@@ -365,10 +381,11 @@ const FHeader: FC<IProps> = props => {
                   color: "#FFF",
                 }}
                 onClick={async () => {
-                  const u = await signinWeb2();
-                  if (u) {
-                    setVerifyStage("InputEmail");
-                  }
+                  // const u = await signinWeb2();
+                  // if (u) {
+                  //   setVerifyStage("InputEmail");
+                  // }
+                  setVerifyStage("InputEmail");
                 }}
               >
                 Continue

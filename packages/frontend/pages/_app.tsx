@@ -87,6 +87,7 @@ const App = ({ Component, pageProps }: AppProps) => {
                 }}
               >
                 <FHeader></FHeader>
+                <Component {...pageProps} />
               </div>
             )}
           </div>

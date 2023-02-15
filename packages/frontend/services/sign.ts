@@ -11,7 +11,7 @@ export interface signinResponse {
   jwt: string;
 }
 
-export interface getUserInfoResponse {
+export interface getUserDetailResponse {
   create_at: number;
   create_profile_whitelisted: boolean;
   updated_at: number;
@@ -20,6 +20,10 @@ export interface getUserInfoResponse {
   wallet_address: string;
   soul_bound_token_id?: number;
   email?: string;
+
+  // 这些从graph里获取
+  username: string;
+  avatar: string;
 }
 
 export interface sendValidateCodeParams {
@@ -34,8 +38,12 @@ export interface bindAccountParams {
 }
 
 export const signin = post<signinResponse, signinParams>("/signin");
-export const getUserInfo = get<getUserInfoResponse>("/getUserInfo");
+export const getUserInfo = get<
+  getUserDetailResponse,
+  { walletAddress: string }
+>("/api/getUserDetail");
 export const sendValidateCode = post<any, sendValidateCodeParams>(
   "/sendValidateCode"
 );
 export const bindAccount = post<any, bindAccountParams>("/bindAccount");
+export const linkSoulBoundTokenId = post("/linkSoulBoundTokenId");

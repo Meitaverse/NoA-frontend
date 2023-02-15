@@ -35,10 +35,12 @@ const usePlugin = (plugin: Plugin) => {
 
 const loginPlugin: Plugin = {
   request: config => {
-    config.headers = {
-      ...config.headers,
-      token: localStorage.getItem("token") || "",
-    };
+    try {
+      config.headers = {
+        ...config.headers,
+        token: localStorage.getItem("token") || "",
+      };
+    } catch (e) {}
     return config;
   },
   response: data => {
@@ -112,13 +114,22 @@ const wrapperRequest = (method: Method): RequestMethod => {
           ...requestConfig,
         },
       ];
+
+      const baseURL =
+        process.env.NODE_ENV === "development" && url.includes("api/")
+          ? "http://localhost:3000"
+          : config.baseURL;
+
       if (method.toLowerCase() === "get") {
-        realParams = [url, { params: params, ...config, ...requestConfig }];
+        realParams = [
+          url,
+          { params: params, ...config, ...requestConfig, baseURL },
+        ];
       }
 
       // 这里axios的定义是<T = any, R = AxiosResponse<T>, D = any>
       // 如果在responseInterceptor里完全修改了返回值，第一个参数是必传的。
-      return instance[method]<any, CommonRes<R>>(...realParams);
+      return instance[method]<any, CommonRes<R>>(...realParams, baseURL);
     };
   };
 };
@@ -127,3 +138,5 @@ export const post = wrapperRequest("post");
 export const del = wrapperRequest("delete");
 export const put = wrapperRequest("put");
 export const get = wrapperRequest("get");
+
+export const wrapFetch = (url, options) => fetch(`${API_URL}${url}`, options);

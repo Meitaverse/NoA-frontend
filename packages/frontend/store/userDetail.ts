@@ -1,6 +1,7 @@
+import { getUserDetailResponse } from "@/services/sign";
 import { atom } from "jotai";
 
 const isLogin = atom(false);
-const userDetail = atom<Record<any, any>>({});
+const userDetail = atom<getUserDetailResponse | null>(null);
 
 export { isLogin, userDetail };
