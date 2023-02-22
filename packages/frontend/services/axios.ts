@@ -75,7 +75,7 @@ const alertPlugin: Plugin = {
     if (config.alert === true) {
       if (data.data.err_code !== 0) {
         message.error({
-          content: data.data.msg,
+          content: JSON.stringify(data.data.msg),
         });
       }
     }

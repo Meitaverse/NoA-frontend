@@ -56,6 +56,30 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "publishId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getGenesisAndPreviousPublishId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "genesisPublishId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "previousPublishId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getGovernance",
     "outputs": [
@@ -135,6 +159,72 @@
         "internalType": "address",
         "name": "",
         "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "projectId_",
+        "type": "uint256"
+      }
+    ],
+    "name": "getProjectInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "hubId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "soulBoundTokenId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "description",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "image",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "metadataURI",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "descriptor",
+            "type": "address"
+          },
+          {
+            "internalType": "uint16",
+            "name": "defaultRoyaltyPoints",
+            "type": "uint16"
+          },
+          {
+            "internalType": "bool",
+            "name": "permitByHubOwner",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct DataTypes.ProjectData",
+        "name": "",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",

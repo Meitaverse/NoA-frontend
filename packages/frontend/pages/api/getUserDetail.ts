@@ -2,7 +2,7 @@ import { getUserInfo } from "@/services/sign";
 // 该API目录用作中间件，此项目下有些接口需要同时查询GraphQL和后端，统一通过这里定义的中间件来处理为统一的(聚合)返回格式。
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getProfile } from "@/services/graphql";
+import { getProfile, sbtasset } from "@/services/graphql";
 import { wrapFetch } from "@/services/axios";
 
 export default async function handler(
@@ -21,10 +21,18 @@ export default async function handler(
 
   try {
     const profiles = await getProfile(
-      `first: 1 where: {wallet: "${req.query.walletAddress}"}`
+      `first: 1 where: {wallet: "${req.query.walletAddress
+        .toString()
+        .toLowerCase()}"}`
     );
 
     const profile = profiles.data.profiles[0];
+
+    const balance = await sbtasset(
+      req.query.walletAddress.toString().toLowerCase()
+    );
+
+    const myBalance = balance.data.sbtasset?.balance;
 
     const userInfo = await wrapFetch("/getUserInfo", {
       headers: req.headers,
@@ -45,6 +53,7 @@ export default async function handler(
             req.query.walletAddress.length - 4
           )}`,
         avatar: profile?.imageURI || "",
+        balance: myBalance || "0",
       },
     };
 

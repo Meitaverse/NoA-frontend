@@ -1,264 +1,251 @@
-import { Button, Input, message } from "antd";
-import React, { FC, useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
+import React, { FC, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
-import { getUserInfo, linkSoulBoundTokenId } from "@/services/sign";
-import { useAtom } from "jotai";
-import { isLogin, userDetail } from "@/store/userDetail";
-import { useManagerContract } from "@/hooks/useManagerContract";
+import { CopyOutlined, EditOutlined } from "@ant-design/icons";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { useAccount } from "wagmi";
+import { useRouter } from "next/router";
+import { Button, Tabs, TabsProps } from "antd";
 
 interface IProps {}
 
+const items: TabsProps["items"] = [
+  {
+    key: "balance",
+    label: "My Balance",
+  },
+  {
+    key: "DNFT",
+    label: "My DNFT",
+  },
+];
+
 const Dashboard: FC<IProps> = props => {
-  const { address, isConnected } = useAccount();
-  const loginLoading = useRef(false);
-  const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
-  const [userInfo, setUserInfo] = useAtom(userDetail);
-  const [userName, setUserName] = useState(userInfo?.username);
-  const [manager] = useManagerContract();
+  const [userInfo] = useUserInfo();
+  const { address } = useAccount();
 
-  const initUserInfo = async () => {
-    if (loginLoading.current) return;
-    loginLoading.current = true;
-    // 存在token的情况下尝试进行登录
-    // 检查及登录步骤：
-    //    调用接口获取用户信息失败则signinWeb2
-    //    成功则setLoginStatus和userInfo。
-    try {
-      if (localStorage.getItem("token")) {
-        const { data } = await getUserInfo({
-          walletAddress: address || "",
-        });
+  const [actTab, setActTab] = useState("balance");
 
-        if (data.wallet_address) {
-          setIsLoginStatus(true);
-          setUserInfo(data);
-          return data;
-        }
-      }
-    } finally {
-      loginLoading.current = false;
-    }
-
-    return false;
-  };
-
-  console.log(userInfo);
-
-  useEffect(() => {
-    if (isConnected) {
-      initUserInfo();
-    }
-  }, [isConnected]);
-
-  useEffect(() => {
-    setUserName(userInfo?.username);
-  }, [userInfo]);
+  const router = useRouter();
 
   return (
     <div className={styles.dashboard}>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {/* 上下结构 */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: `url(${BgPng.src})`,
-            height: "270px",
-            width: "100%",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-          }}
-        >
-          <div style={{ fontSize: "52px", lineHeight: "78px" }}>
-            Edit Profile
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background: `url(${BgPng.src})`,
+          height: "270px",
+          width: "100%",
+          backgroundRepeat: "no-repeat",
+          backgroundSize: "cover",
+        }}
+      >
+        <div style={{ fontSize: "52px", lineHeight: "78px", color: "#fff" }}>
+          My Asset Library
+        </div>
+      </div>
+
+      <div className={styles.main}>
+        {/* left to right */}
+
+        <div className={styles.userCard}>
+          <div className={styles.avatarWrapper}>
+            <img src={userInfo?.avatar} alt="" />
           </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontSize: "24px",
+              lineHeight: "36px",
+              fontWeight: "700",
+            }}
+          >
+            <span>John haha</span>
+            <EditOutlined
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                router.push("/dashboard/editProfile");
+              }}
+            />
+          </div>
+
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              fontSize: "14px",
-              color: "rgba(255, 255, 255, 0.5)",
+              marginTop: 2,
+              marginBottom: 24,
             }}
           >
-            Home <span style={{ margin: "0 10px" }}>/</span>{" "}
-            <span style={{ color: "#fff" }}>Edit Profile </span>
+            <span
+              style={{
+                marginRight: "15px",
+                fontSize: "16px",
+                lineHeight: "24px",
+              }}
+            >{`${address?.slice(0, 6)}...${address?.slice(
+              address.length - 5
+            )}`}</span>
+            <CopyOutlined />
+          </div>
+
+          <div className={styles.followers}>
+            <div className={styles.followerChunk}>
+              <span className={styles.followerCount}>96</span>
+              <span className={styles.followerTitle}>Followers</span>
+            </div>
+
+            <div className={styles.followerChunk}>
+              <span className={styles.followerCount}>96</span>
+              <span className={styles.followerTitle}>Followers</span>
+            </div>
+
+            <div className={styles.followerChunk}>
+              <span className={styles.followerCount}>96</span>
+              <span className={styles.followerTitle}>Followers</span>
+            </div>
           </div>
         </div>
 
-        <div style={{ padding: "80px 286px", display: "flex" }}>
-          {/* 左右 */}
-          <div
-            style={{
-              display: "flex",
-              marginRight: "33px",
+        <div className={styles.myTabs}>
+          <Tabs
+            activeKey={actTab}
+            defaultActiveKey={actTab}
+            items={items}
+            onChange={key => {
+              setActTab(key);
             }}
-          >
-            <img
-              src={userInfo?.avatar}
-              alt=""
-              style={{
-                width: "128px",
-                height: "128px",
-                borderRadius: "50%",
-                marginRight: "32px",
-              }}
-            />
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span
-                style={{
-                  fontSize: "16px",
-                  color: "#fff",
-                  lineHeight: "24px",
-                  fontWeight: "700",
-                  marginBottom: "10px",
-                }}
-              >
-                Profile photo
-              </span>
+          ></Tabs>
 
-              <span
+          {actTab === "balance" && (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div
                 style={{
-                  width: "145px",
-                  fontSize: "14px",
-                  lineHeight: "22px",
-                  opacity: "0.6",
-                  marginBottom: "10px",
-                  fontFamily: "Poppins",
+                  background: "#242759",
+                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "16px",
+                  height: "116px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  fontSize: "20px",
+                  color: "#fff",
                 }}
               >
-                Recommanded resolution is 640*640 with file size less than 2MB,
-                keep visual elements centered
-              </span>
-              <div className={styles.uploadButtonBg}>
-                <Button className={styles.uploadButton}>Upload</Button>
+                <span style={{ marginBottom: "10px" }}>My Balance</span>
+                <span>1,111,111 Soul</span>
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  width: "100%",
+                  marginTop: 24,
+                  marginBottom: 48,
+                }}
+              >
+                <div
+                  style={{
+                    background: "#242759",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                    borderRadius: "16px",
+                    height: "200px",
+                    padding: "24px 34px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    flex: "1",
+                    marginRight: 24,
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#fff",
+                      fontSize: "24px",
+                      lineHeight: "32px",
+                    }}
+                  >
+                    Deposit
+                  </span>
+                  <Button
+                    className={styles.linearButton}
+                    style={{ marginBottom: "24px", marginTop: "16px" }}
+                  >
+                    Buy SOUL
+                  </Button>
+                  <Button className={styles.linearButton}>
+                    Recharge From SOUL Card
+                  </Button>
+                </div>
+
+                <div
+                  style={{
+                    background: "#242759",
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                    borderRadius: "16px",
+                    height: "200px",
+                    padding: "24px 34px",
+                    flex: "1",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "#fff",
+                      fontSize: "24px",
+                      lineHeight: "32px",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    Withdraw
+                  </span>
+                  <Button className={styles.linearButton}>
+                    Mint SOUL Card
+                  </Button>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  borderTop: "1px solid rgba(230, 232, 236, 0.5)",
+                  padding: "48px 0",
+                  color: "#fff",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <div style={{ fontSize: "20px", lineHeight: "30px" }}>
+                  My SOUL Cards
+                </div>
+                <span
+                  style={{
+                    opacity: "0.8",
+                    fontSize: "12px",
+                    lineHeight: "18px",
+                    marginTop: "4px",
+                  }}
+                >
+                  Add your existing social links to build a stronger reputation
+                </span>
+
+                <div className={styles.soulCards}>
+                  <img src="" alt="" />
+                  <img src="" alt="" />
+                  <img src="" alt="" />
+                  <img src="" alt="" />
+                </div>
               </div>
             </div>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <div
-              style={{
-                fontSize: "20px",
-                lineHeight: "30px",
-                fontWeight: "700",
-                marginBottom: "4px",
-              }}
-            >
-              Personal Setting
-            </div>
-            <span
-              style={{
-                fontSize: "12px",
-                lineHeight: "18px",
-                marginBottom: "20px",
-                opacity: 0.8,
-              }}
-            >
-              You can change your avatar and your user name
-            </span>
-
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: 700,
-                lineHeight: "24px",
-                marginBottom: "15px",
-              }}
-            >
-              Username <span style={{ color: "red" }}>*</span>
-            </div>
-
-            <Input
-              className={styles.inputWrapper}
-              value={userName}
-              defaultValue={userName}
-              onChange={e => {
-                setUserName(e.target.value);
-              }}
-            ></Input>
-
-            <div
-              style={{
-                fontSize: "16px",
-                fontWeight: 700,
-                lineHeight: "24px",
-                marginBottom: "15px",
-              }}
-            >
-              Email <span style={{ color: "red" }}>*</span>
-            </div>
-
-            <Input
-              value={userInfo?.email}
-              placeholder="Email Address"
-              disabled
-              className={styles.inputWrapper}
-              defaultValue={userInfo?.email}
-            ></Input>
-
-            <div className={styles.line}></div>
-
-            <div
-              style={{
-                fontSize: "20px",
-                lineHeight: "30px",
-                fontWeight: "700",
-                marginBottom: "4px",
-              }}
-            >
-              Social Links
-            </div>
-            <span
-              style={{
-                fontSize: "12px",
-                lineHeight: "18px",
-                marginBottom: "20px",
-                opacity: 0.8,
-              }}
-            >
-              Add your existing social links to build a stronger reputation
-            </span>
-
-            <Button
-              style={{
-                border: "none",
-                background:
-                  "linear-gradient(117.55deg, #1E50FF -3.37%, #00DFB7 105.51%)",
-                height: "56px",
-                width: "200px",
-                borderRadius: "16px",
-                fontSize: "16px",
-                color: "#FFF",
-              }}
-              onClick={async () => {
-                if (userInfo?.soul_bound_token_id) {
-                  // 更新Profile信息
-                  return;
-                }
-
-                await manager.createProfile(
-                  {
-                    nickName: userName || "",
-                    imageURI: userInfo?.avatar || "",
-                    wallet: address || "",
-                  },
-                  {
-                    from: address,
-                  }
-                );
-
-                await linkSoulBoundTokenId();
-
-                message.success("save success");
-              }}
-            >
-              Save
-            </Button>
-          </div>
+          )}
         </div>
       </div>
     </div>

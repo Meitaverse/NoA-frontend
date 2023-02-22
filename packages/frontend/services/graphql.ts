@@ -262,3 +262,19 @@ export const getDerivativeNFTAssets = params => {
     }
   }`);
 };
+
+export const profileCreatorWhitelistedRecord = id => {
+  return query<{ profileCreatorWhitelistedRecord?: { id: string } }>(`query{
+    profileCreatorWhitelistedRecord(id: "${id}") {
+      id
+    }
+  }`);
+};
+
+export const sbtasset = id => {
+  return query<{ sbtasset?: { balance: string } }>(`query{
+    sbtasset(id: "${id}") {
+      balance
+    }
+  }`);
+};

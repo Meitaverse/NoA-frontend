@@ -24,7 +24,7 @@ const Header: FC<IProps> = props => {
   const [currentBalance, setCurrentBalance] = useState(0);
 
   const getProfileResult = async () => {
-    const res = await getProfile({});
+    const res = await getProfile();
 
     setProfiles(res.data.profiles);
   };

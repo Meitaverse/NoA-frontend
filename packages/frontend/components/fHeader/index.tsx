@@ -1,24 +1,18 @@
-import {
-  bindAccount,
-  getUserInfo,
-  sendValidateCode,
-  signin,
-} from "@/services/sign";
+import { bindAccount, sendValidateCode, signin } from "@/services/sign";
 import { activeTab } from "@/store/tabs";
 import { isLogin, userDetail } from "@/store/userDetail";
 import { CloseCircleOutlined } from "@ant-design/icons";
-import { useUpdate } from "ahooks";
 import { Input, InputNumber, MenuProps, message } from "antd";
 import { Button, Dropdown, Modal, Tabs, TabsProps } from "antd";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import LogoImg from "@/images/logo.jpeg";
 import styles from "./index.module.scss";
-import { useManagerContract } from "@/hooks/useManagerContract";
-import { getProfile } from "@/services/graphql";
 import { useRouter } from "next/router";
+import PurchaseDialog from "../purchaseDialog";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 interface IProps {}
 
@@ -50,14 +44,13 @@ const FHeader: FC<IProps> = props => {
   const router = useRouter();
   const [actTab, setActTab] = useAtom(activeTab);
   const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
-  const [, setUserInfo] = useAtom(userDetail);
   const { address, isConnected } = useAccount();
   const connect = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnectAsync } = useDisconnect();
   const [metaMask] = useState(new MetaMaskConnector());
-  // const [walletConnector] = useState(new WalletConnectConnector({
 
-  // }));
+  const [userInfo, initUserInfo] = useUserInfo();
+
   const [openConnectModal, setOpenConnectModal] = useState(false);
   const [showSignInDialog, setShowSignInDialog] = useState(false);
   const [verifyStage, setVerifyStage] = useState<
@@ -66,11 +59,8 @@ const FHeader: FC<IProps> = props => {
   const [verifyEmail, setVerifyEmail] = useState("");
   const [verifyCode, setVerifyCode] = useState(new Array(6).fill(""));
   const verifyRefs = useRef<any[]>([]);
-  const { status, signMessageAsync } = useSignMessage();
-  const [manager] = useManagerContract();
-  const loginLoading = useRef(false);
-
-  const update = useUpdate();
+  const { signMessageAsync } = useSignMessage();
+  const [openPurchase, setOpenPurchase] = useState(false);
 
   const dropdownItems: MenuProps["items"] = [
     {
@@ -87,58 +77,33 @@ const FHeader: FC<IProps> = props => {
     },
   ];
 
-  const initUserInfo = async (adr = "") => {
-    if (loginLoading.current) return;
-    loginLoading.current = true;
-    // 存在token的情况下尝试进行登录
-    // 检查及登录步骤：
-    //    调用接口获取用户信息失败则signinWeb2
-    //    成功则setLoginStatus和userInfo。
-    try {
-      if (localStorage.getItem("token")) {
-        const { data } = await getUserInfo({
-          walletAddress: address || adr,
-        });
-
-        if (data.wallet_address) {
-          setIsLoginStatus(true);
-          setUserInfo(data);
-          return data;
-        }
-      }
-    } finally {
-      loginLoading.current = false;
-    }
-
-    return false;
-  };
-
   const signinWeb2 = async (account?: string) => {
     const timestamp = +new Date();
     try {
       const signMsg = await signMessageAsync({
         message: `signin${timestamp}AABBCC`,
       });
-      const { data, err_code } = await signin({
-        wallet_address: address || account || "",
-        timestamp,
-        nonce: "AABBCC",
-        signed: signMsg,
-      });
+      const { data, err_code } = await signin(
+        {
+          wallet_address: address || account || "",
+          timestamp,
+          nonce: "AABBCC",
+          signed: signMsg,
+        },
+        {
+          loading: true,
+        }
+      );
       if (err_code === 0) {
         localStorage.setItem("token", data.jwt || "");
         return true;
       }
     } catch (e) {
-      message.error("签名已拒绝");
+      message.error("登录失败");
+      // 暂时的容错。
+      message.destroy("loadingPluginKey");
       return false;
     }
-  };
-
-  const initLogin = async () => {
-    signinWeb2();
-
-    await initUserInfo();
   };
 
   const sendValidate = async () => {
@@ -175,11 +140,19 @@ const FHeader: FC<IProps> = props => {
     }
   };
 
-  const logOut = () => {
-    disconnect();
+  const logOut = async () => {
+    await disconnectAsync();
     localStorage.removeItem("token");
     setIsLoginStatus(false);
   };
+
+  // const init = async () => {
+  //   const initStatus = await initUserInfo();
+
+  //   if (!initStatus) {
+  //     logOut();
+  //   }
+  // };
 
   useEffect(() => {
     if (isConnected) {
@@ -282,16 +255,20 @@ const FHeader: FC<IProps> = props => {
               className={styles.connectButton}
               style={{ marginBottom: "20px" }}
               onClick={async () => {
+                await logOut();
                 const connectorInfo = await connect.connectAsync({
                   connector: metaMask,
                 });
 
-                // const profile = await getProfile(
-                //   `first: 1 where: {wallet: "${connectorInfo.account}"}`
-                // );
-                await signinWeb2(connectorInfo.account);
+                const status = await signinWeb2(connectorInfo.account);
+                if (!status) {
+                  logOut();
+                  return;
+                }
                 const userInfo = await initUserInfo(connectorInfo.account);
                 if (!userInfo) {
+                  message.error("登录失败");
+                  logOut();
                   return;
                 }
                 // 不存在email的话则走验证verify的流程。
@@ -319,7 +296,7 @@ const FHeader: FC<IProps> = props => {
       </Modal>
 
       {/* TODO: 下面这个组件应该抽离出去，可预见的需要复用，后面再说。 */}
-      {isConnected && (
+      {isConnected && isLoginStatus && (
         <Modal
           className={styles.verifyDialog}
           width={600}
@@ -521,7 +498,7 @@ const FHeader: FC<IProps> = props => {
       {isLoginStatus && (
         <div style={{ display: "flex", alignItems: "center" }}>
           <img
-            src=""
+            src={userInfo?.avatar}
             alt=""
             style={{
               width: "48px",
@@ -531,16 +508,37 @@ const FHeader: FC<IProps> = props => {
             }}
           />
 
+          <div
+            style={{
+              fontSize: "20px",
+              background: "#303654",
+              borderRadius: "8px",
+              padding: "12px 10px",
+              marginRight: "16px",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setOpenPurchase(true);
+            }}
+          >
+            soul: {(Number(userInfo?.balance) || 0) / 10 ** 18}
+          </div>
+
           <Dropdown menu={{ items: dropdownItems }}>
             <div
               style={{
                 fontSize: "20px",
                 color: "#fff",
-                width: "102px",
+                width: "166px",
+                height: "48px",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
                 wordBreak: "keep-all",
                 overflow: "hidden",
+                background: "#303654",
+                borderRadius: "8px",
+                padding: "12px 10px",
+                cursor: "pointer",
               }}
             >
               {address}
@@ -548,6 +546,13 @@ const FHeader: FC<IProps> = props => {
           </Dropdown>
         </div>
       )}
+
+      <PurchaseDialog
+        open={openPurchase}
+        onChange={() => {
+          setOpenPurchase(false);
+        }}
+      ></PurchaseDialog>
     </div>
   );
 };

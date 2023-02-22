@@ -23,13 +23,20 @@ import FHeader from "@/components/fHeader";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
-  const { pathname } = useRouter();
+  const { pathname, push } = useRouter();
 
   const isManagerRoute = React.useMemo(() => {
     return pathname.includes("forBkMU");
   }, [pathname]);
 
+  // React.useEffect(() => {
+  //   if (!pathname) {
+  //     push("/home");
+  //   }
+  // }, []);
+
   if (!isMounted) return null;
+
   return (
     <ApolloProvider client={client}>
       <WagmiConfig client={wagmiClient}>

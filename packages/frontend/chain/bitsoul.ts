@@ -5,8 +5,8 @@ const BitSoul: Chain = {
   name: "BitSoul",
   nativeCurrency: {
     decimals: 18,
-    name: "BitSoul",
-    symbol: "BitSoul",
+    name: "ETH",
+    symbol: "ETH",
   },
   network: "BitSoul",
   rpcUrls: {

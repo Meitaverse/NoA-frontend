@@ -24,6 +24,7 @@ export interface getUserDetailResponse {
   // 这些从graph里获取
   username: string;
   avatar: string;
+  balance: string;
 }
 
 export interface sendValidateCodeParams {

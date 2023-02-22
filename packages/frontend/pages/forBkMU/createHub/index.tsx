@@ -102,7 +102,7 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const getProfileResult = async () => {
-    const res = await getProfile({});
+    const res = await getProfile();
 
     const filterd: IGetProfile["profiles"] = [];
 
@@ -129,14 +129,14 @@ const CreateEvent: FC<IProps> = props => {
 
   useEffect(() => {
     getProfileResult();
-    getHubsResult();
-    cycle.current = setInterval(() => {
-      getHubsResult();
-    }, 1000);
+    // getHubsResult();
+    // cycle.current = setInterval(() => {
+    //   getHubsResult();
+    // }, 1000);
 
-    return () => {
-      clearInterval(cycle.current);
-    };
+    // return () => {
+    //   clearInterval(cycle.current);
+    // };
   }, []);
 
   return (

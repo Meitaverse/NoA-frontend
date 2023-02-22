@@ -14,7 +14,7 @@
     "@apollo/client": "^3.7.1",
     "@rainbow-me/rainbowkit": "^0.5.0",
     "ahooks": "^3.7.2",
-    "antd": "^5.0.3",
+    "antd": "^5.2.2",
     "dayjs": "^1.11.7",
     "ethers": "^5.6.9",
     "graphql": "^16.6.0",

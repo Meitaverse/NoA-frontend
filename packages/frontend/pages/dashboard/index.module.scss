@@ -1,54 +1,122 @@
 .dashboard {
   color: #fff;
 
-  .uploadButtonBg {
-    background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
-    border-radius: 13px;
-    width: 102px;
-    height: 34px;
+  .main {
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .uploadButton {
-    background: linear-gradient(
-        rgba(16, 20, 78, 0.2) 18.01%,
-        rgba(0, 0, 0, 0) 100%
-      ),
-      rgb(12, 16, 72);
-    color: #fff;
-    padding: 5px;
-    width: 100px;
-    height: auto;
-    font-size: 14px;
-    // border-image: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%) 1;
-    // clip-path: inset(0 round 6px);
-    // border-width: 3px;
-    border-radius: 13px;
-    border: none;
-  }
+    padding: 72px 120px;
 
-  .inputWrapper {
-    background: rgba(217, 217, 217, 0.2);
-    border: 1px solid rgba(101, 103, 107, 0.5);
-    border-radius: 20px;
+    .userCard {
+      width: 260px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
 
-    width: 530px;
-    height: 63px;
-    color: #fff;
-    padding: 17px 20px;
-    font-size: 16px;
-    line-height: 22px;
+      .avatarWrapper {
+        position: absolute;
+        top: -130px;
+        left: 0;
+        img {
+          width: 108px;
+          height: 108px;
+          border: 1px solid #fff;
+          border-radius: 50%;
+          overflow: hidden;
+        }
+      }
 
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.3);
+      .followers {
+        border-top: 1px solid #e6e8ec;
+        border-bottom: 1px solid #e6e8ec;
+        padding: 16px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        .followerChunk {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          .followerCount {
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            line-height: 24px;
+          }
+
+          .followerTitle {
+            color: #93989a;
+            font-size: 14px;
+            line-height: 21px;
+          }
+        }
+      }
     }
-  }
 
-  .line {
-    background: #e6e8ec;
-    margin: 40px 0;
-    height: 1px;
-    width: 530px;
+    .myTabs {
+      display: flex;
+      flex-direction: column;
+      margin-left: 53px;
+      min-width: 678px;
+      :global .ant-tabs {
+        margin-bottom: 34px;
+        &-tab {
+          &-btn {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+          }
+        }
+
+        &-tab + .ant-tabs-tab {
+          margin-left: 60px;
+        }
+
+        &-tab-active {
+          .ant-tabs-tab-btn {
+            color: transparent;
+            background: linear-gradient(
+              117.55deg,
+              #1e50ff -3.37%,
+              #00dfb7 105.51%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+        }
+
+        .ant-tabs-ink-bar {
+          background: linear-gradient(
+            117.55deg,
+            #1e50ff -3.37%,
+            #00dfb7 105.51%
+          );
+        }
+      }
+
+      .linearButton {
+        border-radius: 16px;
+        border: none;
+        font-size: 20px;
+        line-height: 30px;
+        color: #fff;
+        background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+        width: 260px;
+        height: 40px;
+        &:hover {
+          color: #fff;
+        }
+      }
+
+      .soulCards {
+        margin-top: 24px;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1fr 1fr;
+        img {
+          width: 327px;
+          height: 200px;
+          border-radius: 50%;
+        }
+      }
+    }
   }
 }

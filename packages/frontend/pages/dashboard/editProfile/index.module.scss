@@ -1,0 +1,54 @@
+.editProfile {
+  color: #fff;
+
+  .uploadButtonBg {
+    background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+    border-radius: 13px;
+    width: 102px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .uploadButton {
+    background: linear-gradient(
+        rgba(16, 20, 78, 0.2) 18.01%,
+        rgba(0, 0, 0, 0) 100%
+      ),
+      rgb(12, 16, 72);
+    color: #fff;
+    padding: 5px;
+    width: 100px;
+    height: auto;
+    font-size: 14px;
+    // border-image: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%) 1;
+    // clip-path: inset(0 round 6px);
+    // border-width: 3px;
+    border-radius: 13px;
+    border: none;
+  }
+
+  .inputWrapper {
+    background: rgba(217, 217, 217, 0.2);
+    border: 1px solid rgba(101, 103, 107, 0.5);
+    border-radius: 20px;
+
+    width: 530px;
+    height: 63px;
+    color: #fff;
+    padding: 17px 20px;
+    font-size: 16px;
+    line-height: 22px;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .line {
+    background: #e6e8ec;
+    margin: 40px 0;
+    height: 1px;
+    width: 530px;
+  }
+}

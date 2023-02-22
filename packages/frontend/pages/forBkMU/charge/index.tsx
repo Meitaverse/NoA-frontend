@@ -111,7 +111,7 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const getProfileResult = async () => {
-    const res = await getProfile({});
+    const res = await getProfile();
 
     setProfiles(res.data.profiles);
   };
