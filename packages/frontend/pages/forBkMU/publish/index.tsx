@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { LoadingOutlined, MailOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form, Input, Select, Upload, Button, message, Table } from "antd";

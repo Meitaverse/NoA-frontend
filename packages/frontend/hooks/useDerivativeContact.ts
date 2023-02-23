@@ -1,4 +1,4 @@
-import { DerivativeNFTV1 } from "@/typechain";
+import { DerivativeNFT } from "@/typechain";
 import { useContract, useProvider, useSigner } from "wagmi";
 
 import abi from "@/contracts/derivative_contracts.json";
@@ -9,13 +9,13 @@ export const useDerivative = () => {
   const { data: signerData } = useSigner();
   const provider = useProvider();
 
-  const signer = useContract<DerivativeNFTV1>({
+  const signer = useContract<DerivativeNFT>({
     addressOrName: DERIVATIVE_ADDRESS,
     contractInterface: abi,
     signerOrProvider: signerData,
   });
 
-  const prov = useContract<DerivativeNFTV1>({
+  const prov = useContract<DerivativeNFT>({
     addressOrName: DERIVATIVE_ADDRESS,
     contractInterface: abi,
     signerOrProvider: provider,

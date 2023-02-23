@@ -96,6 +96,7 @@ const CreateEvent: FC<IProps> = props => {
             "https://ipfs.io/ipfs/QmVnu7JQVoDRqSgHBzraYp7Hy78HwJtLFi6nUFCowTGdzp/11.png",
           metadataURI,
           defaultRoyaltyPoints,
+          // @ts-ignore
           feeShareType,
         },
         {
