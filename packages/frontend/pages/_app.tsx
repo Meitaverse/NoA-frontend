@@ -42,7 +42,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider coolMode chains={chains}>
           <NextHead>
-            <title>NoA</title>
+            <title>BitSoul</title>
           </NextHead>
           <div id="app">
             {/* 

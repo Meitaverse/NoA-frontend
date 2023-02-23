@@ -39,7 +39,7 @@ const PurchaseDialog: FC<IProps> = props => {
   };
 
   const buySBT = async () => {
-    if (!userInfo?.soul_bound_token_id || !data?.decimals) {
+    if (!userInfo?.soul_bound_token_id) {
       message.error("user dont register");
       return false;
     }

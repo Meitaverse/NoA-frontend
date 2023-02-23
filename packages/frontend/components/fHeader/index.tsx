@@ -81,8 +81,21 @@ const FHeader: FC<IProps> = props => {
     const timestamp = +new Date();
     try {
       const signMsg = await signMessageAsync({
-        message: `signin${timestamp}AABBCC`,
+        message: `Welcome to BitSoul!
+
+        Click to sign in and accept the BitSoul Terms of Service: [https://bitsoul.net](https://bitsoul.net)
+        
+        This request will not trigger a blockchain transaction or cost any gas fees.
+        
+        Your authentication status will reset after 48 hours.
+        
+        Wallet address:
+        ${address}
+        
+        Nonce:
+        signin${timestamp}AABBCC`,
       });
+
       const { data, err_code } = await signin(
         {
           wallet_address: address || account || "",
@@ -132,7 +145,7 @@ const FHeader: FC<IProps> = props => {
 
     if (err_code === 0) {
       message.success("verify success");
-      router.push("/dashboard");
+      router.push("/dashboard/editProfile");
       setShowSignInDialog(false);
       setVerifyStage("InputEmail");
 
@@ -264,21 +277,7 @@ const FHeader: FC<IProps> = props => {
                   connector: metaMask,
                 });
 
-                const status = await signinWeb2(connectorInfo.account);
-                if (!status) {
-                  logOut();
-                  return;
-                }
-                const userInfo = await initUserInfo(connectorInfo.account);
-                if (!userInfo) {
-                  message.error("登录失败");
-                  logOut();
-                  return;
-                }
-                // 不存在email的话则走验证verify的流程。
-                if (!userInfo.email) {
-                  setShowSignInDialog(true);
-                }
+                setShowSignInDialog(true);
               }}
             >
               Metamask
@@ -300,7 +299,7 @@ const FHeader: FC<IProps> = props => {
       </Modal>
 
       {/* TODO: 下面这个组件应该抽离出去，可预见的需要复用，后面再说。 */}
-      {isConnected && isLoginStatus && (
+      {isConnected && (
         <Modal
           className={styles.verifyDialog}
           width={600}
@@ -362,11 +361,24 @@ const FHeader: FC<IProps> = props => {
                   color: "#FFF",
                 }}
                 onClick={async () => {
-                  // const u = await signinWeb2();
-                  // if (u) {
-                  //   setVerifyStage("InputEmail");
-                  // }
-                  setVerifyStage("InputEmail");
+                  const status = await signinWeb2(address);
+                  if (!status) {
+                    logOut();
+                    return;
+                  }
+                  const userInfo = await initUserInfo(address);
+                  if (!userInfo) {
+                    message.error("登录失败");
+                    logOut();
+                    return;
+                  }
+                  // 不存在email的话则走验证verify的流程。
+                  if (!userInfo.email) {
+                    setVerifyStage("InputEmail");
+                  } else {
+                    setShowSignInDialog(false);
+                    return;
+                  }
                 }}
               >
                 Continue
@@ -545,7 +557,9 @@ const FHeader: FC<IProps> = props => {
                 cursor: "pointer",
               }}
             >
-              {address}
+              {`${address?.slice(0, 6)}...${address?.slice(
+                address.length - 4
+              )}`}
             </div>
           </Dropdown>
         </div>
