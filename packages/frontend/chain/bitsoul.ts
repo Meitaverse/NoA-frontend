@@ -10,7 +10,7 @@ const BitSoul: Chain = {
   },
   network: "BitSoul",
   rpcUrls: {
-    default: "http://192.168.20.203:8545/",
+    default: "http://52.77.164.208:8545/",
   },
   // testnet: true,
 };
