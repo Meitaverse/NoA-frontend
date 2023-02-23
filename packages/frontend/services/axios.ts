@@ -1,4 +1,4 @@
-import { API_URL } from "@/config";
+import { API_URL, MIDDLEWARE_URL } from "@/config";
 import { message } from "antd";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
@@ -118,6 +118,8 @@ const wrapperRequest = (method: Method): RequestMethod => {
       const baseURL =
         process.env.NODE_ENV === "development" && url.includes("api/")
           ? "http://localhost:3000"
+          : url.includes("api/")
+          ? MIDDLEWARE_URL
           : config.baseURL;
 
       if (method.toLowerCase() === "get") {

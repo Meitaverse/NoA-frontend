@@ -1,3 +1,4 @@
+export const MIDDLEWARE_URL = "http://52.77.164.208:3000";
 export const API_URL = "http://52.77.164.208:8360";
 export const GRAPHQL_URL =
   "http://52.77.164.208:8000/subgraphs/name/NoA/MySubgraph";
