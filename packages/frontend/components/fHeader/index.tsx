@@ -141,9 +141,13 @@ const FHeader: FC<IProps> = props => {
   };
 
   const logOut = async () => {
-    await disconnectAsync();
-    localStorage.removeItem("token");
-    setIsLoginStatus(false);
+    try {
+      await disconnectAsync();
+      localStorage.removeItem("token");
+      setIsLoginStatus(false);
+    } catch (e) {
+      return;
+    }
   };
 
   // const init = async () => {
