@@ -7,6 +7,7 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import { Button, Tabs, TabsProps } from "antd";
 import PurchaseDialog from "@/components/purchaseDialog";
+import { strip } from "@/utils/strip";
 
 interface IProps {}
 
@@ -141,7 +142,9 @@ const Dashboard: FC<IProps> = props => {
                 }}
               >
                 <span style={{ marginBottom: "10px" }}>My Balance</span>
-                <span>{(Number(userInfo?.balance) || 0) / 10 ** 18} Soul</span>
+                <span>
+                  {strip((Number(userInfo?.balance) || 0) / 10 ** 18)} Soul
+                </span>
               </div>
 
               <div

@@ -16,7 +16,12 @@ interface IProps {
 const PurchaseDialog: FC<IProps> = props => {
   const [openState, setOpenState] = usePropsValue({
     value: props.open,
-    onChange: props.onChange,
+    onChange: () => {
+      setInputEth("");
+      setBuying(false);
+      setConfirmBuy(false);
+      props.onChange();
+    },
     defaultValue: false,
   });
 
@@ -52,6 +57,7 @@ const PurchaseDialog: FC<IProps> = props => {
       });
       message.success("bought success");
       setBuying(false);
+      setConfirmBuy(false);
       return true;
     } catch (e) {
       message.error(JSON.stringify(e));
@@ -387,7 +393,6 @@ const PurchaseDialog: FC<IProps> = props => {
                 className={styles.approveButton}
                 onClick={async () => {
                   const state = await buySBT();
-
                   if (state) {
                     const close = Modal.success({
                       width: 600,
@@ -426,9 +431,6 @@ const PurchaseDialog: FC<IProps> = props => {
                             style={{ width: "200px", height: "56px" }}
                             onClick={() => {
                               close.destroy();
-                              setConfirmBuy(false);
-                              setOpenState(false);
-                              initUserInfo();
                             }}
                           >
                             Close

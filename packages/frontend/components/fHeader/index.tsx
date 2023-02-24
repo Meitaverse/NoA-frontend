@@ -13,6 +13,7 @@ import styles from "./index.module.scss";
 import { useRouter } from "next/router";
 import PurchaseDialog from "../purchaseDialog";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import { strip } from "@/utils/strip";
 
 interface IProps {}
 
@@ -540,7 +541,7 @@ const FHeader: FC<IProps> = props => {
               setOpenPurchase(true);
             }}
           >
-            soul: {(Number(userInfo?.balance) || 0) / 10 ** 18}
+            soul: {strip((Number(userInfo?.balance) || 0) / 10 ** 18)}
           </div>
 
           <Dropdown menu={{ items: dropdownItems }}>
