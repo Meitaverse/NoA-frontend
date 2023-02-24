@@ -35,8 +35,9 @@ export default async function handler(
 
     const myHeaders = {
       ...req.headers,
-      connection: "close",
     };
+
+    delete myHeaders.connection;
 
     const userInfo = await wrapFetch("/getUserInfo", {
       headers: myHeaders,
