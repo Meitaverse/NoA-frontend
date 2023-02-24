@@ -7,9 +7,13 @@ import { linkSoulBoundTokenId } from "@/services/sign";
 import { useAtom } from "jotai";
 import { userDetail } from "@/store/userDetail";
 import { useManagerContract } from "@/hooks/useManagerContract";
-import { profileCreatorWhitelistedRecord } from "@/services/graphql";
+import {
+  getSingleProfile,
+  profileCreatorWhitelistedRecord,
+} from "@/services/graphql";
 import { useInterval } from "ahooks";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import { waitForSomething } from "@/utils/waitForSomething";
 
 interface IProps {}
 
@@ -30,7 +34,9 @@ const EditProfile: FC<IProps> = props => {
   const getUserIsWhiteList = async () => {
     if (!address || !userInfo) return;
     if (!userInfo?.create_profile_whitelisted) {
-      const isWhite = await profileCreatorWhitelistedRecord(address);
+      const isWhite = await profileCreatorWhitelistedRecord(
+        address.toLowerCase()
+      );
 
       if (isWhite.data.profileCreatorWhitelistedRecord) {
         setUserInfo({
@@ -253,6 +259,22 @@ const EditProfile: FC<IProps> = props => {
                       from: address,
                     }
                   );
+
+                  message.loading({
+                    content: "loading",
+                    key: "pollingKey",
+                  });
+
+                  try {
+                    await waitForSomething({
+                      func: async () => {
+                        const p = await getSingleProfile(address);
+                        return p;
+                      },
+                    });
+                  } finally {
+                    message.destroy("pollingKey");
+                  }
 
                   await linkSoulBoundTokenId();
                   initUserInfo();

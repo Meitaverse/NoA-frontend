@@ -63,6 +63,20 @@ export const getProfile = (params = "first:100") => {
   }	`);
 };
 
+export const getSingleProfile = (walletAddress = "") => {
+  return query<
+    IGetProfile["profiles"][number]
+  >(`query { profle (id: "${walletAddress}") {
+    id,
+    soulBoundTokenId,
+    creator,
+    wallet,
+    nickName,
+    imageURI,
+    timestamp
+  } }`);
+};
+
 export interface IGetHubs {
   hubs: {
     id: string;

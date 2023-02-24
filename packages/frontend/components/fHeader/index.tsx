@@ -163,20 +163,23 @@ const FHeader: FC<IProps> = props => {
     }
   };
 
-  // const init = async () => {
-  //   const initStatus = await initUserInfo();
+  const init = async () => {
+    const initStatus = await initUserInfo();
 
-  //   if (!initStatus) {
-  //     logOut();
-  //   }
-  // };
+    if (initStatus) {
+      if (!initStatus.email) {
+        setShowSignInDialog(true);
+        setVerifyStage("InputEmail");
+      }
+    }
+  };
 
   useEffect(() => {
     if (isConnected) {
       setOpenConnectModal(false);
 
       if (!isLoginStatus) {
-        initUserInfo();
+        init();
       }
     }
   }, [isConnected, isLoginStatus]);
