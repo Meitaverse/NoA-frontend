@@ -1,4 +1,3 @@
-import { getUserInfo } from "@/services/sign";
 // 该API目录用作中间件，此项目下有些接口需要同时查询GraphQL和后端，统一通过这里定义的中间件来处理为统一的(聚合)返回格式。
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -28,25 +27,19 @@ export default async function handler(
 
     const profile = profiles.data.profiles[0];
 
-    console.log("profile", profile);
-
     const balance = await sbtasset(
       req.query.walletAddress.toString().toLowerCase()
     );
 
     const myBalance = balance.data.sbtasset?.balance;
 
-    console.log("balance", myBalance);
+    console.log("headers", req.headers);
 
     const userInfo = await wrapFetch("/getUserInfo", {
       headers: req.headers,
     });
 
-    console.log("userInfo", userInfo);
-
     const data = await userInfo.json();
-
-    console.log("userInfo Json", data);
 
     const response = {
       ...data,
@@ -64,8 +57,6 @@ export default async function handler(
         balance: myBalance || "0",
       },
     };
-
-    console.log("response", response);
 
     if (response.err_code === 0) {
       res.status(200).json(response);
