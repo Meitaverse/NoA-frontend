@@ -45,16 +45,17 @@ const PurchaseDialog: FC<IProps> = props => {
     }
     try {
       setBuying(true);
+
       await bankTreasury.buySBT(userInfo.soul_bound_token_id, {
-        value: +inputEth * 10 ** 18,
+        value: `${+inputEth * 10 ** 18}`,
         from: address,
       });
       message.success("bought success");
       setBuying(false);
       return true;
     } catch (e) {
+      message.error(JSON.stringify(e));
       setBuying(false);
-
       return false;
     }
   };

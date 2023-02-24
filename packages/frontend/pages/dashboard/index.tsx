@@ -6,6 +6,7 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import { Button, Tabs, TabsProps } from "antd";
+import PurchaseDialog from "@/components/purchaseDialog";
 
 interface IProps {}
 
@@ -25,6 +26,7 @@ const Dashboard: FC<IProps> = props => {
   const { address } = useAccount();
 
   const [actTab, setActTab] = useState("balance");
+  const [showPurchase, setShowPurchase] = useState(false);
 
   const router = useRouter();
 
@@ -65,7 +67,7 @@ const Dashboard: FC<IProps> = props => {
               fontWeight: "700",
             }}
           >
-            <span>John haha</span>
+            <span>{userInfo?.username}</span>
             <EditOutlined
               style={{ cursor: "pointer" }}
               onClick={() => {
@@ -139,7 +141,7 @@ const Dashboard: FC<IProps> = props => {
                 }}
               >
                 <span style={{ marginBottom: "10px" }}>My Balance</span>
-                <span>1,111,111 Soul</span>
+                <span>{(Number(userInfo?.balance) || 0) / 10 ** 18} Soul</span>
               </div>
 
               <div
@@ -177,6 +179,9 @@ const Dashboard: FC<IProps> = props => {
                   <Button
                     className={styles.linearButton}
                     style={{ marginBottom: "24px", marginTop: "16px" }}
+                    onClick={() => {
+                      setShowPurchase(true);
+                    }}
                   >
                     Buy SOUL
                   </Button>
@@ -248,6 +253,13 @@ const Dashboard: FC<IProps> = props => {
           )}
         </div>
       </div>
+
+      <PurchaseDialog
+        open={showPurchase}
+        onChange={() => {
+          setShowPurchase(false);
+        }}
+      ></PurchaseDialog>
     </div>
   );
 };
