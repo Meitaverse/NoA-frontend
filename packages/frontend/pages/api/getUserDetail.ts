@@ -28,17 +28,25 @@ export default async function handler(
 
     const profile = profiles.data.profiles[0];
 
+    console.log("profile", profile);
+
     const balance = await sbtasset(
       req.query.walletAddress.toString().toLowerCase()
     );
 
     const myBalance = balance.data.sbtasset?.balance;
 
+    console.log("balance", myBalance);
+
     const userInfo = await wrapFetch("/getUserInfo", {
       headers: req.headers,
     });
 
+    console.log("userInfo", userInfo);
+
     const data = await userInfo.json();
+
+    console.log("userInfo Json", data);
 
     const response = {
       ...data,
@@ -56,6 +64,8 @@ export default async function handler(
         balance: myBalance || "0",
       },
     };
+
+    console.log("response", response);
 
     if (response.err_code === 0) {
       res.status(200).json(response);
