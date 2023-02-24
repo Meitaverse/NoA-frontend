@@ -33,10 +33,13 @@ export default async function handler(
 
     const myBalance = balance.data.sbtasset?.balance;
 
-    console.log("headers", req.headers);
+    const myHeaders = {
+      ...req.headers,
+      connection: "close",
+    };
 
     const userInfo = await wrapFetch("/getUserInfo", {
-      headers: req.headers,
+      headers: myHeaders,
     });
 
     const data = await userInfo.json();
