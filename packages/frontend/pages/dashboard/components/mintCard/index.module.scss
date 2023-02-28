@@ -1,0 +1,74 @@
+.mintCard {
+  :global .ant-modal-content {
+    background: #252842;
+    border: 1px solid rgba(101, 103, 107, 0.5);
+    border-radius: 20px;
+    padding: 36px 56px;
+  }
+
+  &Inner {
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .amountInput {
+      width: 480px;
+      height: 60px;
+      background: rgba(217, 217, 217, 0.2);
+      border: 1px solid rgba(101, 103, 107, 0.5);
+      border-radius: 20px;
+      padding: 20px;
+      :global .ant-input {
+        background: transparent;
+        font-size: 20px;
+        text-align: right;
+        color: rgba(255, 255, 255, 0.4);
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.4);
+        }
+      }
+    }
+
+    .cancelBg {
+      background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+      border-radius: 13px;
+      width: 202px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 24px;
+      .cancelButton {
+        background: linear-gradient(
+            rgba(16, 20, 78, 0.2) 18.01%,
+            rgba(0, 0, 0, 0) 100%
+          ),
+          rgb(12, 16, 72);
+        color: #fff;
+        padding: 5px;
+        width: 200px;
+        height: 48px;
+        font-size: 18px;
+        border-radius: 13px;
+        border: none;
+      }
+    }
+    .mintButton {
+      flex-grow: 1;
+      height: 50px;
+      font-size: 18px;
+      border-radius: 13px;
+      border: none;
+      color: #fff;
+      background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+      &:hover {
+        color: #fff;
+      }
+
+      &:disabled {
+        background: #dadada;
+      }
+    }
+  }
+}

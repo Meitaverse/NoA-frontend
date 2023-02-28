@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { Button, Tabs, TabsProps } from "antd";
 import PurchaseDialog from "@/components/purchaseDialog";
 import { strip } from "@/utils/strip";
+import MintCard from "./components/mintCard";
+import { formatBalance } from "@/utils/format";
 
 interface IProps {}
 
@@ -28,6 +30,7 @@ const Dashboard: FC<IProps> = props => {
 
   const [actTab, setActTab] = useState("balance");
   const [showPurchase, setShowPurchase] = useState(false);
+  const [showMintCard, setShowMintCard] = useState(false);
 
   const router = useRouter();
 
@@ -143,7 +146,10 @@ const Dashboard: FC<IProps> = props => {
               >
                 <span style={{ marginBottom: "10px" }}>My Balance</span>
                 <span>
-                  {strip((Number(userInfo?.balance) || 0) / 10 ** 18)} Soul
+                  {formatBalance(
+                    strip((Number(userInfo?.balance) || 0) / 10 ** 18)
+                  )}
+                  Soul
                 </span>
               </div>
 
@@ -216,7 +222,12 @@ const Dashboard: FC<IProps> = props => {
                   >
                     Withdraw
                   </span>
-                  <Button className={styles.linearButton}>
+                  <Button
+                    className={styles.linearButton}
+                    onClick={() => {
+                      setShowMintCard(true);
+                    }}
+                  >
                     Mint SOUL Card
                   </Button>
                 </div>
@@ -263,6 +274,13 @@ const Dashboard: FC<IProps> = props => {
           setShowPurchase(false);
         }}
       ></PurchaseDialog>
+
+      <MintCard
+        open={showMintCard}
+        onChange={() => {
+          setShowMintCard(false);
+        }}
+      ></MintCard>
     </div>
   );
 };

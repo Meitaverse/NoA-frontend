@@ -6,7 +6,13 @@ import { Input, InputNumber, MenuProps, message } from "antd";
 import { Button, Dropdown, Modal, Tabs, TabsProps } from "antd";
 import { useAtom } from "jotai";
 import React, { FC, useEffect, useRef, useState } from "react";
-import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useSignMessage,
+  useSwitchNetwork,
+} from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import LogoImg from "@/images/logo.jpeg";
 import styles from "./index.module.scss";
@@ -14,6 +20,7 @@ import { useRouter } from "next/router";
 import PurchaseDialog from "../purchaseDialog";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { strip } from "@/utils/strip";
+import BitSoul from "@/chain/bitsoul";
 
 interface IProps {}
 
@@ -49,6 +56,7 @@ const FHeader: FC<IProps> = props => {
   const connect = useConnect();
   const { disconnectAsync } = useDisconnect();
   const [metaMask] = useState(new MetaMaskConnector());
+  const { switchNetworkAsync } = useSwitchNetwork();
 
   const [userInfo, initUserInfo] = useUserInfo();
 
@@ -277,6 +285,9 @@ const FHeader: FC<IProps> = props => {
               style={{ marginBottom: "20px" }}
               onClick={async () => {
                 await logOut();
+
+                // await switchNetworkAsync?.(BitSoul.id);
+
                 const connectorInfo = await connect.connectAsync({
                   connector: metaMask,
                 });

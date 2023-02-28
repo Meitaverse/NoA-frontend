@@ -197,7 +197,12 @@ const PurchaseDialog: FC<IProps> = props => {
         </div>
 
         <div
-          style={{ marginTop: "36px", display: "flex", marginBottom: "40px" }}
+          style={{
+            marginTop: "36px",
+            display: "flex",
+            marginBottom: "40px",
+            alignItems: "flex-start",
+          }}
         >
           <InfoCircleOutlined
             style={{
