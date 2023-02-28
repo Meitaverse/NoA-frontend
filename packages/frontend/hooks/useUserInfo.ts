@@ -35,6 +35,9 @@ export const useUserInfo: () => [
           setUserInfo(data);
           return data;
         }
+      } else {
+        setUserInfo(null);
+        setIsLoginStatus(false);
       }
     } finally {
       loginLoading.current = false;

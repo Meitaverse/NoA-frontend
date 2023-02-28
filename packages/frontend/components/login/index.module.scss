@@ -1,0 +1,110 @@
+.login {
+  :global .ant-modal-content {
+    background: #252842;
+    box-shadow: 0px 4px 36px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    padding: 79px;
+  }
+  :global .ant-modal-close {
+    top: -40px;
+    color: #fff;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .connectInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .connectButton {
+    background: transparent;
+    color: #fff;
+    padding: 5px;
+    width: 300px;
+    height: auto;
+    font-size: 24px;
+    border-image: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%) 1;
+    clip-path: inset(0 round 6px);
+    border-width: 3px;
+  }
+}
+
+.verifyDialog {
+  .inputVerify {
+    color: rgba(255, 255, 255);
+    padding: 5px 16px;
+    background: #3c3f56;
+    border: 1px solid #798495;
+    border-radius: 16px;
+    width: 320px;
+    margin-bottom: 48px;
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .inputVerifyCode {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #fff;
+    border-radius: 0;
+    width: 38px;
+
+    :global .ant-input-number-input {
+      color: #fff;
+      font-size: 24px;
+      text-align: center;
+
+      &:focus {
+        border: none;
+      }
+    }
+  }
+
+  .inputVerifyCode + .inputVerifyCode {
+    margin-left: 30px;
+  }
+
+  :global .ant-input-number-focused {
+    box-shadow: none;
+  }
+
+  .sendButton,
+  .verifyButton {
+    width: 200px;
+    height: 56px;
+    border-radius: 16px;
+    color: #fff;
+    font-size: 20px;
+    background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+    border: none;
+    &:disabled {
+      background: #dadada;
+    }
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  .verifyButton {
+    margin-top: 50px;
+  }
+
+  :global .ant-modal-content {
+    background: #252842;
+    box-shadow: 0px 4px 36px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    padding: 79px;
+  }
+
+  :global .ant-modal-close {
+    color: #fff;
+    &:hover {
+      color: #fff;
+    }
+  }
+}

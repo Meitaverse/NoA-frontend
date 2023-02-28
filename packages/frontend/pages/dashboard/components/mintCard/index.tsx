@@ -7,6 +7,7 @@ import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal } from "antd";
 import React, { FC, useState } from "react";
 import { useAccount } from "wagmi";
+import { BigNumber } from "bignumber.js";
 import styles from "./index.module.scss";
 
 interface IProps {
@@ -34,7 +35,7 @@ const MintCard: FC<IProps> = props => {
       await voucher.mintBaseNew(
         userInfo.soul_bound_token_id,
         [address],
-        [mintVal],
+        [new BigNumber(+mintVal * 10 ** 18).toFixed()],
         ["https://img.tukuppt.com/photo-big/00/00/94/6152bc0ce6e5d805.jpg"],
         {
           from: address,

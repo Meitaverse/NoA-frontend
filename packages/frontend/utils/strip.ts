@@ -1,3 +1,4 @@
+import { BigNumber } from "bignumber.js";
 export function strip(num, precision = 12) {
-  return +parseFloat(num.toPrecision(precision));
+  return new BigNumber(num).toFixed();
 }

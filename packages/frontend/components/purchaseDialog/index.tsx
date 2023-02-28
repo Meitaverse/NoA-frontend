@@ -7,6 +7,7 @@ import { useAccount, useBalance } from "wagmi";
 import { useBankTreasury } from "@/hooks/useBankTreasury";
 import { SBT_ADDRESS } from "@/config";
 import { useUserInfo } from "@/hooks/useUserInfo";
+import { BigNumber } from "bignumber.js";
 
 interface IProps {
   open: boolean;
@@ -50,9 +51,8 @@ const PurchaseDialog: FC<IProps> = props => {
     }
     try {
       setBuying(true);
-
       await bankTreasury.buySBT(userInfo.soul_bound_token_id, {
-        value: `${+inputEth * 10 ** 18}`,
+        value: new BigNumber(+inputEth * 10 ** 18).toFixed(),
         from: address,
       });
       message.success("bought success");
@@ -192,7 +192,7 @@ const PurchaseDialog: FC<IProps> = props => {
           </div>
 
           <div style={{ color: "#fff", fontSize: "24px", lineHeight: "18px" }}>
-            {+inputEth * currentCurrency}{" "}
+            {new BigNumber(+inputEth * currentCurrency).toFixed()}
           </div>
         </div>
 
@@ -366,7 +366,7 @@ const PurchaseDialog: FC<IProps> = props => {
               <div
                 style={{ color: "#fff", fontSize: "24px", lineHeight: "18px" }}
               >
-                {+inputEth * currentCurrency}
+                {new BigNumber(+inputEth * currentCurrency).toFixed()}
               </div>
             </div>
 

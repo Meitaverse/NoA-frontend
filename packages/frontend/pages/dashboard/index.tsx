@@ -10,6 +10,9 @@ import PurchaseDialog from "@/components/purchaseDialog";
 import { strip } from "@/utils/strip";
 import MintCard from "./components/mintCard";
 import { formatBalance } from "@/utils/format";
+import { useAtom } from "jotai";
+import { isLogin } from "@/store/userDetail";
+import Login from "@/components/login";
 
 interface IProps {}
 
@@ -34,253 +37,273 @@ const Dashboard: FC<IProps> = props => {
 
   const router = useRouter();
 
+  const [isLoginStatus] = useAtom(isLogin);
   return (
-    <div className={styles.dashboard}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          background: `url(${BgPng.src})`,
-          height: "270px",
-          width: "100%",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-        }}
-      >
-        <div style={{ fontSize: "52px", lineHeight: "78px", color: "#fff" }}>
-          My Asset Library
-        </div>
-      </div>
-
-      <div className={styles.main}>
-        {/* left to right */}
-
-        <div className={styles.userCard}>
-          <div className={styles.avatarWrapper}>
-            <img src={userInfo?.avatar} alt="" />
-          </div>
+    <div>
+      {isLoginStatus && (
+        <div className={styles.dashboard}>
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              flexDirection: "column",
               alignItems: "center",
-              fontSize: "24px",
-              lineHeight: "36px",
-              fontWeight: "700",
+              justifyContent: "center",
+              background: `url(${BgPng.src})`,
+              height: "270px",
+              width: "100%",
+              backgroundRepeat: "no-repeat",
+              backgroundSize: "cover",
             }}
           >
-            <span>{userInfo?.username}</span>
-            <EditOutlined
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                router.push("/dashboard/editProfile");
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginTop: 2,
-              marginBottom: 24,
-            }}
-          >
-            <span
-              style={{
-                marginRight: "15px",
-                fontSize: "16px",
-                lineHeight: "24px",
-              }}
-            >{`${address?.slice(0, 6)}...${address?.slice(
-              address.length - 5
-            )}`}</span>
-            <CopyOutlined />
-          </div>
-
-          <div className={styles.followers}>
-            <div className={styles.followerChunk}>
-              <span className={styles.followerCount}>96</span>
-              <span className={styles.followerTitle}>Followers</span>
-            </div>
-
-            <div className={styles.followerChunk}>
-              <span className={styles.followerCount}>96</span>
-              <span className={styles.followerTitle}>Followers</span>
-            </div>
-
-            <div className={styles.followerChunk}>
-              <span className={styles.followerCount}>96</span>
-              <span className={styles.followerTitle}>Followers</span>
+            <div
+              style={{ fontSize: "52px", lineHeight: "78px", color: "#fff" }}
+            >
+              My Asset Library
             </div>
           </div>
-        </div>
 
-        <div className={styles.myTabs}>
-          <Tabs
-            activeKey={actTab}
-            defaultActiveKey={actTab}
-            items={items}
-            onChange={key => {
-              setActTab(key);
-            }}
-          ></Tabs>
+          <div className={styles.main}>
+            {/* left to right */}
 
-          {actTab === "balance" && (
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className={styles.userCard}>
+              <div className={styles.avatarWrapper}>
+                <img src={userInfo?.avatar} alt="" />
+              </div>
               <div
                 style={{
-                  background: "#242759",
-                  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-                  borderRadius: "16px",
-                  height: "116px",
                   display: "flex",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  fontSize: "20px",
-                  color: "#fff",
+                  fontSize: "24px",
+                  lineHeight: "36px",
+                  fontWeight: "700",
                 }}
               >
-                <span style={{ marginBottom: "10px" }}>My Balance</span>
-                <span>
-                  {formatBalance(
-                    strip((Number(userInfo?.balance) || 0) / 10 ** 18)
-                  )}
-                  Soul
-                </span>
+                <span>{userInfo?.username}</span>
+                <EditOutlined
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    router.push("/dashboard/editProfile");
+                  }}
+                />
               </div>
 
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  width: "100%",
-                  marginTop: 24,
-                  marginBottom: 48,
+                  marginTop: 2,
+                  marginBottom: 24,
                 }}
               >
-                <div
-                  style={{
-                    background: "#242759",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-                    borderRadius: "16px",
-                    height: "200px",
-                    padding: "24px 34px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    flex: "1",
-                    marginRight: 24,
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#fff",
-                      fontSize: "24px",
-                      lineHeight: "32px",
-                    }}
-                  >
-                    Deposit
-                  </span>
-                  <Button
-                    className={styles.linearButton}
-                    style={{ marginBottom: "24px", marginTop: "16px" }}
-                    onClick={() => {
-                      setShowPurchase(true);
-                    }}
-                  >
-                    Buy SOUL
-                  </Button>
-                  <Button className={styles.linearButton}>
-                    Recharge From SOUL Card
-                  </Button>
-                </div>
-
-                <div
-                  style={{
-                    background: "#242759",
-                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-                    borderRadius: "16px",
-                    height: "200px",
-                    padding: "24px 34px",
-                    flex: "1",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                  }}
-                >
-                  <span
-                    style={{
-                      color: "#fff",
-                      fontSize: "24px",
-                      lineHeight: "32px",
-                      marginBottom: "16px",
-                    }}
-                  >
-                    Withdraw
-                  </span>
-                  <Button
-                    className={styles.linearButton}
-                    onClick={() => {
-                      setShowMintCard(true);
-                    }}
-                  >
-                    Mint SOUL Card
-                  </Button>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  borderTop: "1px solid rgba(230, 232, 236, 0.5)",
-                  padding: "48px 0",
-                  color: "#fff",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <div style={{ fontSize: "20px", lineHeight: "30px" }}>
-                  My SOUL Cards
-                </div>
                 <span
                   style={{
-                    opacity: "0.8",
-                    fontSize: "12px",
-                    lineHeight: "18px",
-                    marginTop: "4px",
+                    marginRight: "15px",
+                    fontSize: "16px",
+                    lineHeight: "24px",
                   }}
-                >
-                  Add your existing social links to build a stronger reputation
-                </span>
+                >{`${address?.slice(0, 6)}...${address?.slice(
+                  address.length - 5
+                )}`}</span>
+                <CopyOutlined />
+              </div>
 
-                <div className={styles.soulCards}>
-                  <img src="" alt="" />
-                  <img src="" alt="" />
-                  <img src="" alt="" />
-                  <img src="" alt="" />
+              <div className={styles.followers}>
+                <div className={styles.followerChunk}>
+                  <span className={styles.followerCount}>96</span>
+                  <span className={styles.followerTitle}>Followers</span>
+                </div>
+
+                <div className={styles.followerChunk}>
+                  <span className={styles.followerCount}>96</span>
+                  <span className={styles.followerTitle}>Followers</span>
+                </div>
+
+                <div className={styles.followerChunk}>
+                  <span className={styles.followerCount}>96</span>
+                  <span className={styles.followerTitle}>Followers</span>
                 </div>
               </div>
             </div>
-          )}
+
+            <div className={styles.myTabs}>
+              <Tabs
+                activeKey={actTab}
+                defaultActiveKey={actTab}
+                items={items}
+                onChange={key => {
+                  setActTab(key);
+                }}
+              ></Tabs>
+
+              {actTab === "balance" && (
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div
+                    style={{
+                      background: "#242759",
+                      boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                      borderRadius: "16px",
+                      height: "116px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexDirection: "column",
+                      fontSize: "20px",
+                      color: "#fff",
+                    }}
+                  >
+                    <span style={{ marginBottom: "10px" }}>My Balance</span>
+                    <span>
+                      {formatBalance(
+                        strip((Number(userInfo?.balance) || 0) / 10 ** 18)
+                      )}
+                      Soul
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      width: "100%",
+                      marginTop: 24,
+                      marginBottom: 48,
+                    }}
+                  >
+                    <div
+                      style={{
+                        background: "#242759",
+                        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "16px",
+                        height: "200px",
+                        padding: "24px 34px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        flex: "1",
+                        marginRight: 24,
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: "#fff",
+                          fontSize: "24px",
+                          lineHeight: "32px",
+                        }}
+                      >
+                        Deposit
+                      </span>
+                      <Button
+                        className={styles.linearButton}
+                        style={{ marginBottom: "24px", marginTop: "16px" }}
+                        onClick={() => {
+                          setShowPurchase(true);
+                        }}
+                      >
+                        Buy SOUL
+                      </Button>
+                      <Button className={styles.linearButton}>
+                        Recharge From SOUL Card
+                      </Button>
+                    </div>
+
+                    <div
+                      style={{
+                        background: "#242759",
+                        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+                        borderRadius: "16px",
+                        height: "200px",
+                        padding: "24px 34px",
+                        flex: "1",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <span
+                        style={{
+                          color: "#fff",
+                          fontSize: "24px",
+                          lineHeight: "32px",
+                          marginBottom: "16px",
+                        }}
+                      >
+                        Withdraw
+                      </span>
+                      <Button
+                        className={styles.linearButton}
+                        onClick={() => {
+                          setShowMintCard(true);
+                        }}
+                      >
+                        Mint SOUL Card
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      borderTop: "1px solid rgba(230, 232, 236, 0.5)",
+                      padding: "48px 0",
+                      color: "#fff",
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <div style={{ fontSize: "20px", lineHeight: "30px" }}>
+                      My SOUL Cards
+                    </div>
+                    <span
+                      style={{
+                        opacity: "0.8",
+                        fontSize: "12px",
+                        lineHeight: "18px",
+                        marginTop: "4px",
+                      }}
+                    >
+                      Add your existing social links to build a stronger
+                      reputation
+                    </span>
+
+                    <div className={styles.soulCards}>
+                      <img src="" alt="" />
+                      <img src="" alt="" />
+                      <img src="" alt="" />
+                      <img src="" alt="" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <PurchaseDialog
+            open={showPurchase}
+            onChange={() => {
+              setShowPurchase(false);
+            }}
+          ></PurchaseDialog>
+
+          <MintCard
+            open={showMintCard}
+            onChange={() => {
+              setShowMintCard(false);
+            }}
+          ></MintCard>
         </div>
-      </div>
-
-      <PurchaseDialog
-        open={showPurchase}
-        onChange={() => {
-          setShowPurchase(false);
-        }}
-      ></PurchaseDialog>
-
-      <MintCard
-        open={showMintCard}
-        onChange={() => {
-          setShowMintCard(false);
-        }}
-      ></MintCard>
+      )}
+      {!isLoginStatus && (
+        <div
+          style={{
+            width: "1200px",
+            padding: "200px 80px",
+            margin: "0 auto",
+            color: "#fff",
+          }}
+        >
+          <Login></Login>
+        </div>
+      )}
     </div>
   );
 };

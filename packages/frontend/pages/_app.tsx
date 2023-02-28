@@ -20,6 +20,10 @@ import client from "@/services/apollo";
 import { ApolloProvider } from "@apollo/client";
 import { useRouter } from "next/router";
 import FHeader from "@/components/fHeader";
+import Login from "@/components/login";
+import { useAtom } from "jotai";
+import { isLogin } from "@/store/userDetail";
+import { useUserInfo } from "@/hooks/useUserInfo";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();
@@ -28,12 +32,6 @@ const App = ({ Component, pageProps }: AppProps) => {
   const isManagerRoute = React.useMemo(() => {
     return pathname.includes("forBkMU");
   }, [pathname]);
-
-  // React.useEffect(() => {
-  //   if (!pathname) {
-  //     push("/home");
-  //   }
-  // }, []);
 
   if (!isMounted) return null;
 
@@ -94,6 +92,9 @@ const App = ({ Component, pageProps }: AppProps) => {
                 }}
               >
                 <FHeader></FHeader>
+                <div style={{ display: "none" }}>
+                  <Login></Login>
+                </div>
                 <Component {...pageProps} />
               </div>
             )}
