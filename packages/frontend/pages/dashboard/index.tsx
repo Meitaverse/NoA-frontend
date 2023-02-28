@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
 import { CopyOutlined, EditOutlined } from "@ant-design/icons";
@@ -13,6 +13,8 @@ import { formatBalance } from "@/utils/format";
 import { useAtom } from "jotai";
 import { isLogin } from "@/store/userDetail";
 import Login from "@/components/login";
+import { voucherAssets, VoucherAssets } from "@/services/graphql";
+import Recharge from "./components/recharge";
 
 interface IProps {}
 
@@ -34,10 +36,26 @@ const Dashboard: FC<IProps> = props => {
   const [actTab, setActTab] = useState("balance");
   const [showPurchase, setShowPurchase] = useState(false);
   const [showMintCard, setShowMintCard] = useState(false);
+  const [showRecharge, setShowRecharge] = useState(false);
+  const [myCards, setMyCards] = useState<VoucherAssets["voucherAssets"]>([]);
 
   const router = useRouter();
 
   const [isLoginStatus] = useAtom(isLogin);
+
+  const getMyCards = async () => {
+    const cards = await voucherAssets(address?.toLowerCase());
+
+    if (cards.data.voucherAssets) {
+      setMyCards(cards.data.voucherAssets);
+    }
+  };
+
+  useEffect(() => {
+    if (!address) return;
+    getMyCards();
+  }, [address]);
+
   return (
     <div>
       {isLoginStatus && (
@@ -202,7 +220,12 @@ const Dashboard: FC<IProps> = props => {
                       >
                         Buy SOUL
                       </Button>
-                      <Button className={styles.linearButton}>
+                      <Button
+                        className={styles.linearButton}
+                        onClick={() => {
+                          setShowRecharge(true);
+                        }}
+                      >
                         Recharge From SOUL Card
                       </Button>
                     </div>
@@ -266,10 +289,19 @@ const Dashboard: FC<IProps> = props => {
                     </span>
 
                     <div className={styles.soulCards}>
-                      <img src="" alt="" />
-                      <img src="" alt="" />
-                      <img src="" alt="" />
-                      <img src="" alt="" />
+                      {myCards?.map(i => {
+                        return (
+                          <img
+                            src="1"
+                            alt={`tokenId: ${i.tokenId}`}
+                            title={i.tokenId}
+                            style={{
+                              background:
+                                "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",
+                            }}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -290,6 +322,13 @@ const Dashboard: FC<IProps> = props => {
               setShowMintCard(false);
             }}
           ></MintCard>
+
+          <Recharge
+            open={showRecharge}
+            onChange={() => {
+              setShowRecharge(false);
+            }}
+          ></Recharge>
         </div>
       )}
       {!isLoginStatus && (

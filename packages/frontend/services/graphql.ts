@@ -292,3 +292,21 @@ export const sbtasset = id => {
     }
   }`);
 };
+
+export interface VoucherAssets {
+  voucherAssets?: {
+    id: string;
+    tokenId: string;
+    value: string;
+  }[];
+}
+
+export const voucherAssets = wallet => {
+  return query<VoucherAssets>(`query{
+    voucherAssets(first: 10, where: { wallet: "${wallet}" }) {
+      id,
+      tokenId,
+      value
+    }
+  }`);
+};
