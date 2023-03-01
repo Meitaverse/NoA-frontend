@@ -26,6 +26,7 @@ import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { profile } from "console";
 import { useModuleGlobalContract } from "@/hooks/useModuleGlobalContract";
+import { useVoucher } from "@/hooks/useVoucherContact";
 interface IProps {}
 
 const columns: ColumnsType<

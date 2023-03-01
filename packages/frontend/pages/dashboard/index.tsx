@@ -44,8 +44,11 @@ const Dashboard: FC<IProps> = props => {
   const [isLoginStatus] = useAtom(isLogin);
 
   const getMyCards = async () => {
-    const cards = await voucherAssets(address?.toLowerCase());
-
+    const cards = await voucherAssets({
+      first: 10,
+      skip: 0,
+      wallet: address?.toLowerCase() || "",
+    });
     if (cards.data.voucherAssets) {
       setMyCards(cards.data.voucherAssets);
     }
@@ -295,6 +298,7 @@ const Dashboard: FC<IProps> = props => {
                             src="1"
                             alt={`tokenId: ${i.tokenId}`}
                             title={i.tokenId}
+                            key={i.tokenId}
                             style={{
                               background:
                                 "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",

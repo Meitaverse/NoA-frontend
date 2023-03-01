@@ -301,9 +301,15 @@ export interface VoucherAssets {
   }[];
 }
 
-export const voucherAssets = wallet => {
+export interface VoucherAssetsParams {
+  first: number;
+  skip: number;
+  wallet: string;
+}
+
+export const voucherAssets = (params: VoucherAssetsParams) => {
   return query<VoucherAssets>(`query{
-    voucherAssets(first: 10, where: { wallet: "${wallet}" }) {
+    voucherAssets(first: ${params.first}, skip: ${params.skip}, where: { wallet: "${params.wallet}" }) {
       id,
       tokenId,
       value
