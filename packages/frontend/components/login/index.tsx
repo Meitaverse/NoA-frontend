@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
+import loginPng from "@/images/login.png";
 import styles from "./index.module.scss";
 
 interface IProps {}
@@ -137,7 +138,9 @@ const Login: FC<IProps> = props => {
   return (
     <div className={styles.login}>
       <div className={styles.connectInner}>
-        <div className={styles.connectLeft}>这里应该放一张图片</div>
+        <div className={styles.connectLeft}>
+          <img src={loginPng.src} alt="" />
+        </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div

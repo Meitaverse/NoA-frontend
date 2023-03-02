@@ -12,6 +12,7 @@ import styles from "./index.module.scss";
 import { VoucherAssets, voucherAssets } from "@/services/graphql";
 import { useBankTreasury } from "@/hooks/useBankTreasury";
 import useScrollBottom from "@/hooks/useScrollBottom";
+import { getBgNow } from "@/services/voucher";
 
 interface IProps {
   open: boolean;
@@ -88,6 +89,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
   const getMyCards = async (type: "reset" | "next" = "next") => {
     if (type === "reset") {
       finished.current = false;
+      getMyCardParams.current.skip = 0;
     }
     if (finished.current) return;
     if (loading.current) return;
@@ -128,6 +130,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
   useScrollBottom(() => {
     getMyCards();
   }, cardArea);
+
   return (
     <div className={styles.rechargeInner}>
       <div

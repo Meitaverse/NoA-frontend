@@ -324,6 +324,7 @@ const Dashboard: FC<IProps> = props => {
             open={showMintCard}
             onChange={() => {
               setShowMintCard(false);
+              getMyCards();
             }}
           ></MintCard>
 
@@ -331,6 +332,7 @@ const Dashboard: FC<IProps> = props => {
             open={showRecharge}
             onChange={() => {
               setShowRecharge(false);
+              getMyCards();
             }}
           ></Recharge>
         </div>

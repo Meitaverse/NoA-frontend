@@ -12,6 +12,47 @@
     flex-direction: column;
     align-items: center;
 
+    .mintCardPreview {
+      position: relative;
+      &LeftTop {
+        position: absolute;
+        left: 23px;
+        top: 47px;
+        display: flex;
+        align-items: center;
+        img {
+          width: 16px;
+          height: 16px;
+          object-fit: cover;
+        }
+      }
+
+      &RightTop {
+        position: absolute;
+        top: 47px;
+        right: 23px;
+        display: flex;
+        align-items: center;
+        line-height: 1;
+      }
+
+      &LeftBottom {
+        position: absolute;
+        left: 23px;
+        bottom: 44px;
+        display: flex;
+        align-items: flex-end;
+      }
+
+      &RightBottom {
+        font-size: 14px;
+        color: #fff;
+        position: absolute;
+        right: 23px;
+        bottom: 44px;
+      }
+    }
+
     .amountInput {
       width: 480px;
       height: 60px;

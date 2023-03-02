@@ -5,10 +5,13 @@ import { formatBalance } from "@/utils/format";
 import { strip } from "@/utils/strip";
 import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal } from "antd";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { BigNumber } from "bignumber.js";
 import styles from "./index.module.scss";
+import { getBgNow } from "@/services/voucher";
+import logoPng from "@/images/logo.jpeg";
+import dayjs from "dayjs";
 
 interface IProps {
   open: boolean;
@@ -25,6 +28,7 @@ const MintCard: FC<IProps> = props => {
   const { address } = useAccount();
   const [mintVal, setMintVal] = useState("");
   const [mintLoading, setMintLoading] = useState(false);
+  const [nowBg, setNowBg] = useState("");
   const [userInfo] = useUserInfo();
   const [voucher] = useVoucher();
 
@@ -43,11 +47,24 @@ const MintCard: FC<IProps> = props => {
       );
 
       message.success("mint success");
+      setOpenState(false);
     } finally {
       setMintLoading(false);
     }
   };
+  const getNowBg = async () => {
+    const data = await getBgNow();
 
+    if (data.err_code === 0) {
+      setNowBg(data.data.url);
+    }
+  };
+
+  useEffect(() => {
+    if (openState) {
+      getNowBg();
+    }
+  }, [openState]);
   return (
     <Modal
       className={styles.mintCard}
@@ -102,17 +119,56 @@ const MintCard: FC<IProps> = props => {
           </span>
         </div>
 
-        <img
-          src=""
-          alt=""
-          style={{
-            borderRadius: "10px",
-            width: "327px",
-            height: "200px",
-            marginTop: "24px",
-            marginBottom: "19px",
-          }}
-        />
+        <div className={styles.mintCardPreview}>
+          <img
+            className={styles.mintCardPreviewBg}
+            src={nowBg}
+            alt=""
+            style={{
+              borderRadius: "12px",
+              width: "327px",
+              height: "200px",
+              marginTop: "24px",
+              marginBottom: "19px",
+            }}
+          />
+          <div className={styles.mintCardPreviewLeftTop}>
+            <img src={logoPng.src} alt="" />
+            <span
+              style={{ fontStyle: "italic", fontWeight: 700, marginLeft: 4 }}
+            >
+              BITSOUL
+            </span>
+          </div>
+          <div className={styles.mintCardPreviewRightTop}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                transform: "scale(0.5)",
+                marginRight: 2,
+              }}
+            >
+              <span>MINT</span>
+              <span>DATE</span>
+            </div>
+            <div>{dayjs().format("DD/MM/YY")}</div>
+          </div>
+          <div className={styles.mintCardPreviewLeftBottom}>
+            <span
+              style={{
+                fontSize: "32px",
+                fontWeight: 700,
+                marginRight: "4px",
+                lineHeight: "1.2",
+              }}
+            >
+              {mintVal}
+            </span>
+            <span style={{ fontSize: "16px" }}>SOUL</span>
+          </div>
+          <div className={styles.mintCardPreviewRightBottom}>#1991</div>
+        </div>
 
         <div
           style={{
