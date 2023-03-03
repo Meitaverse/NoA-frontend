@@ -159,7 +159,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
                     "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",
                 }}
               >
-                <img src={"1"} alt={card.tokenId} />
+                <img src={card.uri.uri} alt={card.tokenId} />
               </div>
             );
           })}

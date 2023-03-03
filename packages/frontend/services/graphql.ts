@@ -298,6 +298,9 @@ export interface VoucherAssets {
     id: string;
     tokenId: string;
     value: string;
+    uri: {
+      uri: string;
+    };
   }[];
 }
 
@@ -312,7 +315,10 @@ export const voucherAssets = (params: VoucherAssetsParams) => {
     voucherAssets(first: ${params.first}, skip: ${params.skip}, where: { wallet: "${params.wallet}" }) {
       id,
       tokenId,
-      value
+      value,
+      uri {
+        uri
+      }
     }
   }`);
 };

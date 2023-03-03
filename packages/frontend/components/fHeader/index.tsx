@@ -132,7 +132,7 @@ const FHeader: FC<IProps> = props => {
         </Button>
       )}
 
-      {!isLoginStatus && (
+      {(!isLoginStatus || (isLoginStatus && !userInfo?.email)) && (
         <Modal
           className={styles.connectModal}
           open={openConnectModal}
@@ -144,7 +144,11 @@ const FHeader: FC<IProps> = props => {
           }}
           width={1200}
         >
-          <Login></Login>
+          <Login
+            onConnect={() => {
+              setOpenConnectModal(false);
+            }}
+          ></Login>
         </Modal>
       )}
 

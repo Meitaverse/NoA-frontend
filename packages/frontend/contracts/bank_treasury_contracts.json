@@ -447,7 +447,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "amountOfSBT",
+          "name": "amount",
           "type": "uint256"
         }
       ],
@@ -706,14 +706,21 @@
       "name": "getExchangePrice",
       "outputs": [
         {
-          "internalType": "uint256",
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "currencyAmount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "sbtAmount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct DataTypes.ExchangePrice",
           "name": "",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
+          "type": "tuple"
         }
       ],
       "stateMutability": "view",
@@ -1187,19 +1194,6 @@
       "name": "marketUnlockFor",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "name",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {

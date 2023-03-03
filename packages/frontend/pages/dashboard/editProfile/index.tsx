@@ -283,6 +283,7 @@ const EditProfile: FC<IProps> = props => {
                     initUserInfo();
                     message.success("save success");
                   } catch (e) {
+                    console.error(e);
                     message.error("save error");
                   }
                 }}
@@ -293,7 +294,7 @@ const EditProfile: FC<IProps> = props => {
           </div>
         </div>
       )}
-      {!isLoginStatus && (
+      {(!isLoginStatus || (isLoginStatus && !userInfo?.email)) && (
         <div
           style={{ width: "1200px", padding: "200px 80px", margin: "0 auto" }}
         >

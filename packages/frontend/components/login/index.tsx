@@ -10,7 +10,9 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import loginPng from "@/images/login.png";
 import styles from "./index.module.scss";
 
-interface IProps {}
+interface IProps {
+  onConnect?: () => void;
+}
 
 const Login: FC<IProps> = props => {
   const router = useRouter();
@@ -176,6 +178,10 @@ const Login: FC<IProps> = props => {
               });
 
               setShowSignInDialog(true);
+
+              if (props.onConnect) {
+                props.onConnect();
+              }
             }}
           >
             Metamask

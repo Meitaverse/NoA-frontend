@@ -295,7 +295,7 @@ const Dashboard: FC<IProps> = props => {
                       {myCards?.map(i => {
                         return (
                           <img
-                            src="1"
+                            src={i.uri.uri}
                             alt={`tokenId: ${i.tokenId}`}
                             title={i.tokenId}
                             key={i.tokenId}
@@ -337,7 +337,7 @@ const Dashboard: FC<IProps> = props => {
           ></Recharge>
         </div>
       )}
-      {!isLoginStatus && (
+      {(!isLoginStatus || (isLoginStatus && !userInfo?.email)) && (
         <div
           style={{
             width: "1200px",

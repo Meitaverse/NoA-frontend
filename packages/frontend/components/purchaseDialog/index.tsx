@@ -8,6 +8,7 @@ import { useBankTreasury } from "@/hooks/useBankTreasury";
 import { SBT_ADDRESS } from "@/config";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { BigNumber } from "bignumber.js";
+import { useCallbackEvent } from "@/hooks/useCallbackEvent";
 
 interface IProps {
   open: boolean;
@@ -38,10 +39,15 @@ const PurchaseDialog: FC<IProps> = props => {
   const [buying, setBuying] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState(false);
   const [userInfo, initUserInfo] = useUserInfo();
+  const refreshTransction = useCallbackEvent();
 
   const getSBTExchangeRate = async () => {
-    const currency = await bankTreasury.getExchangePrice(SBT_ADDRESS);
-    setCurrentCurrency(currency[1].toNumber());
+    try {
+      const currency = await bankTreasury.getExchangePrice(SBT_ADDRESS);
+      setCurrentCurrency(currency[1].toNumber());
+    } catch (e) {
+      message.error("用户未注册");
+    }
   };
 
   const buySBT = async () => {
@@ -51,11 +57,20 @@ const PurchaseDialog: FC<IProps> = props => {
     }
     try {
       setBuying(true);
-      await bankTreasury.buySBT(userInfo.soul_bound_token_id, {
+      const { hash } = await bankTreasury.buySBT(userInfo.soul_bound_token_id, {
         value: new BigNumber(+inputEth * 10 ** 18).toFixed(),
         from: address,
       });
-      message.success("bought success");
+
+      const result = await refreshTransction(hash);
+
+      if (result) {
+        message.success("bought success");
+      } else {
+        message.success(
+          "bought may fail transction timeout, please wait for a while."
+        );
+      }
       setBuying(false);
       setConfirmBuy(false);
       return true;
@@ -399,6 +414,7 @@ const PurchaseDialog: FC<IProps> = props => {
                 onClick={async () => {
                   const state = await buySBT();
                   if (state) {
+                    initUserInfo();
                     const close = Modal.success({
                       width: 600,
                       className: styles.purchaseSuccessModal,
