@@ -111,10 +111,10 @@
         display: grid;
         gap: 24px;
         grid-template-columns: 1fr 1fr;
-        img {
+        .soulCardImg {
           width: 327px;
           height: 200px;
-          border-radius: 10px;
+          border-radius: 12px;
         }
       }
     }
@@ -124,7 +124,7 @@
       &LeftTop {
         position: absolute;
         left: 23px;
-        top: 47px;
+        top: 27px;
         display: flex;
         align-items: center;
         .cornerLogo {
@@ -136,7 +136,7 @@
 
       &RightTop {
         position: absolute;
-        top: 47px;
+        top: 20px;
         right: 23px;
         display: flex;
         align-items: center;
@@ -146,7 +146,7 @@
       &LeftBottom {
         position: absolute;
         left: 23px;
-        bottom: 44px;
+        bottom: 24px;
         display: flex;
         align-items: flex-end;
       }
@@ -156,7 +156,7 @@
         color: #fff;
         position: absolute;
         right: 23px;
-        bottom: 44px;
+        bottom: 24px;
       }
     }
   }

@@ -7,7 +7,6 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
 import { Button, Tabs, TabsProps } from "antd";
 import PurchaseDialog from "@/components/purchaseDialog";
-import { strip } from "@/utils/strip";
 import MintCard from "./components/mintCard";
 import { formatBalance } from "@/utils/format";
 import { useAtom } from "jotai";
@@ -190,9 +189,7 @@ const Dashboard: FC<IProps> = props => {
                   >
                     <span style={{ marginBottom: "10px" }}>My Balance</span>
                     <span>
-                      {formatBalance(
-                        strip((Number(userInfo?.balance) || 0) / 10 ** 18)
-                      )}
+                      {toSoul(userInfo?.balance)}
                       Soul
                     </span>
                   </div>
@@ -311,6 +308,7 @@ const Dashboard: FC<IProps> = props => {
                         if (i.uri.uri) {
                           return (
                             <img
+                              className={styles.soulCardImg}
                               src={i.uri.uri}
                               alt={`tokenId: ${i.tokenId}`}
                               title={i.tokenId}
@@ -371,7 +369,7 @@ const Dashboard: FC<IProps> = props => {
                                   fontSize: "32px",
                                   fontWeight: 700,
                                   marginRight: "4px",
-                                  lineHeight: "1.2",
+                                  lineHeight: "1",
                                 }}
                               >
                                 {toSoul(i.value)}
@@ -379,7 +377,7 @@ const Dashboard: FC<IProps> = props => {
                               <span style={{ fontSize: "16px" }}>SOUL</span>
                             </div>
                             <div className={styles.mintCardPreviewRightBottom}>
-                              #{i.tokenId}
+                              <i>#{i.tokenId}</i>
                             </div>
                           </div>
                         );

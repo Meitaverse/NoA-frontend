@@ -11,7 +11,6 @@ import styles from "./index.module.scss";
 import { useRouter } from "next/router";
 import PurchaseDialog from "../purchaseDialog";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { strip } from "@/utils/strip";
 import Login from "../login";
 import { toSoul } from "@/utils/toSoul";
 
@@ -183,7 +182,7 @@ const FHeader: FC<IProps> = props => {
               setOpenPurchase(true);
             }}
           >
-            soul: {toSoul(userInfo?.balance)}
+            soul: {toSoul(userInfo?.balance, false)}
           </div>
 
           <Dropdown menu={{ items: dropdownItems }}>

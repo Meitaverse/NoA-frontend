@@ -1,6 +1,12 @@
+import BigNumber from "bignumber.js";
 import { formatBalance } from "./format";
-import { strip } from "./strip";
 
-export const toSoul = balance => {
-  return formatBalance(strip((Number(balance) || 0) / 10 ** 18));
+export const toSoul = (balance, withFormat = true) => {
+  const bigNumber = new BigNumber(balance);
+
+  if (withFormat) {
+    return formatBalance(bigNumber.dividedBy(10 ** 18).toFixed());
+  }
+
+  return bigNumber.dividedBy(10 ** 18).toFixed();
 };
