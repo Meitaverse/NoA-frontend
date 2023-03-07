@@ -9,6 +9,7 @@ import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import loginPng from "@/images/login.png";
 import styles from "./index.module.scss";
+import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
 
 interface IProps {
   onConnect?: () => void;
@@ -23,6 +24,8 @@ const Login: FC<IProps> = props => {
   const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
   const [userInfo, initUserInfo] = useUserInfo();
   const [metaMask] = useState(new MetaMaskConnector());
+  const { switchToSoulAsync } = useSwitchToSoul();
+
   const [showSignInDialog, setShowSignInDialog] = useState(false);
   const [verifyStage, setVerifyStage] = useState<
     "SignIn" | "InputEmail" | "Verify"
@@ -180,12 +183,11 @@ const Login: FC<IProps> = props => {
             onClick={async () => {
               await logOut();
 
-              // await switchNetworkAsync?.(BitSoul.id);
-
               try {
                 const connectorInfo = await connect.connectAsync({
                   connector: metaMask,
                 });
+
                 setShowSignInDialog(true);
                 if (props.onConnect) {
                   props.onConnect();

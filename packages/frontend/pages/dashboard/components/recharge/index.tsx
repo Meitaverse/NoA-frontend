@@ -11,6 +11,7 @@ import { useBankTreasury } from "@/hooks/useBankTreasury";
 import useScrollBottom from "@/hooks/useScrollBottom";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { toSoul } from "@/utils/toSoul";
+import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 
 interface IProps {
   open: boolean;
@@ -52,6 +53,8 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
   const { openState } = props;
   const { address } = useAccount();
   const refreshHash = useTransctionPending();
+  const isCurrentNetwork = useIsCurrentNetwork();
+
   const [rechargeLoading, setRechargeLoading] = useState(false);
   const [transctionLoading, setTransctionLoading] = useState(false);
   const [userInfo, initUserInfo] = useUserInfo();
@@ -242,7 +245,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
         <Button
           className={styles.mintButton}
           loading={rechargeLoading || transctionLoading}
-          disabled={!selectedCard}
+          disabled={!selectedCard || !isCurrentNetwork}
           onClick={() => {
             recharge();
           }}

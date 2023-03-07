@@ -12,6 +12,7 @@ import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { toSoul } from "@/utils/toSoul";
+import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 
 interface IProps {
   open: boolean;
@@ -33,6 +34,7 @@ const MintCard: FC<IProps> = props => {
   const [userInfo, initUserInfo] = useUserInfo();
   const [voucher] = useVoucher();
   const refreshHash = useTransctionPending();
+  const isCurrentNetwork = useIsCurrentNetwork();
 
   const mint = async () => {
     try {
@@ -232,7 +234,11 @@ const MintCard: FC<IProps> = props => {
           <Button
             className={styles.mintButton}
             loading={mintLoading || transcitonLoading}
-            disabled={!mintVal || Number(mintVal) > (userInfo?.balance || 0)}
+            disabled={
+              !mintVal ||
+              Number(mintVal) > (userInfo?.balance || 0) ||
+              !isCurrentNetwork
+            }
             onClick={() => {
               mint();
             }}

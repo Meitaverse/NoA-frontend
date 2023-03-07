@@ -13,6 +13,7 @@ import { getExchangePrices } from "@/services/graphql";
 import logoPng from "@/images/logo.jpeg";
 import ethSvg from "@/images/eth.svg";
 import downArrowPng from "@/images/downArrow.png";
+import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 interface IProps {
   open: boolean;
   onChange: () => void;
@@ -36,14 +37,15 @@ const PurchaseDialog: FC<IProps> = props => {
     addressOrName: address,
     watch: true,
   });
+  const [userInfo, initUserInfo] = useUserInfo();
+  const refreshTransction = useTransctionPending();
+  const isCurrentNetwork = useIsCurrentNetwork();
 
   const [inputEth, setInputEth] = useState("");
   const [currentCurrency, setCurrentCurrency] = useState(0);
   const [buying, setBuying] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState(false);
   const [transactionLoading, setTransactionLoading] = useState(false);
-  const [userInfo, initUserInfo] = useUserInfo();
-  const refreshTransction = useTransctionPending();
 
   const getSBTExchangeEthRate = async () => {
     try {
@@ -262,7 +264,7 @@ const PurchaseDialog: FC<IProps> = props => {
         </div>
 
         <Button
-          disabled={!!!inputEth}
+          disabled={!!!inputEth || !isCurrentNetwork}
           className={styles.approveButton}
           onClick={() => {
             setConfirmBuy(true);

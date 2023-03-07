@@ -16,6 +16,7 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import { waitForSomething } from "@/utils/waitForSomething";
 import Login from "@/components/login";
 import { useSBTContract } from "@/hooks/useSBTContract";
+import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 
 interface IProps {}
 
@@ -26,6 +27,7 @@ const EditProfile: FC<IProps> = props => {
   const [userName, setUserName] = useState(userInfo?.username);
   const [manager] = useManagerContract();
   const [isLoginStatus] = useAtom(isLogin);
+  const isCurrentNetwork = useIsCurrentNetwork();
 
   const clear = useInterval(() => {
     if (!userInfo) return;
@@ -245,7 +247,9 @@ const EditProfile: FC<IProps> = props => {
                   fontSize: "16px",
                   color: "#FFF",
                 }}
-                disabled={!userInfo?.create_profile_whitelisted}
+                disabled={
+                  !userInfo?.create_profile_whitelisted || !isCurrentNetwork
+                }
                 onClick={async () => {
                   if (userInfo?.soul_bound_token_id) {
                     // 更新Profile信息
@@ -274,7 +278,7 @@ const EditProfile: FC<IProps> = props => {
                       await waitForSomething({
                         func: async () => {
                           const p = await getSingleProfile(address);
-                          return p.data;
+                          return !!p.data;
                         },
                       });
                     } finally {

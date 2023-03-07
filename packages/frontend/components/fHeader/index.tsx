@@ -1,6 +1,9 @@
 import { activeTab } from "@/store/tabs";
 import { isLogin } from "@/store/userDetail";
-import { CloseCircleOutlined } from "@ant-design/icons";
+import {
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { MenuProps } from "antd";
 import { Button, Dropdown, Modal, Tabs, TabsProps } from "antd";
 import { useAtom } from "jotai";
@@ -13,6 +16,8 @@ import PurchaseDialog from "../purchaseDialog";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import Login from "../login";
 import { toSoul } from "@/utils/toSoul";
+import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
+import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
 
 interface IProps {}
 
@@ -46,11 +51,10 @@ const FHeader: FC<IProps> = props => {
   const [isLoginStatus, setIsLoginStatus] = useAtom(isLogin);
   const { address, isConnected } = useAccount();
   const { disconnectAsync } = useDisconnect();
-
   const [userInfo, initUserInfo] = useUserInfo();
-
+  const isCurrentNetwork = useIsCurrentNetwork();
+  const { switchToSoul } = useSwitchToSoul();
   const [openConnectModal, setOpenConnectModal] = useState(false);
-
   const [openPurchase, setOpenPurchase] = useState(false);
 
   const dropdownItems: MenuProps["items"] = [
@@ -124,12 +128,6 @@ const FHeader: FC<IProps> = props => {
           }}
           onClick={() => {
             setOpenConnectModal(true);
-            // if (!isConnected) {
-            //   setOpenConnectModal(true);
-            //   return;
-            // }
-
-            // setShowSignInDialog(true);
           }}
         >
           Connect
@@ -158,22 +156,34 @@ const FHeader: FC<IProps> = props => {
 
       {isLoginStatus && (
         <div style={{ display: "flex", alignItems: "center" }}>
-          <img
-            src={userInfo?.avatar}
-            alt=""
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              marginRight: "16px",
-            }}
-          />
-
+          {!isCurrentNetwork && (
+            <div
+              style={{
+                fontSize: "16px",
+                background: "#373963",
+                borderRadius: "16px",
+                padding: "12px 10px",
+                marginRight: "16px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              onClick={() => {
+                switchToSoul();
+              }}
+            >
+              <ExclamationCircleOutlined
+                style={{ marginRight: "6px", color: "#fff", fontSize: "24px" }}
+              />
+              Wrong Network
+            </div>
+          )}
           <div
             style={{
               fontSize: "20px",
-              background: "#303654",
-              borderRadius: "8px",
+              background: "#373963",
+              borderRadius: "16px",
               padding: "12px 10px",
               marginRight: "16px",
               cursor: "pointer",
@@ -185,27 +195,37 @@ const FHeader: FC<IProps> = props => {
             soul: {toSoul(userInfo?.balance, false)}
           </div>
 
+          <div
+            style={{
+              fontSize: "20px",
+              color: "#fff",
+              width: "166px",
+              height: "48px",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              wordBreak: "keep-all",
+              overflow: "hidden",
+              background: "#373963",
+              borderRadius: "16px",
+              padding: "12px 10px",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+          >
+            {`${address?.slice(0, 6)}...${address?.slice(address.length - 4)}`}
+          </div>
+
           <Dropdown menu={{ items: dropdownItems }}>
-            <div
+            <img
+              src={userInfo?.avatar}
+              alt=""
               style={{
-                fontSize: "20px",
-                color: "#fff",
-                width: "166px",
+                width: "48px",
                 height: "48px",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-                wordBreak: "keep-all",
-                overflow: "hidden",
-                background: "#303654",
-                borderRadius: "8px",
-                padding: "12px 10px",
-                cursor: "pointer",
+                borderRadius: "50%",
+                marginRight: "16px",
               }}
-            >
-              {`${address?.slice(0, 6)}...${address?.slice(
-                address.length - 4
-              )}`}
-            </div>
+            />
           </Dropdown>
         </div>
       )}
