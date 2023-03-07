@@ -143,9 +143,9 @@
     font-size: 20px;
     background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
     border: none;
-    &:disabled {
-      background: #dadada;
-    }
+    // &:disabled {
+    //   background: #dadada;
+    // }
     &:hover {
       color: #fff;
     }

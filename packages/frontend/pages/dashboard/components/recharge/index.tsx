@@ -1,18 +1,16 @@
 import { usePropsValue } from "@/hooks/usePropsValue";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { useVoucher } from "@/hooks/useVoucherContact";
-import { formatBalance } from "@/utils/format";
-import { strip } from "@/utils/strip";
+
 import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal, Select } from "antd";
 import React, { FC, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
-import { BigNumber } from "bignumber.js";
 import styles from "./index.module.scss";
 import { VoucherAssets, voucherAssets } from "@/services/graphql";
 import { useBankTreasury } from "@/hooks/useBankTreasury";
 import useScrollBottom from "@/hooks/useScrollBottom";
-import { getBgNow } from "@/services/voucher";
+import { useTransctionPending } from "@/hooks/useTransctionPending";
+import { toSoul } from "@/utils/toSoul";
 
 interface IProps {
   open: boolean;
@@ -40,25 +38,28 @@ const Recharge: FC<IProps> = props => {
         setOpenState(false);
       }}
     >
-      <RechargeInner {...{ ...props, openState, setOpenState }}></RechargeInner>
+      <div>
+        {openState && <RechargeInner openState={openState}></RechargeInner>}
+      </div>
     </Modal>
   );
 };
 
-interface InnerProps extends IProps {
+interface InnerProps {
   openState: boolean;
-  setOpenState: (...args: any) => void;
 }
 const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
-  const { openState, setOpenState } = props;
+  const { openState } = props;
   const { address } = useAccount();
-  const [mintLoading, setRechargeLoading] = useState(false);
-  const [userInfo] = useUserInfo();
+  const refreshHash = useTransctionPending();
+  const [rechargeLoading, setRechargeLoading] = useState(false);
+  const [transctionLoading, setTransctionLoading] = useState(false);
+  const [userInfo, initUserInfo] = useUserInfo();
   const [bankTreasury] = useBankTreasury();
   const [myCards, setMyCards] = useState<VoucherAssets["voucherAssets"]>([]);
   const [selectedCard, setSelectedCard] = useState("");
-  const cardArea = useRef<HTMLDivElement>(null);
 
+  const cardArea = useRef<HTMLDivElement>(null);
   const loading = useRef(false);
   const finished = useRef(false);
   const getMyCardParams = useRef({
@@ -70,7 +71,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
     try {
       setRechargeLoading(true);
       if (!userInfo?.soul_bound_token_id || !address) return;
-      await bankTreasury.depositFromVoucher(
+      const { hash } = await bankTreasury.depositFromVoucher(
         selectedCard,
         userInfo.soul_bound_token_id,
         {
@@ -78,11 +79,24 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
         }
       );
 
-      message.success("recharge success");
-
-      getMyCards();
+      setTransctionLoading(true);
+      setRechargeLoading(false);
+      const result = await refreshHash(hash);
+      if (result) {
+        const newMyCards = myCards?.filter(i => i.tokenId !== selectedCard);
+        setMyCards(newMyCards);
+        setSelectedCard("");
+        if (getMyCardParams.current.skip > 0) {
+          getMyCardParams.current.skip -= 1;
+        }
+        initUserInfo();
+        message.success("recharge success");
+      }
+    } catch (e) {
+      console.error(e);
     } finally {
       setRechargeLoading(false);
+      setTransctionLoading(false);
     }
   };
 
@@ -124,7 +138,9 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
     if (!address) {
       return;
     }
-    getMyCards("reset");
+    if (openState) {
+      getMyCards("reset");
+    }
   }, [address, openState]);
 
   useScrollBottom(() => {
@@ -154,12 +170,16 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
                 onClick={() => {
                   setSelectedCard(card.tokenId);
                 }}
-                style={{
-                  background:
-                    "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",
-                }}
               >
-                <img src={card.uri.uri} alt={card.tokenId} />
+                <img
+                  src={card.uri.uri}
+                  alt={card.tokenId}
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                    objectFit: "cover",
+                  }}
+                />
               </div>
             );
           })}
@@ -182,12 +202,9 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
         className={styles.amountInput}
         disabled
         value={
-          formatBalance(
-            new BigNumber(
-              Number(myCards?.find(i => i.tokenId === selectedCard)?.value) /
-                10 ** 18
-            ).toFixed()
-          ) || 0
+          selectedCard
+            ? toSoul(myCards?.find(i => i.tokenId === selectedCard)?.value)
+            : 0
         }
         placeholder="enter amount"
         prefix={<div style={{ color: "#fff" }}>SOUL</div>}
@@ -222,25 +239,19 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
           width: "424px",
         }}
       >
-        <div className={styles.cancelBg}>
-          <Button
-            className={styles.cancelButton}
-            onClick={() => {
-              setOpenState(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
         <Button
           className={styles.mintButton}
-          loading={mintLoading}
+          loading={rechargeLoading || transctionLoading}
           disabled={!selectedCard}
           onClick={() => {
             recharge();
           }}
         >
-          Recharge
+          {transctionLoading
+            ? "Transaction Pending"
+            : rechargeLoading
+            ? "Confirm transction in wallet"
+            : "Recharge"}
         </Button>
       </div>
     </div>

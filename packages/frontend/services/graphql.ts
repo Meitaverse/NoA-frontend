@@ -66,7 +66,7 @@ export const getProfile = (params = "first:100") => {
 export const getSingleProfile = (walletAddress = "") => {
   return query<
     IGetProfile["profiles"][number]
-  >(`query { profle (id: "${walletAddress}") {
+  >(`query { profile (id: "${walletAddress}") {
     id,
     soulBoundTokenId,
     creator,
@@ -103,6 +103,38 @@ export const getHubs = params => {
       timestamp
     }
   }	`);
+};
+
+export const getExchangePrices = () => {
+  return query<{
+    exchangePrices: {
+      currency: string;
+      currencyName: string;
+      currencySymbol: string;
+      currencyDecimals: number;
+      currencyAmount: string;
+      sbtAmount: string;
+    }[];
+  }>(`query{
+    exchangePrices{
+      currency
+      currencyName
+      currencySymbol
+      currencyDecimals
+      currencyAmount
+      sbtAmount
+    }
+  }	`);
+};
+
+export const getTransactionHistory = hash => {
+  return query<{
+    transactionHashHistories: { id: string }[];
+  }>(`query {
+    transactionHashHistories(first: 1 where: { id: "${hash}" }) {
+      id
+    }
+  }`);
 };
 
 export interface IGetProjects {
@@ -294,7 +326,7 @@ export const sbtasset = id => {
 };
 
 export interface VoucherAssets {
-  voucherAssets?: {
+  voucherAssets: {
     id: string;
     tokenId: string;
     value: string;

@@ -30,10 +30,12 @@ const Login: FC<IProps> = props => {
   const [verifyEmail, setVerifyEmail] = useState("");
   const [verifyCode, setVerifyCode] = useState(new Array(6).fill(""));
   const verifyRefs = useRef<any[]>([]);
+  const [signLoading, setSignLoading] = useState(false);
 
   const signinWeb2 = async (account?: string) => {
     const timestamp = +new Date();
     try {
+      setSignLoading(true);
       const signMsg = await signMessageAsync({
         message: `Welcome to BitSoul!
 
@@ -70,6 +72,8 @@ const Login: FC<IProps> = props => {
       // 暂时的容错。
       message.destroy("loadingPluginKey");
       return false;
+    } finally {
+      setSignLoading(false);
     }
   };
 
@@ -139,7 +143,12 @@ const Login: FC<IProps> = props => {
 
   return (
     <div className={styles.login}>
-      <div className={styles.connectInner}>
+      <div
+        className={styles.connectInner}
+        style={{
+          display: isLoginStatus && !userInfo?.email ? "none" : "flex",
+        }}
+      >
         <div className={styles.connectLeft}>
           <img src={loginPng.src} alt="" />
         </div>
@@ -173,14 +182,16 @@ const Login: FC<IProps> = props => {
 
               // await switchNetworkAsync?.(BitSoul.id);
 
-              const connectorInfo = await connect.connectAsync({
-                connector: metaMask,
-              });
-
-              setShowSignInDialog(true);
-
-              if (props.onConnect) {
-                props.onConnect();
+              try {
+                const connectorInfo = await connect.connectAsync({
+                  connector: metaMask,
+                });
+                setShowSignInDialog(true);
+                if (props.onConnect) {
+                  props.onConnect();
+                }
+              } catch (e) {
+                message.error("cannot found Metamask");
               }
             }}
           >
@@ -271,8 +282,9 @@ const Login: FC<IProps> = props => {
                     return;
                   }
                 }}
+                loading={signLoading}
               >
-                Continue
+                {signLoading ? "Waiting for signing" : "Continue"}
               </Button>
             </div>
           )}

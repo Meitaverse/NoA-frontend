@@ -12,8 +12,8 @@ import { useRouter } from "next/router";
 import PurchaseDialog from "../purchaseDialog";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { strip } from "@/utils/strip";
-import BitSoul from "@/chain/bitsoul";
 import Login from "../login";
+import { toSoul } from "@/utils/toSoul";
 
 interface IProps {}
 
@@ -104,6 +104,10 @@ const FHeader: FC<IProps> = props => {
             setActTab(key);
             router.push(navRouter[key] || "");
           }}
+          onTabClick={key => {
+            setActTab(key);
+            router.push(navRouter[key] || "");
+          }}
         ></Tabs>
       </div>
 
@@ -120,10 +124,11 @@ const FHeader: FC<IProps> = props => {
             color: "#FFF",
           }}
           onClick={() => {
-            if (!isConnected) {
-              setOpenConnectModal(true);
-              return;
-            }
+            setOpenConnectModal(true);
+            // if (!isConnected) {
+            //   setOpenConnectModal(true);
+            //   return;
+            // }
 
             // setShowSignInDialog(true);
           }}
@@ -178,7 +183,7 @@ const FHeader: FC<IProps> = props => {
               setOpenPurchase(true);
             }}
           >
-            soul: {strip((Number(userInfo?.balance) || 0) / 10 ** 18)}
+            soul: {toSoul(userInfo?.balance)}
           </div>
 
           <Dropdown menu={{ items: dropdownItems }}>

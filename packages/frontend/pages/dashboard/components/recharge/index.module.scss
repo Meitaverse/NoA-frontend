@@ -66,9 +66,9 @@
         color: #fff;
       }
 
-      &:disabled {
-        background: #dadada;
-      }
+      // &:disabled {
+      //   background: #dadada;
+      // }
     }
 
     .chooseCard {
@@ -108,6 +108,7 @@
           height: 120px;
           border-radius: 10px;
           border: 2px solid transparent;
+          overflow: hidden;
         }
 
         .choosen {

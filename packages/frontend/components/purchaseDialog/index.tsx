@@ -8,8 +8,11 @@ import { useBankTreasury } from "@/hooks/useBankTreasury";
 import { SBT_ADDRESS } from "@/config";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { BigNumber } from "bignumber.js";
-import { useCallbackEvent } from "@/hooks/useCallbackEvent";
-
+import { useTransctionPending } from "@/hooks/useTransctionPending";
+import { getExchangePrices } from "@/services/graphql";
+import logoPng from "@/images/logo.jpeg";
+import ethSvg from "@/images/eth.svg";
+import downArrowPng from "@/images/downArrow.png";
 interface IProps {
   open: boolean;
   onChange: () => void;
@@ -38,15 +41,21 @@ const PurchaseDialog: FC<IProps> = props => {
   const [currentCurrency, setCurrentCurrency] = useState(0);
   const [buying, setBuying] = useState(false);
   const [confirmBuy, setConfirmBuy] = useState(false);
+  const [transactionLoading, setTransactionLoading] = useState(false);
   const [userInfo, initUserInfo] = useUserInfo();
-  const refreshTransction = useCallbackEvent();
+  const refreshTransction = useTransctionPending();
 
-  const getSBTExchangeRate = async () => {
+  const getSBTExchangeEthRate = async () => {
     try {
-      const currency = await bankTreasury.getExchangePrice(SBT_ADDRESS);
-      setCurrentCurrency(currency[1].toNumber());
+      const prices = await getExchangePrices();
+      const ethPrice = prices.data.exchangePrices.find(
+        i => i.currencySymbol === "ETH"
+      );
+      if (ethPrice) {
+        setCurrentCurrency(+ethPrice?.sbtAmount || 0);
+      }
     } catch (e) {
-      message.error("用户未注册");
+      message.error("获取SBT汇率失败");
     }
   };
 
@@ -61,7 +70,8 @@ const PurchaseDialog: FC<IProps> = props => {
         value: new BigNumber(+inputEth * 10 ** 18).toFixed(),
         from: address,
       });
-
+      setBuying(false);
+      setTransactionLoading(true);
       const result = await refreshTransction(hash);
 
       if (result) {
@@ -71,19 +81,20 @@ const PurchaseDialog: FC<IProps> = props => {
           "bought may fail transction timeout, please wait for a while."
         );
       }
-      setBuying(false);
       setConfirmBuy(false);
-      return true;
+      return hash;
     } catch (e) {
       message.error(JSON.stringify(e));
-      setBuying(false);
       return false;
+    } finally {
+      setBuying(false);
+      setTransactionLoading(false);
     }
   };
 
   useEffect(() => {
     if (isConnected && openState) {
-      setTimeout(getSBTExchangeRate, 1000);
+      getSBTExchangeEthRate();
     }
   }, [isConnected, openState]);
 
@@ -135,7 +146,7 @@ const PurchaseDialog: FC<IProps> = props => {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+
                 border: "1px solid rgb(140 140 141)",
                 padding: "8px",
                 width: "170px",
@@ -143,31 +154,44 @@ const PurchaseDialog: FC<IProps> = props => {
                 borderRadius: "16px",
               }}
             >
-              <span
-                style={{ fontSize: "16px", lineHeight: "1", color: "#FFF" }}
-              >
-                ETH
-              </span>
-              <span
+              <img
+                src={ethSvg.src}
+                alt=""
+                style={{ width: "32px", height: "32px", objectFit: "contain" }}
+              />
+              <div
                 style={{
-                  fontSize: "10px",
-                  lineHeight: "1",
-                  marginTop: "4px",
-                  color: "rgba(255, 255, 255, 0.7)",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                Ether
-              </span>
+                <span
+                  style={{ fontSize: "16px", lineHeight: "1", color: "#FFF" }}
+                >
+                  ETH
+                </span>
+                <span
+                  style={{
+                    fontSize: "10px",
+                    lineHeight: "1",
+                    marginTop: "4px",
+                    color: "rgba(255, 255, 255, 0.7)",
+                  }}
+                >
+                  Ether
+                </span>
+              </div>
             </div>
             <div style={{ marginTop: "10px", fontSize: "12px" }}>
               {`Balance ${data?.formatted.slice(0, 9)} eth`}
             </div>
           </div>
           <Input
+            className={styles.inputEth}
             placeholder="Enter Amount"
             style={{
               background: "transparent",
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(255,255,255)",
               textAlign: "right",
               fontSize: "24px",
               border: "none",
@@ -194,15 +218,19 @@ const PurchaseDialog: FC<IProps> = props => {
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
               border: "1px solid rgb(140 140 141)",
               padding: "8px",
               width: "170px",
               height: "48px",
               borderRadius: "16px",
-              justifyContent: "center",
+              alignItems: "center",
             }}
           >
+            <img
+              src={logoPng.src}
+              alt=""
+              style={{ width: "32px", height: "32px", marginRight: "10px" }}
+            />
             <span>SOUL</span>
           </div>
 
@@ -286,7 +314,6 @@ const PurchaseDialog: FC<IProps> = props => {
                 display: "flex",
               }}
             >
-              {/* outter left to right */}
               <div
                 style={{
                   display: "flex",
@@ -296,7 +323,7 @@ const PurchaseDialog: FC<IProps> = props => {
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
+
                     border: "1px solid rgb(140 140 141)",
                     padding: "8px",
                     width: "170px",
@@ -304,21 +331,42 @@ const PurchaseDialog: FC<IProps> = props => {
                     borderRadius: "16px",
                   }}
                 >
-                  <span
-                    style={{ fontSize: "16px", lineHeight: "1", color: "#FFF" }}
-                  >
-                    ETH
-                  </span>
-                  <span
+                  <img
+                    src={ethSvg.src}
+                    alt=""
                     style={{
-                      fontSize: "10px",
-                      lineHeight: "1",
-                      marginTop: "4px",
-                      color: "rgba(255, 255, 255, 0.7)",
+                      width: "32px",
+                      height: "32px",
+                      objectFit: "contain",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
                     }}
                   >
-                    Ether
-                  </span>
+                    <span
+                      style={{
+                        fontSize: "16px",
+                        lineHeight: "1",
+                        color: "#FFF",
+                      }}
+                    >
+                      ETH
+                    </span>
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        lineHeight: "1",
+                        marginTop: "4px",
+                        color: "rgba(255, 255, 255, 0.7)",
+                      }}
+                    >
+                      Ether
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -348,7 +396,14 @@ const PurchaseDialog: FC<IProps> = props => {
                 borderRadius: "12px",
                 margin: "20px auto",
               }}
-            >{`1ETH=${currentCurrency} Bitsoul`}</div>
+            >
+              <img
+                src={downArrowPng.src}
+                alt=""
+                style={{ marginRight: "5px" }}
+              />
+              <span>{`1ETH=${currentCurrency} Bitsoul`}</span>
+            </div>
 
             <span style={{ marginBottom: "3px" }}>To</span>
             <div
@@ -366,15 +421,19 @@ const PurchaseDialog: FC<IProps> = props => {
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
+                  alignItems: "center",
                   border: "1px solid rgb(140 140 141)",
                   padding: "8px",
                   width: "170px",
                   height: "48px",
                   borderRadius: "16px",
-                  justifyContent: "center",
                 }}
               >
+                <img
+                  src={logoPng.src}
+                  alt=""
+                  style={{ width: "32px", height: "32px", marginRight: "10px" }}
+                />
                 <span>SOUL</span>
               </div>
 
@@ -445,7 +504,13 @@ const PurchaseDialog: FC<IProps> = props => {
                               marginBottom: "24px",
                             }}
                           >
-                            View on Explorer
+                            View on{" "}
+                            <a
+                              href={`https://etherscan.io/tx/${state}`}
+                              target="_blank"
+                            >
+                              Explorer
+                            </a>
                           </div>
                           <Button
                             className={styles.closeButton}
@@ -461,9 +526,13 @@ const PurchaseDialog: FC<IProps> = props => {
                     });
                   }
                 }}
-                loading={buying}
+                loading={buying || transactionLoading}
               >
-                {buying ? "Confirm Transaction In Wallet" : "Confirm Purchase"}
+                {transactionLoading
+                  ? "Transaction Pending"
+                  : buying
+                  ? "Confirm Transaction In Wallet"
+                  : "Confirm Purchase"}
               </Button>
             </div>
           </div>

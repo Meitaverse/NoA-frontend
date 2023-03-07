@@ -15,6 +15,10 @@ import { isLogin } from "@/store/userDetail";
 import Login from "@/components/login";
 import { voucherAssets, VoucherAssets } from "@/services/graphql";
 import Recharge from "./components/recharge";
+import { getBgNow } from "@/services/voucher";
+import logoPng from "@/images/logo.jpeg";
+import dayjs from "dayjs";
+import { toSoul } from "@/utils/toSoul";
 
 interface IProps {}
 
@@ -38,7 +42,14 @@ const Dashboard: FC<IProps> = props => {
   const [showMintCard, setShowMintCard] = useState(false);
   const [showRecharge, setShowRecharge] = useState(false);
   const [myCards, setMyCards] = useState<VoucherAssets["voucherAssets"]>([]);
+  const [nowBg, setNowBg] = useState("");
+  const getNowBg = async () => {
+    const data = await getBgNow();
 
+    if (data.err_code === 0) {
+      setNowBg(data.data.url);
+    }
+  };
   const router = useRouter();
 
   const [isLoginStatus] = useAtom(isLogin);
@@ -58,6 +69,10 @@ const Dashboard: FC<IProps> = props => {
     if (!address) return;
     getMyCards();
   }, [address]);
+
+  useEffect(() => {
+    getNowBg();
+  }, []);
 
   return (
     <div>
@@ -293,17 +308,80 @@ const Dashboard: FC<IProps> = props => {
 
                     <div className={styles.soulCards}>
                       {myCards?.map(i => {
+                        if (i.uri.uri) {
+                          return (
+                            <img
+                              src={i.uri.uri}
+                              alt={`tokenId: ${i.tokenId}`}
+                              title={i.tokenId}
+                              key={i.tokenId}
+                              style={{
+                                background:
+                                  "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",
+                              }}
+                            />
+                          );
+                        }
+
                         return (
-                          <img
-                            src={i.uri.uri}
-                            alt={`tokenId: ${i.tokenId}`}
-                            title={i.tokenId}
-                            key={i.tokenId}
-                            style={{
-                              background:
-                                "linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%)",
-                            }}
-                          />
+                          <div className={styles.mintCardPreview}>
+                            <img
+                              className={styles.mintCardPreviewBg}
+                              src={nowBg}
+                              alt=""
+                              style={{
+                                borderRadius: "12px",
+                                width: "327px",
+                                height: "200px",
+                              }}
+                            />
+                            <div className={styles.mintCardPreviewLeftTop}>
+                              <img
+                                src={logoPng.src}
+                                alt=""
+                                className={styles.cornerLogo}
+                              />
+                              <span
+                                style={{
+                                  fontStyle: "italic",
+                                  fontWeight: 700,
+                                  marginLeft: 4,
+                                }}
+                              >
+                                BITSOUL
+                              </span>
+                            </div>
+                            <div className={styles.mintCardPreviewRightTop}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  transform: "scale(0.5)",
+                                  marginRight: 2,
+                                }}
+                              >
+                                <span>MINT</span>
+                                <span>DATE</span>
+                              </div>
+                              <div>{dayjs().format("DD/MM/YY")}</div>
+                            </div>
+                            <div className={styles.mintCardPreviewLeftBottom}>
+                              <span
+                                style={{
+                                  fontSize: "32px",
+                                  fontWeight: 700,
+                                  marginRight: "4px",
+                                  lineHeight: "1.2",
+                                }}
+                              >
+                                {toSoul(i.value)}
+                              </span>
+                              <span style={{ fontSize: "16px" }}>SOUL</span>
+                            </div>
+                            <div className={styles.mintCardPreviewRightBottom}>
+                              #{i.tokenId}
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
@@ -328,13 +406,15 @@ const Dashboard: FC<IProps> = props => {
             }}
           ></MintCard>
 
-          <Recharge
-            open={showRecharge}
-            onChange={() => {
-              setShowRecharge(false);
-              getMyCards();
-            }}
-          ></Recharge>
+          {showRecharge && (
+            <Recharge
+              open={showRecharge}
+              onChange={() => {
+                setShowRecharge(false);
+                getMyCards();
+              }}
+            ></Recharge>
+          )}
         </div>
       )}
       {(!isLoginStatus || (isLoginStatus && !userInfo?.email)) && (

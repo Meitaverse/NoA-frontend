@@ -15,6 +15,7 @@ import { useInterval } from "ahooks";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { waitForSomething } from "@/utils/waitForSomething";
 import Login from "@/components/login";
+import { useSBTContract } from "@/hooks/useSBTContract";
 
 interface IProps {}
 
@@ -248,6 +249,7 @@ const EditProfile: FC<IProps> = props => {
                 onClick={async () => {
                   if (userInfo?.soul_bound_token_id) {
                     // 更新Profile信息
+
                     return;
                   }
 
@@ -272,15 +274,20 @@ const EditProfile: FC<IProps> = props => {
                       await waitForSomething({
                         func: async () => {
                           const p = await getSingleProfile(address);
-                          return p;
+                          return p.data;
                         },
                       });
                     } finally {
                       message.destroy("pollingKey");
                     }
 
-                    await linkSoulBoundTokenId();
-                    initUserInfo();
+                    try {
+                      await linkSoulBoundTokenId();
+                      initUserInfo();
+                    } catch (e) {
+                      console.error(e);
+                      message.error(JSON.stringify(e));
+                    }
                     message.success("save success");
                   } catch (e) {
                     console.error(e);

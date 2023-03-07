@@ -1,8 +1,6 @@
 import { usePropsValue } from "@/hooks/usePropsValue";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useVoucher } from "@/hooks/useVoucherContact";
-import { formatBalance } from "@/utils/format";
-import { strip } from "@/utils/strip";
 import { CloseCircleOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { Button, Input, message, Modal } from "antd";
 import React, { FC, useEffect, useState } from "react";
@@ -12,6 +10,8 @@ import styles from "./index.module.scss";
 import { getBgNow } from "@/services/voucher";
 import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
+import { useTransctionPending } from "@/hooks/useTransctionPending";
+import { toSoul } from "@/utils/toSoul";
 
 interface IProps {
   open: boolean;
@@ -28,28 +28,39 @@ const MintCard: FC<IProps> = props => {
   const { address } = useAccount();
   const [mintVal, setMintVal] = useState("");
   const [mintLoading, setMintLoading] = useState(false);
+  const [transcitonLoading, setTranscitonLoading] = useState(false);
   const [nowBg, setNowBg] = useState("");
-  const [userInfo] = useUserInfo();
+  const [userInfo, initUserInfo] = useUserInfo();
   const [voucher] = useVoucher();
+  const refreshHash = useTransctionPending();
 
   const mint = async () => {
     try {
       setMintLoading(true);
       if (!userInfo?.soul_bound_token_id || !address) return;
-      await voucher.mintBaseNew(
+      const { hash } = await voucher.mintBaseNew(
         userInfo.soul_bound_token_id,
         [address],
         [new BigNumber(+mintVal * 10 ** 18).toFixed()],
-        ["https://img.tukuppt.com/photo-big/00/00/94/6152bc0ce6e5d805.jpg"],
+        [""],
         {
           from: address,
         }
       );
-
-      message.success("mint success");
-      setOpenState(false);
+      setTranscitonLoading(true);
+      const result = await refreshHash(hash);
+      if (result) {
+        message.success("mint success");
+        initUserInfo();
+        setOpenState(false);
+      }
+      setMintLoading(false);
+    } catch (e) {
+      console.error(e);
+      message.success("mint error");
     } finally {
       setMintLoading(false);
+      setTranscitonLoading(false);
     }
   };
   const getNowBg = async () => {
@@ -63,8 +74,11 @@ const MintCard: FC<IProps> = props => {
   useEffect(() => {
     if (openState) {
       getNowBg();
+    } else {
+      setMintVal("");
     }
   }, [openState]);
+
   return (
     <Modal
       className={styles.mintCard}
@@ -114,9 +128,7 @@ const MintCard: FC<IProps> = props => {
           }}
         >
           Your balance:{" "}
-          <span style={{ color: "#fff" }}>
-            {formatBalance(strip((Number(userInfo?.balance) || 0) / 10 ** 18))}
-          </span>
+          <span style={{ color: "#fff" }}>{toSoul(userInfo?.balance)}</span>
         </div>
 
         <div className={styles.mintCardPreview}>
@@ -217,25 +229,19 @@ const MintCard: FC<IProps> = props => {
             width: "424px",
           }}
         >
-          <div className={styles.cancelBg}>
-            <Button
-              className={styles.cancelButton}
-              onClick={() => {
-                setOpenState(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
           <Button
             className={styles.mintButton}
-            loading={mintLoading}
+            loading={mintLoading || transcitonLoading}
             disabled={!mintVal || Number(mintVal) > (userInfo?.balance || 0)}
             onClick={() => {
               mint();
             }}
           >
-            Mint
+            {transcitonLoading
+              ? "Transaction Pending"
+              : mintLoading
+              ? "Confirm Transction in wallet"
+              : "Mint"}
           </Button>
         </div>
       </div>

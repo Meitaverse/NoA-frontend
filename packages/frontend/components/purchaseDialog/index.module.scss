@@ -6,6 +6,12 @@
     padding: 36px 56px;
   }
 
+  .inputEth {
+    &::placeholder {
+      color: #fff;
+    }
+  }
+
   .approveButton {
     width: 420px;
     height: 56px;
@@ -20,9 +26,9 @@
       color: #fff;
     }
 
-    &:disabled {
-      background: #dadada;
-    }
+    // &:disabled {
+    //   background: #dadada;
+    // }
   }
 
   :global {
@@ -45,6 +51,15 @@
     .ant-modal-confirm-body {
       justify-content: center;
       flex-direction: column;
+
+      .anticon {
+        margin-inline-end: unset !important;
+      }
+
+      .ant-modal-confirm-content {
+        margin-inline-start: unset !important;
+        margin-block-start: unset !important;
+      }
 
       .anticon-check-circle {
         font-size: 80px;
