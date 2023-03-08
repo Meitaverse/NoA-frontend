@@ -79,12 +79,19 @@ const Dashboard: FC<IProps> = props => {
     getNowBg();
 
     return () => {
-      clear;
+      clear();
     };
   }, []);
 
+  const showMsg = () => {
+    messageBox.show({
+      content: "123123123",
+    });
+  };
+
   return (
     <div>
+      <Button onClick={showMsg}>Click me</Button>
       {isLoginStatus && (
         <div className={styles.dashboard}>
           <div

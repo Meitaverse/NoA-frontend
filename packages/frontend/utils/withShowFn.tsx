@@ -18,7 +18,7 @@ type ShowComponentProp<T> = T extends {
 
 function withShow<T>(Component: FC<T>) {
   return (props?: ShowComponentProp<T>) => {
-    const { onClose, duration = 3000 } = props || {};
+    const { onClose } = props || {};
     const handler: DialogShowHandler = renderImperatively(
       // @ts-ignore
       <Component
@@ -30,10 +30,6 @@ function withShow<T>(Component: FC<T>) {
       />
     );
     closeFnSet.add(handler.close);
-
-    setTimeout(() => {
-      handler.close();
-    }, duration);
 
     return handler;
   };
