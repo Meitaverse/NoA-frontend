@@ -1,3 +1,4 @@
+import { sbtasset } from "@/services/graphql";
 import { getUserDetailResponse, getUserInfo } from "@/services/sign";
 import { isLogin, userDetail } from "@/store/userDetail";
 import { useAtom } from "jotai";
@@ -6,14 +7,14 @@ import { useAccount } from "wagmi";
 
 export const useUserInfo: () => [
   getUserDetailResponse | null,
-  (adr?: string) => Promise<false | getUserDetailResponse>
+  (adr?: string, justBalace?: boolean) => Promise<false | getUserDetailResponse>
 ] = () => {
   const { address } = useAccount();
   const [userInfo, setUserInfo] = useAtom(userDetail);
   const [, setIsLoginStatus] = useAtom(isLogin);
   const loginLoading = useRef(false);
 
-  const initUserInfo = async (adr = "") => {
+  const initUserInfo = async (adr = "", justBalace = false) => {
     if (loginLoading.current) return false;
     loginLoading.current = true;
     // 存在token的情况下尝试进行登录
@@ -22,6 +23,19 @@ export const useUserInfo: () => [
     //    成功则setLoginStatus和userInfo。
     try {
       if (localStorage.getItem("token")) {
+        if (justBalace && userInfo) {
+          const data = await sbtasset(address?.toLowerCase());
+          const balance = data.data.sbtasset?.balance || "0";
+
+          const newUserInfo = {
+            ...userInfo,
+            balance,
+          };
+
+          setUserInfo(newUserInfo);
+          return newUserInfo;
+        }
+
         const { err_code, data } = await getUserInfo(
           {
             walletAddress: address || adr,

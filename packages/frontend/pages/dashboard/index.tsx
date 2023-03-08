@@ -18,6 +18,8 @@ import { getBgNow } from "@/services/voucher";
 import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
 import { toSoul } from "@/utils/toSoul";
+import messageBox from "@/components/messageBox";
+import { useInterval } from "ahooks";
 
 interface IProps {}
 
@@ -33,7 +35,7 @@ const items: TabsProps["items"] = [
 ];
 
 const Dashboard: FC<IProps> = props => {
-  const [userInfo] = useUserInfo();
+  const [userInfo, initUserInfo] = useUserInfo();
   const { address } = useAccount();
 
   const [actTab, setActTab] = useState("balance");
@@ -64,6 +66,10 @@ const Dashboard: FC<IProps> = props => {
     }
   };
 
+  const clear = useInterval(() => {
+    initUserInfo("", true);
+  }, 2000);
+
   useEffect(() => {
     if (!address) return;
     getMyCards();
@@ -71,6 +77,10 @@ const Dashboard: FC<IProps> = props => {
 
   useEffect(() => {
     getNowBg();
+
+    return () => {
+      clear;
+    };
   }, []);
 
   return (

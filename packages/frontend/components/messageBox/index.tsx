@@ -1,14 +1,24 @@
 import withShowFn from "@/utils/withShowFn";
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import styles from "./index.module.scss";
 
-interface IProps {}
+interface IProps {
+  visible: boolean;
+  onClose?: () => void;
+  duration?: number;
+}
 
 const MessageBox: FC<IProps> = props => {
+  const { visible } = props;
+
   return (
-    <div className={styles.messageBox}>
-      <div>MessageBox</div>
-    </div>
+    <>
+      {visible && (
+        <div className={styles.messageBox}>
+          <div>MessageBox</div>
+        </div>
+      )}
+    </>
   );
 };
 

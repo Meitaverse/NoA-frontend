@@ -10,18 +10,15 @@ const closeFnSet = new Set<() => void>();
 
 type ShowComponentProp<T> = T extends {
   visible: boolean;
+  duration?: number;
   onClose?: () => void;
 }
   ? Omit<T, "visible">
   : never;
 
-type DefaultComponentProps = {
-  onClose: () => void;
-};
-
-function withShow<T>(Component: FC<DefaultComponentProps>) {
+function withShow<T>(Component: FC<T>) {
   return (props?: ShowComponentProp<T>) => {
-    const { onClose } = props || {};
+    const { onClose, duration = 3000 } = props || {};
     const handler: DialogShowHandler = renderImperatively(
       // @ts-ignore
       <Component
@@ -33,11 +30,16 @@ function withShow<T>(Component: FC<DefaultComponentProps>) {
       />
     );
     closeFnSet.add(handler.close);
+
+    setTimeout(() => {
+      handler.close();
+    }, duration);
+
     return handler;
   };
 }
 
-export default function withShowFn(Component: FC<DefaultComponentProps>) {
+export default function withShowFn<T>(Component: FC<T>) {
   return attachPropertiesToComponent(Component, {
     show: withShow(Component),
   });
