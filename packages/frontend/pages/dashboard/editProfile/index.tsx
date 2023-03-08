@@ -17,17 +17,22 @@ import { waitForSomething } from "@/utils/waitForSomething";
 import Login from "@/components/login";
 import { useSBTContract } from "@/hooks/useSBTContract";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
+import { useRouter } from "next/router";
 
 interface IProps {}
 
 const EditProfile: FC<IProps> = props => {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const [userInfo, initUserInfo] = useUserInfo();
   const [, setUserInfo] = useAtom(userDetail);
-  const [userName, setUserName] = useState(userInfo?.username);
   const [manager] = useManagerContract();
   const [isLoginStatus] = useAtom(isLogin);
   const isCurrentNetwork = useIsCurrentNetwork();
+
+  const [userName, setUserName] = useState(userInfo?.username);
+  const [contractLoading, setContractLoading] = useState(false);
+  const [transactionLoading, setTransactionLoading] = useState(false);
 
   const clear = useInterval(() => {
     if (!userInfo) return;
@@ -87,7 +92,9 @@ const EditProfile: FC<IProps> = props => {
             }}
           >
             <div style={{ fontSize: "52px", lineHeight: "78px" }}>
-              Edit Profile
+              {userInfo?.soul_bound_token_id
+                ? "Edit Profile"
+                : "Create Your Profile"}
             </div>
             <div
               style={{
@@ -97,8 +104,18 @@ const EditProfile: FC<IProps> = props => {
                 color: "rgba(255, 255, 255, 0.5)",
               }}
             >
-              Home <span style={{ margin: "0 10px" }}>/</span>{" "}
-              <span style={{ color: "#fff" }}>Edit Profile </span>
+              {userInfo?.soul_bound_token_id ? (
+                <span>
+                  Home <span style={{ margin: "0 10px" }}>/</span>{" "}
+                  <span style={{ color: "#fff" }}>Edit Profile </span>
+                </span>
+              ) : (
+                <span>
+                  Complete your profile，create your BitSoul id, and get your
+                  SOUL rewards. Please do not close this page until the
+                  transaction is confirmed
+                </span>
+              )}
             </div>
           </div>
 
@@ -215,7 +232,7 @@ const EditProfile: FC<IProps> = props => {
 
               <div className={styles.line}></div>
 
-              <div
+              {/* <div
                 style={{
                   fontSize: "20px",
                   lineHeight: "30px",
@@ -234,7 +251,7 @@ const EditProfile: FC<IProps> = props => {
                 }}
               >
                 Add your existing social links to build a stronger reputation
-              </span>
+              </span> */}
 
               <Button
                 style={{
@@ -242,7 +259,7 @@ const EditProfile: FC<IProps> = props => {
                   background:
                     "linear-gradient(117.55deg, #1E50FF -3.37%, #00DFB7 105.51%)",
                   height: "56px",
-                  width: "200px",
+                  minWidth: "200px",
                   borderRadius: "16px",
                   fontSize: "16px",
                   color: "#FFF",
@@ -250,6 +267,7 @@ const EditProfile: FC<IProps> = props => {
                 disabled={
                   !userInfo?.create_profile_whitelisted || !isCurrentNetwork
                 }
+                loading={transactionLoading || contractLoading}
                 onClick={async () => {
                   if (userInfo?.soul_bound_token_id) {
                     // 更新Profile信息
@@ -258,6 +276,7 @@ const EditProfile: FC<IProps> = props => {
                   }
 
                   try {
+                    setContractLoading(true);
                     await manager.createProfile(
                       {
                         nickName: userName || "",
@@ -269,37 +288,40 @@ const EditProfile: FC<IProps> = props => {
                       }
                     );
 
-                    message.loading({
-                      content: "loading",
-                      key: "pollingKey",
-                    });
-
                     try {
+                      setTransactionLoading(true);
+                      setContractLoading(false);
                       await waitForSomething({
                         func: async () => {
                           const p = await getSingleProfile(address);
                           return !!p.data;
                         },
                       });
-                    } finally {
-                      message.destroy("pollingKey");
-                    }
-
-                    try {
-                      await linkSoulBoundTokenId();
-                      initUserInfo();
                     } catch (e) {
                       console.error(e);
-                      message.error(JSON.stringify(e));
                     }
+
+                    await linkSoulBoundTokenId();
+                    await initUserInfo();
+
+                    router.push("/dashboard");
                     message.success("save success");
                   } catch (e) {
                     console.error(e);
                     message.error("save error");
+                  } finally {
+                    setContractLoading(false);
+                    setTransactionLoading(false);
                   }
                 }}
               >
-                Save
+                {transactionLoading
+                  ? "Transaction Pending"
+                  : contractLoading
+                  ? "Confirm transaction in wallet"
+                  : userInfo?.soul_bound_token_id
+                  ? "Save"
+                  : "Create"}
               </Button>
             </div>
           </div>

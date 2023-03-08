@@ -379,8 +379,32 @@ const Login: FC<IProps> = props => {
                         newV[index] = val;
                         setVerifyCode(newV);
 
-                        if (newV[index] && verifyRefs.current[index + 1]) {
+                        if (
+                          newV[index] !== "" &&
+                          verifyRefs.current[index + 1]
+                        ) {
                           verifyRefs.current[index + 1].focus();
+                        }
+                      }}
+                      onPaste={event => {
+                        event.preventDefault();
+                        const pasteVal = event.clipboardData.getData("text");
+                        setVerifyCode(
+                          new Array(6).fill("").map((i, index) => {
+                            return pasteVal[index] || "";
+                          })
+                        );
+
+                        const lastIndex = verifyCode.findIndex(i => i === "");
+
+                        verifyRefs.current[lastIndex || 5].focus();
+                      }}
+                      onKeyUp={key => {
+                        // console.log(key);
+                        if (key.code === "Backspace" && !verifyCode[index]) {
+                          if (index - 1 >= 0) {
+                            verifyRefs.current[index - 1].focus();
+                          }
                         }
                       }}
                       controls={false}

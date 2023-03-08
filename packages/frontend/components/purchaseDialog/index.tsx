@@ -264,7 +264,11 @@ const PurchaseDialog: FC<IProps> = props => {
         </div>
 
         <Button
-          disabled={!!!inputEth || !isCurrentNetwork}
+          disabled={
+            !!!inputEth ||
+            !isCurrentNetwork ||
+            +inputEth > Number(data?.formatted.slice(0, 9))
+          }
           className={styles.approveButton}
           onClick={() => {
             setConfirmBuy(true);

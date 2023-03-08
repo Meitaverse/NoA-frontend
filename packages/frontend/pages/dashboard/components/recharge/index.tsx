@@ -12,7 +12,9 @@ import useScrollBottom from "@/hooks/useScrollBottom";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { toSoul } from "@/utils/toSoul";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
-
+import logoPng from "@/images/logo.jpeg";
+import dayjs from "dayjs";
+import { getBgNow } from "@/services/voucher";
 interface IProps {
   open: boolean;
   onChange: () => void;
@@ -61,6 +63,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
   const [bankTreasury] = useBankTreasury();
   const [myCards, setMyCards] = useState<VoucherAssets["voucherAssets"]>([]);
   const [selectedCard, setSelectedCard] = useState("");
+  const [nowBg, setNowBg] = useState("");
 
   const cardArea = useRef<HTMLDivElement>(null);
   const loading = useRef(false);
@@ -137,6 +140,14 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
     }
   };
 
+  const getNowBg = async () => {
+    const data = await getBgNow();
+
+    if (data.err_code === 0) {
+      setNowBg(data.data.url);
+    }
+  };
+
   useEffect(() => {
     if (!address) {
       return;
@@ -149,6 +160,10 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
   useScrollBottom(() => {
     getMyCards();
   }, cardArea);
+
+  useEffect(() => {
+    getNowBg();
+  }, []);
 
   return (
     <div className={styles.rechargeInner}>
@@ -174,15 +189,76 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
                   setSelectedCard(card.tokenId);
                 }}
               >
-                <img
-                  src={card.uri.uri}
-                  alt={card.tokenId}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+                {card.uri.uri ? (
+                  <img
+                    src={card.uri.uri}
+                    alt={card.tokenId}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <div className={styles.mintCardPreview}>
+                    <img
+                      className={styles.mintCardPreviewBg}
+                      src={nowBg}
+                      alt=""
+                      style={{
+                        borderRadius: "12px",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    />
+                    <div className={styles.mintCardPreviewLeftTop}>
+                      <img
+                        src={logoPng.src}
+                        alt=""
+                        className={styles.cornerLogo}
+                      />
+                      <span
+                        style={{
+                          fontStyle: "italic",
+                          fontWeight: 700,
+                          marginLeft: 4,
+                        }}
+                      >
+                        BITSOUL
+                      </span>
+                    </div>
+                    <div className={styles.mintCardPreviewRightTop}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          transform: "scale(0.5)",
+                          marginRight: 2,
+                        }}
+                      >
+                        <span>MINT</span>
+                        <span>DATE</span>
+                      </div>
+                      <div>{dayjs().format("DD/MM/YY")}</div>
+                    </div>
+                    <div className={styles.mintCardPreviewLeftBottom}>
+                      <span
+                        style={{
+                          fontSize: "32px",
+                          fontWeight: 700,
+                          marginRight: "4px",
+                          lineHeight: "1",
+                        }}
+                      >
+                        {toSoul(card.value)}
+                      </span>
+                      <span style={{ fontSize: "16px" }}>SOUL</span>
+                    </div>
+                    <div className={styles.mintCardPreviewRightBottom}>
+                      <i>#{card.tokenId}</i>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

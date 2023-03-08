@@ -344,7 +344,7 @@ export interface VoucherAssetsParams {
 
 export const voucherAssets = (params: VoucherAssetsParams) => {
   return query<VoucherAssets>(`query{
-    voucherAssets(first: ${params.first}, skip: ${params.skip}, where: { wallet: "${params.wallet}" }) {
+    voucherAssets(first: ${params.first}, skip: ${params.skip}, orderby: tokenId, where: { wallet: "${params.wallet}" }) {
       id,
       tokenId,
       value,
