@@ -15,6 +15,7 @@ import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
 import { getBgNow } from "@/services/voucher";
+import messageBox from "@/components/messageBox";
 interface IProps {
   open: boolean;
   onChange: () => void;
@@ -96,7 +97,7 @@ const RechargeInner: FC<InnerProps> = (props: InnerProps) => {
           getMyCardParams.current.skip -= 1;
         }
         initUserInfo();
-        message.success("recharge success");
+        messageBox.success("recharge success");
       }
     } catch (e) {
       console.error(e);

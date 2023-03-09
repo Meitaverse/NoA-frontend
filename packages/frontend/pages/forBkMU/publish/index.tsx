@@ -32,6 +32,8 @@ import {
 } from "@/config";
 import { AbiCoder, defaultAbiCoder } from "ethers/lib/utils";
 import { useDerivative } from "@/hooks/useDerivativeContact";
+import messageBox from "@/components/messageBox";
+
 interface IProps {}
 
 // soulBoundTokenId: SECOND_PROFILE_ID,
@@ -197,13 +199,13 @@ const CreateEvent: FC<IProps> = props => {
         from: account.address,
       });
 
-      message.success("发布成功");
+      messageBox.success("发布成功");
       setTimeout(() => {
         getPublishResult();
       }, 1500);
     } catch (e) {
       console.error(e);
-      message.error("发布失败，可能余额不足，需充值");
+      messageBox.error("发布失败，可能余额不足，需充值");
     }
   };
 
@@ -214,7 +216,7 @@ const CreateEvent: FC<IProps> = props => {
     if (!soulBoundTokenId) return;
 
     if (preparePublish.find(x => x.name === name)) {
-      message.error("已有相同名称，请更换名称");
+      messageBox.error("已有相同名称，请更换名称");
       return;
     }
 
@@ -256,7 +258,7 @@ const CreateEvent: FC<IProps> = props => {
         }
       );
 
-      message.success("预发布成功");
+      messageBox.success("预发布成功");
       setTimeout(() => {
         getPreparePublishResult();
       }, 1500);
@@ -322,7 +324,7 @@ const CreateEvent: FC<IProps> = props => {
       from: account.address,
     });
 
-    message.success("approve成功");
+    messageBox.success("approve成功");
   };
 
   useEffect(() => {

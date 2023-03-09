@@ -83,15 +83,8 @@ const Dashboard: FC<IProps> = props => {
     };
   }, []);
 
-  const showMsg = () => {
-    messageBox.show({
-      content: "123123123",
-    });
-  };
-
   return (
     <div>
-      <Button onClick={showMsg}>Click me</Button>
       {isLoginStatus && (
         <div className={styles.dashboard}>
           <div
@@ -339,7 +332,10 @@ const Dashboard: FC<IProps> = props => {
                         }
 
                         return (
-                          <div className={styles.mintCardPreview}>
+                          <div
+                            className={styles.mintCardPreview}
+                            key={i.tokenId}
+                          >
                             <img
                               className={styles.mintCardPreviewBg}
                               src={nowBg}

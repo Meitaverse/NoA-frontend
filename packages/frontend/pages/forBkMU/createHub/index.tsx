@@ -19,6 +19,7 @@ import { getHubs, getProfile, IGetHubs, IGetProfile } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useModuleGlobalContract } from "@/hooks/useModuleGlobalContract";
+import messageBox from "@/components/messageBox";
 interface IProps {}
 
 const columns: ColumnsType<IGetHubs["hubs"][number]> = [
@@ -91,9 +92,9 @@ const CreateEvent: FC<IProps> = props => {
         }
       );
 
-      message.success("创建成功");
+      messageBox.success("创建成功");
     } catch (e) {
-      message.error("创建失败，该账号可能未加入白名单");
+      messageBox.error("创建失败，该账号可能未加入白名单");
       console.error(e);
       console.warn(
         "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"

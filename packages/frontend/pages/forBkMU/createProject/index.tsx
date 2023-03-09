@@ -14,6 +14,7 @@ import {
 } from "@/services/graphql";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import messageBox from "@/components/messageBox";
 interface IProps {}
 
 const columns: ColumnsType<IGetProjects["projects"][number]> = [
@@ -104,7 +105,7 @@ const CreateEvent: FC<IProps> = props => {
         }
       );
 
-      message.success("创建成功");
+      messageBox.success("创建成功");
       setTimeout(() => getProjectsResult(), 1500);
     } catch (e) {
       console.error(e);

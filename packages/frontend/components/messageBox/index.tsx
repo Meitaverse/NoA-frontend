@@ -1,5 +1,9 @@
 import withShowFn from "@/utils/withShowFn";
-import { CheckCircleFilled, CloseOutlined } from "@ant-design/icons";
+import {
+  CheckCircleFilled,
+  CloseOutlined,
+  ExclamationCircleFilled,
+} from "@ant-design/icons";
 import React, { FC, useEffect } from "react";
 import { animated, useSpring } from "@react-spring/web";
 import styles from "./index.module.scss";
@@ -14,12 +18,30 @@ interface IProps {
   type?: "success" | "error" | "pending";
 }
 
+let currentIndex = 1000;
+
+let currentMsgBoxCount = 0;
+
+const typeIcon = {
+  success: (
+    <div className={styles.successIconWrapper}>
+      <CheckCircleFilled />
+    </div>
+  ),
+  error: (
+    <div className={styles.errorIconWrapper}>
+      <ExclamationCircleFilled />
+    </div>
+  ),
+};
+
 const MessageBox: FC<IProps> = props => {
   const {
     visible,
     content,
     title,
-    duration = 5000,
+    duration = 3000,
+    type = "success",
     onClose,
     afterClose,
   } = props;
@@ -36,49 +58,57 @@ const MessageBox: FC<IProps> = props => {
     },
   }));
 
-  // useEffect(() => {
-  //   let clear: any = null;
-  //   if (visible) {
-  //     clear = setTimeout(() => {
-  //       onClose?.();
-  //       setTimeout(() => {
-  //         afterClose?.();
-  //       }, 450);
-  //     }, duration);
-  //   }
+  useEffect(() => {
+    let clear: any = null;
+    if (visible) {
+      clear = setTimeout(() => {
+        api.start({
+          translateX: 384,
+          onResolve: () => {
+            onClose?.();
+            afterClose?.();
+          },
+        });
+      }, duration);
+    }
 
-  //   return () => {
-  //     if (clear) {
-  //       clearTimeout(clear);
-  //     }
-  //   };
-  // }, [visible]);
+    return () => {
+      if (clear) {
+        clearTimeout(clear);
+      }
+    };
+  }, [visible]);
 
+  useEffect(() => {
+    currentIndex += 1;
+    currentMsgBoxCount += 1;
+    return () => {
+      currentMsgBoxCount -= 1;
+    };
+  }, []);
   return (
     <>
       {
         <animated.div
           className={[styles.messageBox].join(" ")}
-          style={{ ...bind }}
+          style={{
+            ...bind,
+            zIndex: currentIndex,
+            bottom: (currentMsgBoxCount - 1) * 220,
+          }}
         >
-          <div className={styles.successIconWrapper}>
-            <CheckCircleFilled />
-          </div>
+          {typeIcon[type]}
 
           <div className={styles.main}>
             <CloseOutlined
               onClick={async () => {
                 onClose?.();
-                await api.start({
+                api.start({
                   translateX: 384,
                   onResolve: () => {
-                    // afterClose?.();
+                    afterClose?.();
                   },
                 });
-                // afterClose?.();
-                // setTimeout(() => {
-                //   afterClose?.();
-                // }, 450);
               }}
             />
             <div className={styles.title}>{title}</div>

@@ -27,6 +27,7 @@ import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { profile } from "console";
 import { useBankTreasury } from "@/hooks/useBankTreasury";
+import messageBox from "@/components/messageBox";
 interface IProps {}
 
 const columns: ColumnsType<
@@ -83,7 +84,7 @@ const CreateEvent: FC<IProps> = props => {
     //   account.address?.toLowerCase() !==
     //   "0x70997970C51812dc3A010C7d01b50e0d17dc79C8".toLowerCase()
     // ) {
-    //   message.error("当前账号不是Governance账号，充值失败");
+    //   messageBox.error("当前账号不是Governance账号，充值失败");
     //   return;
     // }
 
@@ -100,7 +101,7 @@ const CreateEvent: FC<IProps> = props => {
       //   from: account.address,
       // }
 
-      message.success("充值成功");
+      messageBox.success("充值成功");
       getMintSBTValueResult();
     } catch (e) {
       console.error(e);

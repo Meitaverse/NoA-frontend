@@ -10,6 +10,7 @@ import { MetaMaskConnector } from "wagmi/connectors/metaMask";
 import loginPng from "@/images/login.png";
 import styles from "./index.module.scss";
 import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
+import messageBox from "../messageBox";
 
 interface IProps {
   onConnect?: () => void;
@@ -71,9 +72,7 @@ const Login: FC<IProps> = props => {
         return true;
       }
     } catch (e) {
-      message.error("登录失败");
-      // 暂时的容错。
-      message.destroy("loadingPluginKey");
+      messageBox.error("登录失败");
       return false;
     } finally {
       setSignLoading(false);
@@ -105,7 +104,7 @@ const Login: FC<IProps> = props => {
     });
 
     if (err_code === 0) {
-      message.success("verify success");
+      messageBox.success("verify success");
       router.push("/dashboard/editProfile");
       setShowSignInDialog(false);
       setVerifyStage("InputEmail");
@@ -193,7 +192,7 @@ const Login: FC<IProps> = props => {
                   props.onConnect();
                 }
               } catch (e) {
-                message.error("cannot found Metamask");
+                messageBox.error("cannot found Metamask");
               }
             }}
           >
@@ -272,7 +271,7 @@ const Login: FC<IProps> = props => {
                   }
                   const userInfo = await initUserInfo(address);
                   if (!userInfo) {
-                    message.error("登录失败");
+                    messageBox.error("登录失败");
                     logOut();
                     return;
                   }

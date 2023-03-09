@@ -22,6 +22,7 @@ import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
 import { AbiCoder, defaultAbiCoder } from "ethers/lib/utils";
+import messageBox from "@/components/messageBox";
 interface IProps {}
 
 // soulBoundTokenId: SECOND_PROFILE_ID,
@@ -119,7 +120,7 @@ const CreateEvent: FC<IProps> = props => {
         }
       );
 
-      message.success("collect成功");
+      messageBox.success("collect成功");
       getCollectResult();
     } catch (e) {
       console.error(e);

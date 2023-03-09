@@ -9,6 +9,7 @@ import { useMount } from "ahooks";
 import { Button, message } from "antd";
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useAccount, useConnect } from "wagmi";
+import messageBox from "../messageBox";
 import styles from "./styles.module.scss";
 
 interface IProps {}
@@ -57,7 +58,7 @@ const Header: FC<IProps> = props => {
         from: address,
       });
 
-      message.success("充值成功");
+      messageBox.success("充值成功");
     } catch (e) {
       console.error(e);
       console.warn(

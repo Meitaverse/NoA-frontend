@@ -18,6 +18,7 @@ import Login from "@/components/login";
 import { useSBTContract } from "@/hooks/useSBTContract";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 import { useRouter } from "next/router";
+import messageBox from "@/components/messageBox";
 
 interface IProps {}
 
@@ -305,10 +306,10 @@ const EditProfile: FC<IProps> = props => {
                     await initUserInfo();
 
                     router.push("/dashboard");
-                    message.success("save success");
+                    messageBox.success("save success");
                   } catch (e) {
                     console.error(e);
-                    message.error("save error");
+                    messageBox.error("save error");
                   } finally {
                     setContractLoading(false);
                     setTransactionLoading(false);

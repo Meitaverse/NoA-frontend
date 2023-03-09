@@ -1,3 +1,4 @@
+import messageBox from "@/components/messageBox";
 import { API_URL, MIDDLEWARE_URL } from "@/config";
 import { message } from "antd";
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios";
@@ -74,7 +75,7 @@ const alertPlugin: Plugin = {
     const config = data.config as Config;
     if (config.alert === true) {
       if (data.data.err_code !== 0) {
-        message.error({
+        messageBox.error({
           content: JSON.stringify(data.data.msg),
         });
       }

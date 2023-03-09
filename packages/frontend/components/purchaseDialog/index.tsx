@@ -14,6 +14,7 @@ import logoPng from "@/images/logo.jpeg";
 import ethSvg from "@/images/eth.svg";
 import downArrowPng from "@/images/downArrow.png";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
+import messageBox from "../messageBox";
 interface IProps {
   open: boolean;
   onChange: () => void;
@@ -57,13 +58,13 @@ const PurchaseDialog: FC<IProps> = props => {
         setCurrentCurrency(+ethPrice?.sbtAmount || 0);
       }
     } catch (e) {
-      message.error("获取SBT汇率失败");
+      messageBox.error("获取SBT汇率失败");
     }
   };
 
   const buySBT = async () => {
     if (!userInfo?.soul_bound_token_id) {
-      message.error("user dont register");
+      messageBox.error("user dont register");
       return false;
     }
     try {
@@ -77,16 +78,16 @@ const PurchaseDialog: FC<IProps> = props => {
       const result = await refreshTransction(hash);
 
       if (result) {
-        message.success("bought success");
+        messageBox.success("bought success");
       } else {
-        message.success(
+        messageBox.success(
           "bought may fail transction timeout, please wait for a while."
         );
       }
       setConfirmBuy(false);
       return hash;
     } catch (e) {
-      message.error(JSON.stringify(e));
+      messageBox.error(JSON.stringify(e));
       return false;
     } finally {
       setBuying(false);

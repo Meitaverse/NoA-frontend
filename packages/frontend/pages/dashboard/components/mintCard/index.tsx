@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { toSoul } from "@/utils/toSoul";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
+import messageBox from "@/components/messageBox";
 
 interface IProps {
   open: boolean;
@@ -52,14 +53,14 @@ const MintCard: FC<IProps> = props => {
       setTranscitonLoading(true);
       const result = await refreshHash(hash);
       if (result) {
-        message.success("mint success");
+        messageBox.success("mint success");
         initUserInfo();
         setOpenState(false);
       }
       setMintLoading(false);
     } catch (e) {
       console.error(e);
-      message.success("mint error");
+      messageBox.success("mint error");
     } finally {
       setMintLoading(false);
       setTranscitonLoading(false);

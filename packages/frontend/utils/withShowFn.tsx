@@ -16,13 +16,13 @@ type ShowComponentProp<T> = T extends {
   ? Omit<T, "visible">
   : never;
 
-function withShow<T>(Component: FC<T>) {
+function withShow<T>(Component: FC<T>, defaultArgs = {}) {
   return (props?: ShowComponentProp<T>) => {
     const { onClose } = props || {};
     const handler: DialogShowHandler = renderImperatively(
       // @ts-ignore
       <Component
-        {...props}
+        {...{ ...defaultArgs, ...props }}
         onClose={() => {
           closeFnSet.delete(handler.close);
           onClose?.();
@@ -38,5 +38,11 @@ function withShow<T>(Component: FC<T>) {
 export default function withShowFn<T>(Component: FC<T>) {
   return attachPropertiesToComponent(Component, {
     show: withShow(Component),
+    success: msg => {
+      withShow(Component, { type: "success", content: msg })();
+    },
+    error: msg => {
+      withShow(Component, { type: "error", content: msg })();
+    },
   });
 }
