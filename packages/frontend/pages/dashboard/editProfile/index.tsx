@@ -1,6 +1,6 @@
-import { Button, Input, message } from "antd";
-import React, { FC, useEffect, useRef, useState } from "react";
-import { useAccount } from "wagmi";
+import { Button, Input } from "antd";
+import React, { ChangeEvent, FC, useEffect, useRef, useState } from "react";
+import { useAccount, useEnsName } from "wagmi";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
 import { linkSoulBoundTokenId } from "@/services/sign";
@@ -15,10 +15,13 @@ import { useInterval } from "ahooks";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { waitForSomething } from "@/utils/waitForSomething";
 import Login from "@/components/login";
-import { useSBTContract } from "@/hooks/useSBTContract";
 import { useIsCurrentNetwork } from "@/hooks/useIsCurrentNetwork";
 import { useRouter } from "next/router";
 import messageBox from "@/components/messageBox";
+import { useUpload } from "@/hooks/useUpload";
+import { getIpfsUrl } from "@/utils/getIpfsUrl";
+import { useSBTContract } from "@/hooks/useSBTContract";
+import { useTransctionPending } from "@/hooks/useTransctionPending";
 
 interface IProps {}
 
@@ -28,12 +31,31 @@ const EditProfile: FC<IProps> = props => {
   const [userInfo, initUserInfo] = useUserInfo();
   const [, setUserInfo] = useAtom(userDetail);
   const [manager] = useManagerContract();
+  const [sbt] = useSBTContract();
   const [isLoginStatus] = useAtom(isLogin);
   const isCurrentNetwork = useIsCurrentNetwork();
+  const refreshTrans = useTransctionPending();
+  const [currentAvatar, setCurrentAvatar] = useState(
+    userInfo?.avatar.includes("http")
+      ? userInfo.avatar
+      : getIpfsUrl(userInfo?.avatar || "")
+  );
+  const { uploadBlob } = useUpload();
 
-  const [userName, setUserName] = useState(userInfo?.username);
+  const { data: ensName } = useEnsName({
+    address,
+  });
+
+  const [userName, setUserName] = useState(
+    userInfo?.soul_bound_token_id
+      ? userInfo?.username
+      : ensName
+      ? ensName
+      : userInfo?.username
+  );
   const [contractLoading, setContractLoading] = useState(false);
   const [transactionLoading, setTransactionLoading] = useState(false);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const clear = useInterval(() => {
     if (!userInfo) return;
@@ -55,6 +77,14 @@ const EditProfile: FC<IProps> = props => {
           create_profile_whitelisted: !!isWhite,
         });
       }
+    }
+  };
+
+  const uploadAvatar = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const cid = await uploadBlob(file);
+      setCurrentAvatar(getIpfsUrl(cid));
     }
   };
 
@@ -129,13 +159,14 @@ const EditProfile: FC<IProps> = props => {
               }}
             >
               <img
-                src={userInfo?.avatar}
+                src={currentAvatar}
                 alt=""
                 style={{
                   width: "128px",
                   height: "128px",
                   borderRadius: "50%",
                   marginRight: "32px",
+                  objectFit: "cover",
                 }}
               />
               <div style={{ display: "flex", flexDirection: "column" }}>
@@ -165,7 +196,22 @@ const EditProfile: FC<IProps> = props => {
                   2MB, keep visual elements centered
                 </span>
                 <div className={styles.uploadButtonBg}>
-                  <Button className={styles.uploadButton}>Upload</Button>
+                  <input
+                    type="file"
+                    hidden
+                    ref={uploadRef}
+                    onChange={e => {
+                      uploadAvatar(e);
+                    }}
+                  />
+                  <Button
+                    className={styles.uploadButton}
+                    onClick={() => {
+                      uploadRef.current?.click();
+                    }}
+                  >
+                    Upload
+                  </Button>
                 </div>
               </div>
             </div>
@@ -207,6 +253,7 @@ const EditProfile: FC<IProps> = props => {
                 className={styles.inputWrapper}
                 value={userName}
                 defaultValue={userName}
+                disabled
                 onChange={e => {
                   setUserName(e.target.value);
                 }}
@@ -272,7 +319,25 @@ const EditProfile: FC<IProps> = props => {
                 onClick={async () => {
                   if (userInfo?.soul_bound_token_id) {
                     // 更新Profile信息
+                    try {
+                      setContractLoading(true);
+                      const { hash } = await sbt.updateProfile(
+                        userInfo.soul_bound_token_id,
+                        userName || "",
+                        currentAvatar,
+                        {
+                          from: address,
+                        }
+                      );
+                      setTransactionLoading(true);
+                      setContractLoading(false);
+                      await refreshTrans(hash);
+                    } finally {
+                      setContractLoading(false);
+                      setTransactionLoading(false);
+                    }
 
+                    initUserInfo();
                     return;
                   }
 
@@ -281,7 +346,7 @@ const EditProfile: FC<IProps> = props => {
                     await manager.createProfile(
                       {
                         nickName: userName || "",
-                        imageURI: userInfo?.avatar || "",
+                        imageURI: currentAvatar || "",
                         wallet: address || "",
                       },
                       {
@@ -306,10 +371,10 @@ const EditProfile: FC<IProps> = props => {
                     await initUserInfo();
 
                     router.push("/dashboard");
-                    messageBox.success("save success");
+                    messageBox.success("Update success");
                   } catch (e) {
                     console.error(e);
-                    messageBox.error("save error");
+                    messageBox.error("error");
                   } finally {
                     setContractLoading(false);
                     setTransactionLoading(false);
@@ -321,7 +386,7 @@ const EditProfile: FC<IProps> = props => {
                   : contractLoading
                   ? "Confirm transaction in wallet"
                   : userInfo?.soul_bound_token_id
-                  ? "Save"
+                  ? "Update"
                   : "Create"}
               </Button>
             </div>

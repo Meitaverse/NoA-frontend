@@ -112,7 +112,11 @@ const Dashboard: FC<IProps> = props => {
 
             <div className={styles.userCard}>
               <div className={styles.avatarWrapper}>
-                <img src={userInfo?.avatar} alt="" />
+                <img
+                  src={userInfo?.avatar}
+                  alt=""
+                  style={{ objectFit: "cover" }}
+                />
               </div>
               <div
                 style={{

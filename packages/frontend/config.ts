@@ -1,3 +1,5 @@
+export const NFT_STORAGE_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDMyNTJmRTZhMmRCNTZFMEJkMWNFNTJlYWE2NTRFMjdDODI5ZTIyZDAiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3NzIwODEwMTI1OSwibmFtZSI6ImJpdHNvdWwifQ.psNhqVr0vjVYMyTkbpMR5ynV_itMYw-_-QKdlgCDAh4";
 export const MIDDLEWARE_URL = "http://app.bitsoul.net";
 export const API_URL = "http://52.77.164.208:8360";
 export const GRAPHQL_URL =

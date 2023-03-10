@@ -22,6 +22,7 @@
     "jotai": "^1.11.0",
     "lodash-es": "^4.17.21",
     "next": "^12.2.5",
+    "nft.storage": "^7.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-spring": "^9.5.5",

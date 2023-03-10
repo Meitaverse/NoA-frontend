@@ -224,6 +224,7 @@ const FHeader: FC<IProps> = props => {
                 height: "48px",
                 borderRadius: "50%",
                 marginRight: "16px",
+                objectFit: "cover",
               }}
             />
           </Dropdown>
