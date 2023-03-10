@@ -153,7 +153,7 @@ const Dashboard: FC<IProps> = props => {
                 <CopyOutlined />
               </div>
 
-              <div className={styles.followers}>
+              {/* <div className={styles.followers}>
                 <div className={styles.followerChunk}>
                   <span className={styles.followerCount}>96</span>
                   <span className={styles.followerTitle}>Followers</span>
@@ -168,7 +168,7 @@ const Dashboard: FC<IProps> = props => {
                   <span className={styles.followerCount}>96</span>
                   <span className={styles.followerTitle}>Followers</span>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className={styles.myTabs}>

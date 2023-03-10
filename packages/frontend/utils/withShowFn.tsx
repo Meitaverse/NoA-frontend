@@ -35,7 +35,9 @@ function withShow<T>(Component: FC<T>, defaultArgs = {}) {
   };
 }
 
-export default function withShowFn<T>(Component: FC<T>) {
+export default function withShowFn<T extends { visible: boolean }>(
+  Component: FC<T>
+) {
   return attachPropertiesToComponent(Component, {
     show: withShow(Component),
     success: msg => {
