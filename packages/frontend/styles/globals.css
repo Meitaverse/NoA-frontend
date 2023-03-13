@@ -18,3 +18,41 @@ a {
 button {
   cursor: pointer;
 }
+
+.linearButton {
+  border: none;
+  background:
+    linear-gradient(117.55deg, #1E50FF -3.37%, #00DFB7 105.51%);
+  border-radius: 16px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.linearButton.linearButton.linearButton.linearButton:hover {
+  color: #fff;
+}
+
+.linearBorderButtonBg {
+  background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+  border-radius: 13px;
+  width: 102px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linearBorderButton {
+  background: linear-gradient(
+    rgba(16, 20, 78, 0.2) 18.01%,
+    rgba(0, 0, 0, 0) 100%
+  ),
+  rgb(12, 16, 72);
+  color: #fff;
+  padding: 5px;
+  width: 100px;
+  height: auto;
+  font-size: 14px;
+  border-radius: 13px;
+  border: none;
+}

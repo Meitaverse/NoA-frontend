@@ -75,9 +75,7 @@ const alertPlugin: Plugin = {
     const config = data.config as Config;
     if (config.alert === true) {
       if (data.data.err_code !== 0) {
-        messageBox.error({
-          content: JSON.stringify(data.data.msg),
-        });
+        messageBox.error(JSON.stringify(data.data.msg));
       }
     }
     return data;

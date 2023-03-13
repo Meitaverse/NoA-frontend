@@ -15,6 +15,7 @@ export const useUserInfo: () => [
   const loginLoading = useRef(false);
 
   const initUserInfo = async (adr = "", justBalace = false) => {
+    if (!address) return false;
     if (loginLoading.current) return false;
     loginLoading.current = true;
     // 存在token的情况下尝试进行登录

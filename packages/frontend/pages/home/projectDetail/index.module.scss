@@ -1,0 +1,70 @@
+.projectDetail {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 120px;
+  color: #fff;
+  :global .ant-breadcrumb {
+    .ant-breadcrumb-link {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ant-breadcrumb-separator {
+      color: #fff;
+    }
+
+    li:last-child {
+      .ant-breadcrumb-link {
+        color: #fff;
+      }
+    }
+  }
+
+  .detailTitle {
+    color: #fff;
+    font-size: 44px;
+    font-weight: 700;
+    font-family: "Poppins";
+    line-height: 1.5;
+  }
+
+  .publisher {
+    margin-top: 44px;
+    background: #252842;
+    border-radius: 16px;
+    padding: 12.5px 20px;
+    margin-bottom: 24px;
+  }
+
+  .desc,
+  .secondCreation {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    font-family: "Poppins";
+  }
+
+  .mintInfo {
+    line-height: 1.5;
+    font-family: "Poppins";
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+
+  .price,
+  .supply {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .supply {
+    align-items: flex-end;
+  }
+
+  .scItem {
+    margin-right: 26px;
+    margin-bottom: 26px;
+  }
+}

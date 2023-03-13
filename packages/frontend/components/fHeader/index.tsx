@@ -41,7 +41,7 @@ const items: TabsProps["items"] = [
 ];
 
 const navRouter = {
-  Home: "/home",
+  Home: "/home/projectDetail",
   Dashboard: "/dashboard",
 };
 

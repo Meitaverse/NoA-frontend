@@ -40,10 +40,10 @@ export default function withShowFn<T extends { visible: boolean }>(
 ) {
   return attachPropertiesToComponent(Component, {
     show: withShow(Component),
-    success: msg => {
+    success: (msg: React.ReactNode) => {
       withShow(Component, { type: "success", content: msg })();
     },
-    error: msg => {
+    error: (msg: React.ReactNode) => {
       withShow(Component, { type: "error", content: msg })();
     },
   });
