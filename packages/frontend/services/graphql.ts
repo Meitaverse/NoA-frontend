@@ -94,8 +94,6 @@ export const getHubs = params => {
   return query<IGetHubs>(`query{
     hubs(first:100){
       id,
-      soulBoundTokenId,
-      creator,
       hubId,
       name,
       description,
@@ -152,7 +150,6 @@ export const getProjects = params => {
     projects(first:100){
       id,
       projectId,
-      soulBoundTokenId,
       derivativeNFT,
       timestamp
     }
@@ -217,9 +214,6 @@ export const getPreparePublish = params => {
   return query<IGetPreparePublish>(`query {
     publications(first: 100) {
       id
-      soulBoundTokenId
-      hubId
-      projectId
       salePrice
       royaltyBasisPoints
       amount
@@ -232,7 +226,6 @@ export const getPreparePublish = params => {
       publishModule
       publishModuleInitData
       publishId
-      previousPublishId
       publishTaxAmount
       timestamp
     }
@@ -275,7 +268,6 @@ export const getCollectHistory = params => {
   return query<IGetCollectHistory>(`query {
     feesForCollectHistories(first: 100) {
       id
-      collectorSoulBoundTokenId
       publishId
       treasuryAmount
       genesisAmount

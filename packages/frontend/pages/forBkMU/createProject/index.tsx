@@ -123,13 +123,12 @@ const CreateEvent: FC<IProps> = props => {
 
   const getHubsResult = async () => {
     const res = await getHubs({});
-
     setHubs(res.data.hubs);
   };
 
   const getProjectsResult = async () => {
-    const res = await getProjects({});
-    setProjects(res.data.projects);
+    // const res = await getProjects({});
+    // setProjects(res.data.projects);
   };
 
   useEffect(() => {

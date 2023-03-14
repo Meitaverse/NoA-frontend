@@ -28,6 +28,7 @@ import {
   FEE_ADDRESS,
   MANAGER_ADDRESS,
   PUBLISH_ADDRESS,
+  SBT_ADDRESS,
   TEMPLATE_ADDRESS,
 } from "@/config";
 import { AbiCoder, defaultAbiCoder } from "ethers/lib/utils";
@@ -221,53 +222,68 @@ const CreateEvent: FC<IProps> = props => {
     }
 
     const collectModuleInitData = defaultAbiCoder.encode(
-      ["uint256", "uint16", "uint256", "uint256"],
-      [
-        +collectModuleSBTID || +soulBoundTokenId,
-        "0",
-        salePrice,
-        royaltyBasisPoints,
-      ]
+      ["uint256", "uint16", "uint16"],
+      [10, 50, 0]
     );
 
     const publishModuleInitData = defaultAbiCoder.encode(
       ["address", "uint256"],
       [TEMPLATE_ADDRESS, 1]
     );
-    try {
-      const res = await manager.prePublish(
-        {
-          soulBoundTokenId,
-          hubId,
-          projectId,
-          amount,
-          salePrice,
-          royaltyBasisPoints,
-          name,
-          description,
-          materialURIs,
-          fromTokenIds,
+    // try {
+    // debugger;
+    // console.log({
+    //   soulBoundTokenId,
+    //   hubId,
+    //   projectId,
+    //   salePrice,
+    //   royaltyBasisPoints,
+    //   currency: SBT_ADDRESS,
+    //   amount,
+    //   name,
+    //   description,
+    //   canCollect: true,
+    //   materialURIs: [],
+    //   fromTokenIds: [],
+    //   collectModule: FEE_ADDRESS,
+    //   collectModuleInitData: collectModuleInitData,
+    //   publishModule: PUBLISH_ADDRESS,
+    //   publishModuleInitData: publishModuleInitData,
+    // });
+    const res = await manager.prePublish(
+      {
+        soulBoundTokenId,
+        hubId,
+        projectId,
+        salePrice,
+        royaltyBasisPoints,
+        currency: SBT_ADDRESS,
+        amount,
+        name,
+        description,
+        canCollect: true,
+        materialURIs: [],
+        fromTokenIds: [],
+        collectModule: FEE_ADDRESS,
+        collectModuleInitData: collectModuleInitData,
+        publishModule: PUBLISH_ADDRESS,
+        publishModuleInitData: publishModuleInitData,
+      },
+      {
+        from: account.address,
+      }
+    );
 
-          collectModule: FEE_ADDRESS,
-          collectModuleInitData: collectModuleInitData,
-          publishModule: PUBLISH_ADDRESS,
-          publishModuleInitData: publishModuleInitData,
-        },
-        {
-          from: account.address,
-        }
-      );
-
-      messageBox.success("预发布成功");
-      setTimeout(() => {
-        getPreparePublishResult();
-      }, 1500);
-    } catch (e) {
-      console.error(e);
-      console.warn(
-        "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"
-      );
-    }
+    messageBox.success("预发布成功");
+    //   setTimeout(() => {
+    //     getPreparePublishResult();
+    //   }, 1500);
+    // } catch (e) {
+    //   console.error(e);
+    //   console.warn(
+    //     "按照里面的方法重置一下钱包：https://ethereum.stackexchange.com/questions/109625/received-invalid-block-tag-87-latest-block-number-is-0"
+    //   );
+    // }
   };
 
   const getProfileResult = async () => {
@@ -289,9 +305,8 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const getPublishResult = async () => {
-    const res = await getPublishHistory({});
-
-    setPublishes(res.data.publishRecords);
+    // const res = await getPublishHistory({});
+    // setPublishes(res.data.publishRecords);
   };
 
   const getPreparePublishResult = async () => {
@@ -301,22 +316,20 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const getCollectResult = async () => {
-    const res = await getCollectHistory({});
-
-    setCollect(res.data.feesForCollectHistories);
+    // const res = await getCollectHistory({});
+    // setCollect(res.data.feesForCollectHistories);
   };
 
   const getNFTAssets = async () => {
-    const res = await getDerivativeNFTAssets({});
-
-    setNFTAssets(
-      res.data.derivativeNFTAssets.filter(val => {
-        return (
-          val.wallet.toLowerCase() === account.address?.toLowerCase() &&
-          +val.value > 0
-        );
-      })
-    );
+    // const res = await getDerivativeNFTAssets({});
+    // setNFTAssets(
+    //   res.data.derivativeNFTAssets.filter(val => {
+    //     return (
+    //       val.wallet.toLowerCase() === account.address?.toLowerCase() &&
+    //       +val.value > 0
+    //     );
+    //   })
+    // );
   };
 
   const approve = async () => {
