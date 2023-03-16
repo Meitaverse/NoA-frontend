@@ -211,15 +211,15 @@ const CreateEvent: FC<IProps> = props => {
   };
 
   const create = async () => {
-    if (!account.address) return;
-    if (!name) return;
-    if (!description) return;
-    if (!soulBoundTokenId) return;
+    // if (!account.address) return;
+    // if (!name) return;
+    // if (!description) return;
+    // if (!soulBoundTokenId) return;
 
-    if (preparePublish.find(x => x.name === name)) {
-      messageBox.error("已有相同名称，请更换名称");
-      return;
-    }
+    // if (preparePublish.find(x => x.name === name)) {
+    //   messageBox.error("已有相同名称，请更换名称");
+    //   return;
+    // }
 
     const collectModuleInitData = defaultAbiCoder.encode(
       ["uint256", "uint16", "uint16"],
@@ -230,26 +230,7 @@ const CreateEvent: FC<IProps> = props => {
       ["address", "uint256"],
       [TEMPLATE_ADDRESS, 1]
     );
-    // try {
-    // debugger;
-    // console.log({
-    //   soulBoundTokenId,
-    //   hubId,
-    //   projectId,
-    //   salePrice,
-    //   royaltyBasisPoints,
-    //   currency: SBT_ADDRESS,
-    //   amount,
-    //   name,
-    //   description,
-    //   canCollect: true,
-    //   materialURIs: [],
-    //   fromTokenIds: [],
-    //   collectModule: FEE_ADDRESS,
-    //   collectModuleInitData: collectModuleInitData,
-    //   publishModule: PUBLISH_ADDRESS,
-    //   publishModuleInitData: publishModuleInitData,
-    // });
+
     const res = await manager.prePublish(
       {
         soulBoundTokenId,

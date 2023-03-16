@@ -8,15 +8,10 @@ export const useUpload = () => {
   const uploadBlob = async (file: File) => {
     // const blob =
     try {
-      message.loading({
-        content: "loading",
-        key: "cidKey",
-      });
       const cid = await client.storeBlob(file);
 
       return cid;
     } finally {
-      message.destroy("cidKey");
     }
   };
 

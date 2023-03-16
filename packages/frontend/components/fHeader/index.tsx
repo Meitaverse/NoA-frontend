@@ -43,6 +43,7 @@ const items: TabsProps["items"] = [
 const navRouter = {
   Home: "/home/projectDetail",
   Dashboard: "/dashboard",
+  CreativeHubs: "/creativeHub/createMyHub",
 };
 
 const FHeader: FC<IProps> = props => {
@@ -88,6 +89,20 @@ const FHeader: FC<IProps> = props => {
       setActTab("Dashboard");
     }
   }, []);
+
+  useEffect(() => {
+    if (router.pathname.includes("dashboard")) {
+      setActTab("Dashboard");
+      return;
+    }
+
+    if (router.pathname.includes("creativeHub")) {
+      setActTab("CreativeHubs");
+      return;
+    }
+
+    setActTab("Home");
+  }, [router.pathname]);
 
   return (
     <div className={styles.fHeader}>
