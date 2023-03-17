@@ -1,4 +1,4 @@
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd";
 import React, { ChangeEvent, FC, useEffect, useRef, useState } from "react";
 import { useAccount, useEnsName } from "wagmi";
 import styles from "./index.module.scss";
@@ -83,8 +83,16 @@ const EditProfile: FC<IProps> = props => {
   const uploadAvatar = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const cid = await uploadBlob(file);
-      setCurrentAvatar(getIpfsUrl(cid));
+      try {
+        message.loading({
+          content: "Loading",
+          key: "loadingKey",
+        });
+        const cid = await uploadBlob(file);
+        setCurrentAvatar(getIpfsUrl(cid));
+      } finally {
+        message.destroy("loadingKey");
+      }
     }
   };
 

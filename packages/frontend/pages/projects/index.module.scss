@@ -1,0 +1,90 @@
+.projects {
+  display: flex;
+  flex-direction: column;
+
+  .userInfo {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: -36px;
+    color: #fff;
+  }
+
+  .operationBar {
+    display: flex;
+    align-items: center;
+    max-width: 1200px;
+    width: 1200px;
+    margin: 24px auto;
+    background: #242954;
+    padding: 12px 24px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    .opItem {
+      display: flex;
+      color: #fff;
+      align-items: center;
+      &Title {
+        flex-shrink: 0;
+        margin-right: 8px;
+      }
+
+      :global .ant-input {
+        width: 400px;
+        height: 32px;
+
+        background: #0d1149;
+        border-radius: 12px;
+        border: none;
+
+        color: #fff;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.6);
+        }
+      }
+    }
+
+    .opItem + .opItem {
+      margin-left: 36px;
+    }
+  }
+
+  .projTables {
+    display: flex;
+    flex-direction: column;
+    background: #242954;
+    border-radius: 16px;
+    padding: 20px 32px;
+    color: #fff;
+    max-width: 1200px;
+    width: 1200px;
+    margin: 0 auto;
+    .filterBar {
+      display: flex;
+      align-items: center;
+
+      :global {
+        .ant-select {
+          &-selector {
+            background: transparent;
+            border: none;
+            color: #fff;
+            box-shadow: none !important;
+          }
+          &-arrow {
+            color: #fff;
+          }
+
+          &-selection-item {
+            color: #fff;
+            border: none;
+            box-shadow: none;
+          }
+        }
+      }
+    }
+  }
+}
