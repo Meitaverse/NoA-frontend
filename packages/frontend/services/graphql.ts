@@ -346,3 +346,31 @@ export const voucherAssets = (params: VoucherAssetsParams) => {
     }
   }`);
 };
+
+export const TreasuryFee = () => {
+  return query<{
+    treasuryFeeRecord: {
+      newTreasuryFee: number;
+    };
+  }>(`query {
+      treasuryFeeRecord(id: "TreasuryFeeSetting") {
+        newTreasuryFee
+      }
+  }`);
+};
+
+export interface ICurrencyWhiteList {
+  currencyWhitelists: {
+    currency: string;
+    whitelisted: boolean;
+  }[];
+}
+
+export const CurrencyWhitelist = () => {
+  return query<ICurrencyWhiteList>(`query {
+    currencyWhitelists {
+        currency,
+        whitelisted
+      }
+  }`);
+};

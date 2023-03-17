@@ -8,7 +8,7 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-// import styles from './index,.scss';
+import styles from "./index.module.scss";
 
 interface IProps {
   buttonText?: string;
@@ -57,7 +57,10 @@ const Upload = forwardRef<
 
   return (
     <div style={{ ...props.style }}>
-      <div className="linearBorderButtonBg">
+      <div
+        className="linearBorderButtonBg"
+        style={{ width: "100%", height: "100%" }}
+      >
         <input
           style={{ display: "none" }}
           type="file"
@@ -72,11 +75,17 @@ const Upload = forwardRef<
             e.stopPropagation();
             uploadRef.current?.click();
           }}
+          className={styles.buttonWrapper}
         >
           {props.children ? (
             props.children
           ) : (
-            <Button className="linearBorderButton">{buttonText}</Button>
+            <Button
+              className="linearBorderButton"
+              style={{ width: "calc(100% - 2px)", height: "calc(100% - 2px)" }}
+            >
+              {buttonText}
+            </Button>
           )}
         </div>
       </div>

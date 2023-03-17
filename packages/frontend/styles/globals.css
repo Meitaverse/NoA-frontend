@@ -35,8 +35,8 @@ button {
 .linearBorderButtonBg {
   background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
   border-radius: 13px;
-  width: 102px;
-  height: 34px;
+  min-width: 102px;
+  min-height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,7 +50,7 @@ button {
   rgb(12, 16, 72);
   color: #fff;
   padding: 5px;
-  width: 100px;
+  min-width: 100px;
   height: auto;
   font-size: 14px;
   border-radius: 13px;
