@@ -25,10 +25,10 @@ const CreateMyHub: FC<IProps> = props => {
   const [userInfo] = useUserInfo();
   const refreshTrans = useTransctionPending();
 
-  const [hubDetail, setHubDetail] = useState<IGetMyHubDetail | null>(null);
-
   const [loadingOne, setLoadingOne] = useState(false);
   const [loadingTrans, setLoadingTrans] = useState(false);
+
+  const [hubDetail, setHubDetail] = useState<IGetMyHubDetail | null>(null);
 
   const getHubDetail = async () => {
     const res = await getMyHubDetail();
@@ -372,6 +372,10 @@ const CreateMyHub: FC<IProps> = props => {
                 loading={loadingOne || loadingTrans}
                 style={{ width: 528, height: 54, borderRadius: 16 }}
                 onClick={async () => {
+                  if (hubDetail?.blockchain_hub_id) {
+                    messageBox.error("You has been created hub");
+                    return;
+                  }
                   const values = await form.validateFields();
                   if (!currentHubLogo) {
                     messageBox.error("logo is required");

@@ -1,0 +1,44 @@
+.creativeHub {
+  display: flex;
+  flex-direction: column;
+  width: 1200px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: #fff;
+  align-items: center;
+
+  .main {
+    margin-top: 56px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -30px;
+    width: calc(100% + 30px);
+
+    .hubItem {
+      margin-right: 30px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 277px;
+      background: radial-gradient(
+        151.95% 463.58% at -44.29% -62.34%,
+        rgba(255, 255, 255, 0.3) 0%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      backdrop-filter: blur(37px);
+      border-radius: 16px;
+      padding: 20px;
+      border: 2px solid #398dee;
+
+      .hubName {
+        margin: 20px 0;
+      }
+
+      .hubDetail {
+        color: #858584;
+      }
+    }
+  }
+}

@@ -90,7 +90,7 @@ export interface IGetHubs {
   }[];
 }
 
-export const getHubs = params => {
+export const getHubs = (params?) => {
   return query<IGetHubs>(`query{
     hubs(first:100){
       id,
