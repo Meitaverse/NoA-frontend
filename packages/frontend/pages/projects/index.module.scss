@@ -86,5 +86,37 @@
         }
       }
     }
+
+    .projTable {
+      margin-top: 16px;
+
+      :global {
+        .ant-table-container {
+          background: #242954;
+        }
+        th {
+          background: #242954 !important;
+          border-bottom: 1px solid #242954 !important;
+          color: #fff;
+
+          &::before {
+            display: none;
+          }
+        }
+
+        .ant-table-tbody > tr.ant-table-placeholder:hover > td {
+          background: #242954;
+        }
+
+        .ant-empty-description {
+          color: #fff;
+          opacity: 0.5;
+        }
+
+        .ant-table-tbody > tr > td {
+          border-bottom: none;
+        }
+      }
+    }
   }
 }

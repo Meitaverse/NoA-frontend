@@ -1,16 +1,47 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Select, Table } from "antd";
 import { FullscreenOutlined, RedoOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
+import { ColumnsType } from "antd/es/table";
 
 interface IProps {}
+
+interface DataType {
+  key: React.Key;
+  image: string;
+  projectName: string;
+  status: string;
+  action: React.ReactNode;
+}
 
 const Projects: FC<IProps> = props => {
   const [userInfo] = useUserInfo();
   const router = useRouter();
+  const [selectionType, setSelectionType] = useState<"checkbox" | "radio">(
+    "checkbox"
+  );
+
+  const columns: ColumnsType<DataType> = [
+    {
+      title: "Image",
+      dataIndex: "image",
+    },
+    {
+      title: "Project Name",
+      dataIndex: "projectName",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+    },
+  ];
 
   return (
     <div className={styles.projects}>
@@ -95,7 +126,7 @@ const Projects: FC<IProps> = props => {
 
           <span style={{ flex: 1 }}></span>
 
-          <Select defaultValue="12321"></Select>
+          <Select defaultValue="Project Name"></Select>
 
           <div
             className="linearBorderButtonBg"
@@ -115,6 +146,14 @@ const Projects: FC<IProps> = props => {
           <RedoOutlined style={{ marginLeft: 16, marginRight: 12 }} />
           <FullscreenOutlined />
         </div>
+
+        <Table
+          className={styles.projTable}
+          rowSelection={{
+            type: selectionType,
+          }}
+          columns={columns}
+        ></Table>
       </div>
     </div>
   );
