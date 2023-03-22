@@ -1,0 +1,107 @@
+.createProject {
+  .form {
+    color: #fff;
+
+    :global {
+      .ant-form-item .ant-form-item-label > label {
+        color: #fff;
+
+        &::after {
+          display: none;
+        }
+      }
+
+      .ant-radio-wrapper {
+        color: #fff;
+
+        .ant-radio-checked {
+          .ant-radio-inner {
+            border-color: #7357ff;
+            background-color: #7357ff;
+          }
+        }
+      }
+    }
+
+    .formItem {
+      display: flex;
+      flex-direction: column;
+
+      &Desc {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+        margin-bottom: 15px;
+      }
+
+      .formInput {
+        max-width: 530px;
+        min-height: 63px;
+
+        background: rgba(217, 217, 217, 0.2);
+        border: 1px solid rgba(101, 103, 107, 0.5);
+        border-radius: 20px;
+        color: #fff;
+        display: flex;
+        /* Chip fill */
+        :global .ant-input {
+          background: transparent;
+          color: #fff;
+          &::placeholder {
+            color: #777e91;
+          }
+        }
+
+        :global .ant-input-wrapper {
+          width: 100%;
+
+          .ant-input {
+            border: none;
+            height: 63px;
+          }
+
+          .ant-input-group-addon {
+            border: none;
+
+            .ant-select-selector {
+              color: #fff;
+              box-shadow: none;
+              border: none;
+            }
+
+            .ant-select-selection-item {
+              color: #fff;
+            }
+          }
+        }
+
+        &::placeholder {
+          color: #777e91;
+        }
+      }
+
+      :global .ant-picker-range {
+        background: rgba(217, 217, 217, 0.2);
+        border: 1px solid rgba(101, 103, 107, 0.5);
+        height: 64px;
+        border-radius: 20px;
+
+        .ant-picker-input {
+          > input {
+            color: #fff;
+            &::placeholder {
+              color: #fff;
+            }
+          }
+        }
+
+        .ant-picker-range-separator {
+          color: #fff;
+        }
+
+        .ant-picker-suffix {
+          color: #fff;
+        }
+      }
+    }
+  }
+}

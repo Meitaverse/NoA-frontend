@@ -81,7 +81,9 @@ export interface IGetHubs {
   hubs: {
     id: string;
     soulBoundTokenId: string;
-    creator: string;
+    hubOwner: {
+      id: string;
+    };
     hubId: string;
     name: string;
     description: string;
@@ -98,7 +100,10 @@ export const getHubs = (params?) => {
       name,
       description,
       imageURI,
-      timestamp
+      timestamp,
+      hubOwner {
+        id
+      }
     }
   }	`);
 };
@@ -139,18 +144,33 @@ export interface IGetProjects {
   projects: {
     id: string;
     projectId: string;
-    soulBoundTokenId: string;
-    derivativeNFT: string;
+    derivativeNFT: {
+      id: string;
+    };
     timestamp: string;
+    projectCreator: {
+      id: string;
+    };
+    name: string;
+    description: string;
+    image: string;
   }[];
 }
 
-export const getProjects = params => {
+export const getProjects = (params = "first:100") => {
   return query<IGetProjects>(`query{
-    projects(first:100){
+    projects(${params}){
       id,
       projectId,
-      derivativeNFT,
+      derivativeNFT {
+        id
+      },
+      projectCreator {
+        id
+      },
+      name,
+      description,
+      image,
       timestamp
     }
   }`);

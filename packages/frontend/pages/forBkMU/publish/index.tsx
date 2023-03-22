@@ -246,8 +246,8 @@ const CreateEvent: FC<IProps> = props => {
         materialURIs: [],
         fromTokenIds: [],
         collectModule: FEE_ADDRESS,
-        collectModuleInitData: collectModuleInitData,
         publishModule: PUBLISH_ADDRESS,
+        collectModuleInitData: collectModuleInitData,
         publishModuleInitData: publishModuleInitData,
       },
       {

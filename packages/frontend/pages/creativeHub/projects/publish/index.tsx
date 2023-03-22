@@ -8,16 +8,20 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import messageBox from "@/components/messageBox";
 import { useAccount } from "wagmi";
 import { useUpdate } from "ahooks";
-import { createHub } from "@/services/hub";
+import { createHub, getMyHubDetail } from "@/services/hub";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { waitForSomething } from "@/utils/waitForSomething";
 import {
   CurrencyWhitelist,
+  getHubs,
   ICurrencyWhiteList,
   TreasuryFee,
 } from "@/services/graphql";
 import { toSoul } from "@/utils/toSoul";
 import { CaretDownOutlined } from "@ant-design/icons";
+import { useRouter } from "next/router";
+import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
+import { defaultAbiCoder } from "ethers/lib/utils";
 
 interface IProps {}
 // 临时方案
@@ -30,6 +34,7 @@ const CreateMyHub: FC<IProps> = props => {
   const bgRef = useRef<HTMLInputElement>(null);
 
   const account = useAccount();
+  const router = useRouter();
   const update = useUpdate();
   const [form] = Form.useForm();
   const [manager] = useManagerContract();
@@ -44,6 +49,30 @@ const CreateMyHub: FC<IProps> = props => {
   >([]);
   const [loadingOne, setLoadingOne] = useState(false);
   const [loadingTrans, setLoadingTrans] = useState(false);
+
+  const [myHubDetail, setMyHubDetail] = useState<any>();
+
+  const getHubDetail = async () => {
+    const resG = await getHubs();
+
+    const find = resG.data.hubs.find(
+      i => i.hubOwner.id.toLowerCase() === account.address?.toLowerCase()
+    );
+
+    // 正常情况应该用下面那个，但现在后端没写好
+    const res = await getMyHubDetail();
+
+    if (res.err_code === 0) {
+      setMyHubDetail({
+        ...res.data,
+        blockchain_hub_id: find?.hubId || "",
+      });
+
+      return res.data;
+    }
+
+    return false;
+  };
 
   const getFeeSetting = async () => {
     const { data } = await TreasuryFee();
@@ -82,6 +111,7 @@ const CreateMyHub: FC<IProps> = props => {
   useEffect(() => {
     getFeeSetting();
     getCurCurrencry();
+    getHubDetail();
   }, []);
 
   return (
@@ -395,11 +425,6 @@ const CreateMyHub: FC<IProps> = props => {
                   <span className={styles.formItemDesc}>description</span>
 
                   <Radio.Group
-                    value={form.getFieldValue("issueMethod")}
-                    onChange={v => {
-                      form.setFieldValue("issueMethod", v);
-                      update();
-                    }}
                     style={{ display: "flex", flexDirection: "column" }}
                   >
                     <Radio value={true}>Paid Mint</Radio>
@@ -602,6 +627,77 @@ const CreateMyHub: FC<IProps> = props => {
               style={{ width: 528, height: 54, borderRadius: 16 }}
               onClick={async () => {
                 const values = await form.validateFields();
+                if (!myHubDetail?.blockchain_hub_id) {
+                  messageBox.error("you don't have hub, please create first.");
+                  return;
+                }
+                setLoadingOne(true);
+
+                if (!router.query.id) {
+                  messageBox.error("unexcept error");
+                  return;
+                }
+
+                try {
+                  const collectModuleInitData = defaultAbiCoder.encode(
+                    ["uint256", "uint16", "uint16"],
+                    [
+                      +form.getFieldValue("publish"),
+                      +form.getFieldValue("owner"),
+                      0,
+                    ]
+                  );
+
+                  const publishModuleInitData = defaultAbiCoder.encode(
+                    ["address", "uint256"],
+                    [TEMPLATE_ADDRESS, 1]
+                  );
+
+                  const { hash } = await manager.prePublish(
+                    {
+                      hubId: myHubDetail.blockchain_hub_id,
+                      soulBoundTokenId: userInfo?.soul_bound_token_id || "",
+                      projectId: +router.query.id || 1,
+                      name: form.getFieldValue("name"),
+                      description: form.getFieldValue("desc"),
+                      salePrice: form.getFieldValue("mintPrice"),
+                      currency: curSelectCurrency,
+                      canCollect:
+                        form.getFieldValue("issueMethod") === "true"
+                          ? true
+                          : false,
+                      materialURIs: form.getFieldValue("media")
+                        ? [form.getFieldValue("media")]
+                        : [],
+                      fromTokenIds: [],
+                      amount: form.getFieldValue("totalSupply"),
+                      collectModule: FEE_ADDRESS,
+                      publishModule: PUBLISH_ADDRESS,
+                      collectModuleInitData: collectModuleInitData,
+                      publishModuleInitData: publishModuleInitData,
+                      royaltyBasisPoints: form.getFieldValue("publish"),
+                    },
+                    {
+                      from: account.address,
+                    }
+                  );
+
+                  setLoadingOne(false);
+                  setLoadingTrans(true);
+                  const result = await refreshTrans(hash);
+                  if (result) {
+                    messageBox.success("Prepare publish Success");
+                    // const data = await getProjects(
+                    //   "first:1, orderBy: timestamp orderDirection: desc"
+                    // );
+                    // router.push(
+                    //   `/creativeHub/projects/publish?id=${data.data.projects[0].projectId}`
+                    // );
+                  }
+                } finally {
+                  setLoadingOne(false);
+                  setLoadingTrans(false);
+                }
               }}
             >
               {loadingTrans

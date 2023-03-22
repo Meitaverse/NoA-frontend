@@ -3,14 +3,16 @@ import { getMyHubDetail, IGetMyHubDetail } from "@/services/hub";
 import { Button } from "antd";
 import { useRouter } from "next/router";
 import React, { FC, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 
 interface IProps {}
 
 const CreativeHub: FC<IProps> = props => {
   const router = useRouter();
+  const account = useAccount();
   const [hubs, setHubs] = useState<IGetHubs["hubs"]>([]);
-  const [hubDetail, setHubDetail] = useState<IGetMyHubDetail | null>(null);
+  const [hubDetail, setHubDetail] = useState<any>(null);
 
   const fetchHubs = async () => {
     const data = await getHubs();
@@ -19,10 +21,18 @@ const CreativeHub: FC<IProps> = props => {
   };
 
   const getHubDetail = async () => {
+    const resG = await getHubs();
+
+    const find = resG.data.hubs.find(
+      i => i.hubOwner.id.toLowerCase() === account.address?.toLowerCase()
+    );
     const res = await getMyHubDetail();
 
     if (res.err_code === 0) {
-      setHubDetail(res.data);
+      setHubDetail({
+        ...res.data,
+        blockchain_hub_id: find?.hubId || "",
+      });
       return res.data;
     }
 
@@ -33,7 +43,7 @@ const CreativeHub: FC<IProps> = props => {
     getHubDetail();
     fetchHubs();
   }, []);
-
+  console.log(hubDetail);
   return (
     <div className={styles.creativeHub}>
       <h1>Explore Hubs</h1>
