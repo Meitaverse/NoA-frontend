@@ -6,7 +6,12 @@ import { Button, Input, Select, Table } from "antd";
 import { FullscreenOutlined, RedoOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import { ColumnsType } from "antd/es/table";
-import { getHubs, getProjects, IGetProjects } from "@/services/graphql";
+import {
+  getHubs,
+  getProjects,
+  GetProjectsByWallet,
+  IGetProjects,
+} from "@/services/graphql";
 import { useAccount } from "wagmi";
 import { getMyHubDetail } from "@/services/hub";
 
@@ -20,8 +25,9 @@ const Projects: FC<IProps> = props => {
     "checkbox"
   );
 
+  // 暂不分页
   const getProjectsParams = useRef({
-    first: 5,
+    first: 50,
     skip: 0,
   });
 
@@ -89,11 +95,12 @@ const Projects: FC<IProps> = props => {
 
     try {
       loading.current = true;
-      const data = await getProjects(
-        `first: ${getProjectsParams.current.first} skip: ${getProjectsParams.current.skip} where: {  }`
+      const data = await GetProjectsByWallet(
+        `first: ${getProjectsParams.current.first} skip: ${getProjectsParams.current.skip}`,
+        account.address || ""
       );
 
-      setProjects(data.data.projects);
+      setProjects(data.data.account.hub.projects);
     } finally {
       loading.current = false;
     }
@@ -216,14 +223,14 @@ const Projects: FC<IProps> = props => {
           rowKey={"id"}
           columns={columns}
           dataSource={projects}
-          pagination={{
+        ></Table>
+        {/* pagination={{
             pageSize: 5,
             onChange(page, pageSize) {
               getProjectsParams.current.skip = (page - 1) * pageSize;
               fetchProjects();
             },
-          }}
-        ></Table>
+          }} */}
       </div>
     </div>
   );

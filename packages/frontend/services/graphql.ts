@@ -394,3 +394,32 @@ export const CurrencyWhitelist = () => {
       }
   }`);
 };
+
+export const GetProjectsByWallet = (params, walletAddress: string) => {
+  return query<{
+    account: {
+      hub: {
+        projects: IGetProjects["projects"];
+      };
+    };
+  }>(`query getAccount {
+    account(id: "${walletAddress.toLowerCase()}") {
+      hub {
+        projects(${params}){
+          id,
+          projectId,
+          derivativeNFT {
+            id
+          },
+          projectCreator {
+            id
+          },
+          name,
+          description,
+          image,
+          timestamp
+        }
+      }
+    }
+  }`);
+};

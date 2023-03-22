@@ -12,7 +12,7 @@ import { getMyHubDetail, IGetMyHubDetail } from "@/services/hub";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 
 import { useRouter } from "next/router";
-import { getHubs, getProjects } from "@/services/graphql";
+import { getHubs, getProjects, GetProjectsByWallet } from "@/services/graphql";
 
 interface IProps {}
 
@@ -274,11 +274,13 @@ const CreateProject: FC<IProps> = props => {
                   const result = await refreshTrans(hash);
                   if (result) {
                     messageBox.success("Create Success");
-                    const data = await getProjects(
-                      "first:1, orderBy: timestamp orderDirection: desc"
+
+                    const data = await GetProjectsByWallet(
+                      `first: 1 rderBy: timestamp orderDirection: desc`,
+                      account.address || ""
                     );
                     router.push(
-                      `/creativeHub/projects/publish?id=${data.data.projects[0].projectId}`
+                      `/creativeHub/projects/publish?id=${data.data.account.hub.projects[0].projectId}`
                     );
                   }
                 } finally {
