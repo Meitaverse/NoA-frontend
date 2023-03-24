@@ -26,8 +26,8 @@ import { defaultAbiCoder } from "ethers/lib/utils";
 interface IProps {}
 // 临时方案
 const tempCurLabel = {
-  "0x04c89607413713ec9775e14b954286519d836fef": "SBT",
-  "0x82e01223d51eb87e16a03e24687edf0f294da6f1": "ETH",
+  "0xa85233c63b9ee964add6f2cffe00fd84eb32338f": "SBT",
+  "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e": "ETH",
 };
 
 const CreateMyHub: FC<IProps> = props => {
@@ -89,7 +89,7 @@ const CreateMyHub: FC<IProps> = props => {
   const getCurCurrencry = async () => {
     const { data } = await CurrencyWhitelist();
 
-    console.log(
+    setCurrencyList(
       data.currencyWhitelists
         .filter(i => i.whitelisted)
         .map(i => {
@@ -100,15 +100,8 @@ const CreateMyHub: FC<IProps> = props => {
         })
     );
 
-    setCurrencyList(
-      data.currencyWhitelists
-        .filter(i => i.whitelisted)
-        .map(i => {
-          return {
-            value: i.currency,
-            label: tempCurLabel[i.currency],
-          };
-        })
+    setCurSelectCurrency(
+      data.currencyWhitelists.filter(i => i.whitelisted)[0].currency || ""
     );
   };
 
@@ -319,7 +312,7 @@ const CreateMyHub: FC<IProps> = props => {
                     disabled
                   ></Input>
 
-                  <div
+                  {/* <div
                     className="linearBorderButtonBg"
                     style={{
                       width: "120px",
@@ -337,7 +330,7 @@ const CreateMyHub: FC<IProps> = props => {
                     >
                       Select
                     </Button>
-                  </div>
+                  </div> */}
 
                   <Upload
                     ref={bgRef}
@@ -345,7 +338,7 @@ const CreateMyHub: FC<IProps> = props => {
                       width: "120px",
                       height: "64px",
                       marginLeft: "10px",
-                      display: "none",
+                      // display: "none",
                     }}
                     buttonText="Select"
                     onChange={val => {
@@ -591,8 +584,8 @@ const CreateMyHub: FC<IProps> = props => {
                   const collectModuleInitData = defaultAbiCoder.encode(
                     ["uint256", "uint16", "uint16", "uint32"],
                     [
-                      +form.getFieldValue("publish"),
-                      +form.getFieldValue("owner"),
+                      +form.getFieldValue("mintPrice"),
+                      +form.getFieldValue("royalties"),
                       +form.getFieldValue("mintLimit"),
                       0,
                     ]
@@ -602,7 +595,6 @@ const CreateMyHub: FC<IProps> = props => {
                     ["address", "uint256"],
                     [TEMPLATE_ADDRESS, 1]
                   );
-
                   const { hash } = await manager.prePublish(
                     {
                       hubId: myHubDetail.blockchain_hub_id,
