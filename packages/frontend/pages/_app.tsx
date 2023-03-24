@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { AppProps } from "next/app";
 import NextHead from "next/head";
-import "../styles/globals.css";
+import "../styles/globals.scss";
 import "@rainbow-me/rainbowkit/styles.css";
 
 // Imports
@@ -21,9 +21,6 @@ import { ApolloProvider } from "@apollo/client";
 import { useRouter } from "next/router";
 import FHeader from "@/components/fHeader";
 import Login from "@/components/login";
-import { useAtom } from "jotai";
-import { isLogin } from "@/store/userDetail";
-import { useUserInfo } from "@/hooks/useUserInfo";
 
 const App = ({ Component, pageProps }: AppProps) => {
   const isMounted = useIsMounted();

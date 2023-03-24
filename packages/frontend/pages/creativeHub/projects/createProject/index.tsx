@@ -258,7 +258,7 @@ const CreateProject: FC<IProps> = props => {
                       soulBoundTokenId: userInfo?.soul_bound_token_id || "",
                       name: form.getFieldValue("name"),
                       image: form.getFieldValue("media"),
-                      metadataURI: form.getFieldValue("media"),
+                      metadataURI: form.getFieldValue("media") || "",
                       description: form.getFieldValue("desc"),
                       descriptor: account.address || "",
                       defaultRoyaltyPoints: 0,
@@ -274,7 +274,7 @@ const CreateProject: FC<IProps> = props => {
                   const result = await refreshTrans(hash);
                   if (result) {
                     messageBox.success("Create Success");
-
+                    // router.push("/dashboard");
                     const data = await GetProjectsByWallet(
                       `first: 1 rderBy: timestamp orderDirection: desc`,
                       account.address || ""

@@ -11,6 +11,7 @@ import { useUpdate } from "ahooks";
 import { createHub, getMyHubDetail, IGetMyHubDetail } from "@/services/hub";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { waitForSomething } from "@/utils/waitForSomething";
+import { useRouter } from "next/router";
 
 interface IProps {}
 
@@ -19,6 +20,7 @@ const CreateMyHub: FC<IProps> = props => {
   const bgRef = useRef<HTMLInputElement>(null);
 
   const account = useAccount();
+  const router = useRouter();
   const update = useUpdate();
   const [form] = Form.useForm();
   const [manager] = useManagerContract();
@@ -429,6 +431,7 @@ const CreateMyHub: FC<IProps> = props => {
 
                       if (result) {
                         messageBox.success("hub create success");
+                        router.push("/creativeHub/projects");
                       }
                     }
                   } catch (e) {

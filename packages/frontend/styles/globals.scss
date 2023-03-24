@@ -1,0 +1,151 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
+}
+
+.linearButton {
+  border: none;
+  background:
+    linear-gradient(117.55deg, #1E50FF -3.37%, #00DFB7 105.51%);
+  border-radius: 16px;
+  font-size: 16px;
+  color: #fff;
+}
+
+.linearButton.linearButton.linearButton.linearButton:hover {
+  color: #fff;
+}
+
+.linearBorderButtonBg {
+  background: linear-gradient(117.55deg, #1e50ff -3.37%, #00dfb7 105.51%);
+  border-radius: 13px;
+  min-width: 102px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linearBorderButton {
+  background: linear-gradient(
+    rgba(16, 20, 78, 0.2) 18.01%,
+    rgba(0, 0, 0, 0) 100%
+  ),
+  rgb(12, 16, 72);
+  color: #fff;
+  padding: 5px;
+  min-width: 100px;
+  height: auto;
+  font-size: 14px;
+  border-radius: 13px;
+  border: none;
+}
+
+.darkModal .ant-modal-content{
+    background: #252842;
+    border: 1px solid rgba(101, 103, 107, 0.5);
+    border-radius: 20px;
+    padding: 36px 48px;
+  
+}
+
+.blackInput {
+  max-width: 530px;
+  min-height: 63px;
+
+  background: rgba(217, 217, 217, 0.2);
+  border: 1px solid rgba(101, 103, 107, 0.5);
+  border-radius: 20px;
+  color: #fff;
+  display: flex;
+  /* Chip fill */
+  :global .ant-input {
+    background: transparent;
+    color: #fff;
+    &::placeholder {
+      color: #777e91;
+    }
+  }
+
+  :global .ant-input-wrapper {
+    width: 100%;
+
+    .ant-input {
+      border: none;
+      height: 63px;
+    }
+
+    .ant-input-group-addon {
+      border: none;
+
+      .ant-select-selector {
+        color: #fff;
+        box-shadow: none;
+        border: none;
+      }
+
+      .ant-select-selection-item {
+        color: #fff;
+      }
+    }
+  }
+
+  &::placeholder {
+    color: #777e91;
+  }
+}
+
+.blackSelect.blackSelect {
+  max-width: 530px;
+  min-height: 63px;
+
+  border: 1px solid rgba(101, 103, 107, 0.5);
+  border-radius: 20px;
+  color: #fff;
+  display: flex;
+
+  .ant-select-selector {
+    background-color: rgba(217, 217, 217, 0.2);
+    min-height: 63px;
+    border: 1px solid rgba(101, 103, 107, 0.5);
+    border-radius: 20px;
+    color: #fff;
+    display: flex;
+    .ant-select-selection-search {
+      .ant-select-selection-search-input {
+        height: 100%;
+        font-size: 16px;
+        color: #fff;
+      }
+    }
+
+    .ant-select-selection-placeholder {
+      color: #fff;
+      height: 100%;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+  }
+  .ant-select-arrow {
+    color: #fff;
+  }
+}

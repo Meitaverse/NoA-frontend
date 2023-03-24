@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
-import { Button, DatePicker, Form, Input, Radio, Select } from "antd";
+import { Button, DatePicker, Form, Input, Modal, Radio, Select } from "antd";
 import Upload from "@/components/upload";
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { useUserInfo } from "@/hooks/useUserInfo";
@@ -18,7 +18,7 @@ import {
   TreasuryFee,
 } from "@/services/graphql";
 import { toSoul } from "@/utils/toSoul";
-import { CaretDownOutlined } from "@ant-design/icons";
+import { CaretDownOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
 import { defaultAbiCoder } from "ethers/lib/utils";
@@ -51,6 +51,10 @@ const CreateMyHub: FC<IProps> = props => {
   const [loadingTrans, setLoadingTrans] = useState(false);
 
   const [myHubDetail, setMyHubDetail] = useState<any>();
+
+  const [importStage, setImportStage] = useState<"One" | "Two" | "Three">(
+    "One"
+  );
 
   const getHubDetail = async () => {
     const resG = await getHubs();
@@ -314,12 +318,34 @@ const CreateMyHub: FC<IProps> = props => {
                     value={form.getFieldValue("media")}
                     disabled
                   ></Input>
+
+                  <div
+                    className="linearBorderButtonBg"
+                    style={{
+                      width: "120px",
+                      height: "64px",
+                      marginLeft: "10px",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Button
+                      className="linearBorderButton"
+                      style={{
+                        width: "118px",
+                        height: "62px",
+                      }}
+                    >
+                      Select
+                    </Button>
+                  </div>
+
                   <Upload
                     ref={bgRef}
                     style={{
                       width: "120px",
                       height: "64px",
                       marginLeft: "10px",
+                      display: "none",
                     }}
                     buttonText="Select"
                     onChange={val => {
@@ -418,17 +444,18 @@ const CreateMyHub: FC<IProps> = props => {
                     required: true,
                   },
                 ]}
-                initialValue={false}
                 style={{ marginLeft: "67px" }}
+                initialValue={"true"}
               >
                 <div className={styles.formItem}>
                   <span className={styles.formItemDesc}>description</span>
 
                   <Radio.Group
                     style={{ display: "flex", flexDirection: "column" }}
+                    defaultValue={"true"}
                   >
-                    <Radio value={true}>Paid Mint</Radio>
-                    <Radio value={false} style={{ marginTop: "15px" }}>
+                    <Radio value={"true"}>Paid Mint</Radio>
+                    <Radio value={"false"} style={{ marginTop: "15px" }}>
                       Free Airdrop
                     </Radio>
                   </Radio.Group>
@@ -513,103 +540,25 @@ const CreateMyHub: FC<IProps> = props => {
               </div>
             </Form.Item>
 
-            <Form.Item label="Royalties">
+            <Form.Item
+              name="royalties"
+              label="Royalties"
+              rules={[
+                {
+                  required: true,
+                },
+              ]}
+            >
               <div className={styles.formItem} style={{ color: "#fff" }}>
                 <span className={styles.formItemDesc}>
                   Earning receive for every sale
                 </span>
-              </div>
-            </Form.Item>
-
-            <Form.Item name="publish">
-              <div
-                className={styles.formItem}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    width: "160px",
-                    marginRight: 20,
-                    flexShrink: 0,
-                    color: "#fff",
-                  }}
-                >
-                  Publisher(You)
-                </span>
                 <Input
                   placeholder="eg: MAYC Family"
                   className={styles.formInput}
-                  value={form.getFieldValue("publish")}
+                  value={form.getFieldValue("royalties")}
                   onChange={e => {
-                    form.setFieldValue("publish", e.target.value);
-                    update();
-                  }}
-                  suffix={"%"}
-                ></Input>
-              </div>
-            </Form.Item>
-
-            <Form.Item name="owner">
-              <div
-                className={styles.formItem}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    width: "160px",
-                    marginRight: 20,
-                    flexShrink: 0,
-                    color: "#fff",
-                  }}
-                >
-                  Owner
-                </span>
-                <Input
-                  placeholder="eg: MAYC Family"
-                  className={styles.formInput}
-                  value={form.getFieldValue("owner")}
-                  onChange={e => {
-                    form.setFieldValue("owner", e.target.value);
-                    update();
-                  }}
-                  suffix={"%"}
-                ></Input>
-              </div>
-            </Form.Item>
-
-            <Form.Item name="community">
-              <div
-                className={styles.formItem}
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <span
-                  style={{
-                    width: "160px",
-                    marginRight: 20,
-                    flexShrink: 0,
-                    color: "#fff",
-                  }}
-                >
-                  Community(BitSoul)
-                </span>
-                <Input
-                  placeholder="eg: MAYC Family"
-                  className={styles.formInput}
-                  value={form.getFieldValue("community")}
-                  onChange={e => {
-                    form.setFieldValue("community", e.target.value);
+                    form.setFieldValue("royalties", e.target.value);
                     update();
                   }}
                   suffix={"%"}
@@ -640,10 +589,11 @@ const CreateMyHub: FC<IProps> = props => {
 
                 try {
                   const collectModuleInitData = defaultAbiCoder.encode(
-                    ["uint256", "uint16", "uint16"],
+                    ["uint256", "uint16", "uint16", "uint32"],
                     [
                       +form.getFieldValue("publish"),
                       +form.getFieldValue("owner"),
+                      +form.getFieldValue("mintLimit"),
                       0,
                     ]
                   );
@@ -675,7 +625,8 @@ const CreateMyHub: FC<IProps> = props => {
                       publishModule: PUBLISH_ADDRESS,
                       collectModuleInitData: collectModuleInitData,
                       publishModuleInitData: publishModuleInitData,
-                      royaltyBasisPoints: form.getFieldValue("publish"),
+                      royaltyBasisPoints:
+                        +form.getFieldValue("royalties") * 100,
                     },
                     {
                       from: account.address,
@@ -707,6 +658,260 @@ const CreateMyHub: FC<IProps> = props => {
                 : "Pre Publish"}
             </Button>
           </div>
+
+          <Modal
+            className="darkModal"
+            open={false}
+            footer={null}
+            closeIcon={
+              <CloseCircleOutlined
+                style={{ fontSize: "22px", color: "#FFF" }}
+              />
+            }
+            closable
+            width={720}
+          >
+            <>
+              {importStage === "One" && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    color: "#fff",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "24px",
+                      fontWeight: "600",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    Create New Project
+                  </div>
+                  <div
+                    style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px" }}
+                  >
+                    choos the way to continue
+                  </div>
+
+                  <Button
+                    className={styles.selectButton}
+                    style={{ marginTop: "24px" }}
+                    onClick={() => {
+                      setImportStage("Two");
+                    }}
+                  >
+                    Import NFT From Your Wallet
+                  </Button>
+                  <Button
+                    className={styles.selectButton}
+                    onClick={() => {
+                      bgRef.current?.click?.();
+                    }}
+                    style={{ marginTop: "16px" }}
+                  >
+                    Create New NFT
+                  </Button>
+                </div>
+              )}
+
+              {importStage === "Two" && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    color: "#fff",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "24px",
+                      fontWeight: "600",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    Import Your NFT
+                  </div>
+                  <div
+                    style={{ color: "rgba(255,255,255,0.8)", fontSize: "16px" }}
+                  >
+                    Enter the contract address and token ID to import your NFT
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      padding: "0 55px",
+                    }}
+                  >
+                    <div style={{ margin: "15px 0" }}>Select a mainet *</div>
+
+                    <Select
+                      className="blackSelect"
+                      placeholder="Select a network"
+                      style={{ width: "240px" }}
+                    ></Select>
+
+                    <div style={{ margin: "15px 0" }}>Contract Address *</div>
+
+                    <Input className="blackInput"></Input>
+
+                    <div style={{ margin: "15px 0" }}>Token ID *</div>
+
+                    <Input className="blackInput"></Input>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: "0 55px",
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <Button
+                      className="linearButton"
+                      style={{
+                        marginTop: "36px",
+                        width: "100%",
+                        height: "48px",
+                      }}
+                    >
+                      Start Import
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {importStage === "Three" && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    color: "#fff",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "24px",
+                      fontWeight: "600",
+                      marginBottom: "24px",
+                    }}
+                  >
+                    Signing Message
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      background: "#494B60",
+                    }}
+                  >
+                    <img
+                      src=""
+                      alt=""
+                      style={{ width: "240px", height: "260px" }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "360px",
+                        padding: "36px 30px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "20px",
+                          lineHeight: "30px",
+                          fontWeight: 600,
+                          marginBottom: 36,
+                        }}
+                      >
+                        MAYC #9754
+                      </span>
+                      <span
+                        style={{
+                          opacity: 0.8,
+                          fontSize: "16px",
+                          lineHeight: "24px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Contract Address: 0x000
+                      </span>
+                      <span
+                        style={{
+                          opacity: 0.8,
+                          fontSize: "16px",
+                          lineHeight: "24px",
+                          fontWeight: "600",
+                          margin: "16px 0",
+                        }}
+                      >
+                        Token ID: 9574
+                      </span>
+                      <span
+                        style={{
+                          opacity: 0.8,
+                          fontSize: "16px",
+                          lineHeight: "24px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        Owner: 0x000
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      color: "rgba(255,255,255,0.8)",
+                      fontSize: "14px",
+                      margin: "24px 0",
+                    }}
+                  >
+                    Please sign the message in your wallet to continue.
+                  </div>
+
+                  <div
+                    style={{ color: "rgba(255,255,255,0.8)", fontSize: "14px" }}
+                  >
+                    By signing this message, you agree to license your NFT
+                    intellectual property rights to the BitSoul Protocol to
+                    publish new dNFTs.
+                  </div>
+
+                  <div
+                    style={{
+                      padding: "0 55px",
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <Button
+                      className="linearButton"
+                      style={{
+                        marginTop: "36px",
+                        width: "100%",
+                        height: "48px",
+                      }}
+                    >
+                      Sign
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          </Modal>
         </div>
       </div>
     </div>

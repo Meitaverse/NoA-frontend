@@ -1462,6 +1462,32 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "market",
+        "type": "address"
+      }
+    ],
+    "name": "setMarket",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sbt",
+        "type": "address"
+      }
+    ],
+    "name": "setSBT",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "enum DataTypes.ProtocolState",
         "name": "newState",
         "type": "uint8"
@@ -1481,6 +1507,32 @@
       }
     ],
     "name": "setTimeLock",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "treasury",
+        "type": "address"
+      }
+    ],
+    "name": "setTreasury",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "voucher",
+        "type": "address"
+      }
+    ],
+    "name": "setVoucher",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
