@@ -6,7 +6,7 @@ import Upload from "@/components/upload";
 import { useManagerContract } from "@/hooks/useManagerContract";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import messageBox from "@/components/messageBox";
-import { useAccount } from "wagmi";
+import { useAccount, useSignMessage, useSwitchNetwork } from "wagmi";
 import { useUpdate } from "ahooks";
 import { createHub, getMyHubDetail } from "@/services/hub";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
@@ -22,6 +22,10 @@ import { CaretDownOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
 import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
 import { defaultAbiCoder } from "ethers/lib/utils";
+import Mumbai from "@/chain/Mumbai";
+import { useNftContracts } from "@/hooks/useNftContracts";
+import { signLog } from "@/services/sign";
+import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
 
 interface IProps {}
 // 临时方案
@@ -29,6 +33,13 @@ const tempCurLabel = {
   "0xa85233c63b9ee964add6f2cffe00fd84eb32338f": "SBT",
   "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e": "ETH",
 };
+
+const nftNetworks = [
+  {
+    label: "Mumbai",
+    value: Mumbai.id,
+  },
+];
 
 const CreateMyHub: FC<IProps> = props => {
   const bgRef = useRef<HTMLInputElement>(null);
@@ -38,8 +49,12 @@ const CreateMyHub: FC<IProps> = props => {
   const update = useUpdate();
   const [form] = Form.useForm();
   const [manager] = useManagerContract();
+  const { setNftAddress, caller } = useNftContracts();
   const [userInfo] = useUserInfo();
   const refreshTrans = useTransctionPending();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const { switchToSoulAsync } = useSwitchToSoul();
+  const { signMessageAsync } = useSignMessage();
 
   // 位
   const [fee, setFee] = useState<number>(0);
@@ -52,9 +67,16 @@ const CreateMyHub: FC<IProps> = props => {
 
   const [myHubDetail, setMyHubDetail] = useState<any>();
 
+  const [showImport, setShowImport] = useState(false);
   const [importStage, setImportStage] = useState<"One" | "Two" | "Three">(
     "One"
   );
+  const [importContractAddress, setImportContractAddress] = useState("");
+  const [importTokenId, setImportTokenId] = useState("");
+  const [importURI, setImportURI] = useState("");
+
+  const [checkOwnLoading, setCheckOwnLoading] = useState(false);
+  const [signLoading, setSignLoading] = useState(false);
 
   const getHubDetail = async () => {
     const resG = await getHubs();
@@ -103,6 +125,15 @@ const CreateMyHub: FC<IProps> = props => {
     setCurSelectCurrency(
       data.currencyWhitelists.filter(i => i.whitelisted)[0].currency || ""
     );
+  };
+
+  const reset = async () => {
+    await switchToSoulAsync();
+    setShowImport(false);
+    setImportStage("One");
+    setImportContractAddress("");
+    setImportTokenId("");
+    setImportURI("");
   };
 
   useEffect(() => {
@@ -312,13 +343,17 @@ const CreateMyHub: FC<IProps> = props => {
                     disabled
                   ></Input>
 
-                  {/* <div
+                  <div
                     className="linearBorderButtonBg"
                     style={{
                       width: "120px",
                       height: "64px",
                       marginLeft: "10px",
                       flexShrink: 0,
+                    }}
+                    onClick={() => {
+                      setShowImport(true);
+                      setImportStage("One");
                     }}
                   >
                     <Button
@@ -330,7 +365,7 @@ const CreateMyHub: FC<IProps> = props => {
                     >
                       Select
                     </Button>
-                  </div> */}
+                  </div>
 
                   <Upload
                     ref={bgRef}
@@ -338,7 +373,7 @@ const CreateMyHub: FC<IProps> = props => {
                       width: "120px",
                       height: "64px",
                       marginLeft: "10px",
-                      // display: "none",
+                      display: "none",
                     }}
                     buttonText="Select"
                     onChange={val => {
@@ -494,10 +529,11 @@ const CreateMyHub: FC<IProps> = props => {
               </div>
             </Form.Item>
 
-            <Form.Item name="time" label="Start & End Time">
+            <Form.Item name="time" label="Start" initialValue={0}>
               <div className={styles.formItem}>
-                <DatePicker.RangePicker
-                  separator={"to"}
+                {/* separator={"to"} */}
+                <DatePicker
+                  showTime
                   value={form.getFieldValue("time")}
                   onChange={e => {
                     form.setFieldValue("time", e);
@@ -587,7 +623,7 @@ const CreateMyHub: FC<IProps> = props => {
                       +form.getFieldValue("mintPrice"),
                       +form.getFieldValue("royalties"),
                       +form.getFieldValue("mintLimit"),
-                      0,
+                      +form.getFieldValue("time") / 1000,
                     ]
                   );
 
@@ -653,7 +689,7 @@ const CreateMyHub: FC<IProps> = props => {
 
           <Modal
             className="darkModal"
-            open={false}
+            open={showImport}
             footer={null}
             closeIcon={
               <CloseCircleOutlined
@@ -662,6 +698,9 @@ const CreateMyHub: FC<IProps> = props => {
             }
             closable
             width={720}
+            onCancel={() => {
+              reset();
+            }}
           >
             <>
               {importStage === "One" && (
@@ -749,15 +788,32 @@ const CreateMyHub: FC<IProps> = props => {
                       className="blackSelect"
                       placeholder="Select a network"
                       style={{ width: "240px" }}
+                      options={nftNetworks}
+                      onChange={async val => {
+                        await switchNetworkAsync?.(val);
+                      }}
                     ></Select>
 
                     <div style={{ margin: "15px 0" }}>Contract Address *</div>
 
-                    <Input className="blackInput"></Input>
+                    <Input
+                      className="blackInput"
+                      value={importContractAddress}
+                      onChange={v => {
+                        setImportContractAddress(v.target.value);
+                        setNftAddress(v.target.value);
+                      }}
+                    ></Input>
 
                     <div style={{ margin: "15px 0" }}>Token ID *</div>
 
-                    <Input className="blackInput"></Input>
+                    <Input
+                      className="blackInput"
+                      value={importTokenId}
+                      onChange={v => {
+                        setImportTokenId(v.target.value);
+                      }}
+                    ></Input>
                   </div>
 
                   <div
@@ -773,6 +829,30 @@ const CreateMyHub: FC<IProps> = props => {
                         marginTop: "36px",
                         width: "100%",
                         height: "48px",
+                      }}
+                      loading={checkOwnLoading}
+                      onClick={async () => {
+                        setCheckOwnLoading(true);
+
+                        try {
+                          const data = await caller[1].ownerOf(importTokenId);
+
+                          if (
+                            data.toLowerCase() ===
+                            account.address?.toLowerCase()
+                          ) {
+                            const tokenURI = await caller[1].tokenURI(
+                              importTokenId
+                            );
+
+                            setImportURI(tokenURI);
+                            setImportStage("Three");
+                          } else {
+                            messageBox.error("This is not your nft");
+                          }
+                        } finally {
+                          setCheckOwnLoading(false);
+                        }
                       }}
                     >
                       Start Import
@@ -808,9 +888,9 @@ const CreateMyHub: FC<IProps> = props => {
                     }}
                   >
                     <img
-                      src=""
+                      src={importURI}
                       alt=""
-                      style={{ width: "240px", height: "260px" }}
+                      style={{ width: "240px", objectFit: "cover" }}
                     />
                     <div
                       style={{
@@ -838,7 +918,7 @@ const CreateMyHub: FC<IProps> = props => {
                           fontWeight: "600",
                         }}
                       >
-                        Contract Address: 0x000
+                        Contract Address: {importContractAddress}
                       </span>
                       <span
                         style={{
@@ -849,7 +929,7 @@ const CreateMyHub: FC<IProps> = props => {
                           margin: "16px 0",
                         }}
                       >
-                        Token ID: 9574
+                        Token ID: {importTokenId}
                       </span>
                       <span
                         style={{
@@ -859,7 +939,7 @@ const CreateMyHub: FC<IProps> = props => {
                           fontWeight: "600",
                         }}
                       >
-                        Owner: 0x000
+                        Owner: {account.address}
                       </span>
                     </div>
                   </div>
@@ -895,6 +975,32 @@ const CreateMyHub: FC<IProps> = props => {
                         marginTop: "36px",
                         width: "100%",
                         height: "48px",
+                      }}
+                      loading={signLoading}
+                      onClick={async () => {
+                        setSignLoading(true);
+
+                        try {
+                          const msg = `Contract Address: ${importContractAddress}
+                          Token ID: ${importTokenId}
+                          Owner: ${account.address}
+                          `;
+                          const signMsg = await signMessageAsync({
+                            message: msg,
+                          });
+
+                          const res = await signLog({
+                            content: msg,
+                            sign: signMsg,
+                          });
+
+                          if (res.err_code === 0) {
+                            form.setFieldValue("media", importURI);
+                            await reset();
+                          }
+                        } finally {
+                          setSignLoading(false);
+                        }
                       }}
                     >
                       Sign

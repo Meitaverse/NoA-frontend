@@ -144,6 +144,11 @@ button {
       justify-content: center;
     }
 
+    .ant-select-selection-item {
+      display: flex;
+      align-items: center;
+    }
+
   }
   .ant-select-arrow {
     color: #fff;

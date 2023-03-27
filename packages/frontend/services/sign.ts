@@ -48,3 +48,10 @@ export const sendValidateCode = post<any, sendValidateCodeParams>(
 );
 export const bindAccount = post<any, bindAccountParams>("/bindAccount");
 export const linkSoulBoundTokenId = post("/linkSoulBoundTokenId");
+export const signLog = post<
+  any,
+  {
+    content: string;
+    sign: string;
+  }
+>("/signLog");

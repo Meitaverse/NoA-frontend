@@ -5,12 +5,19 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID as string;
 
-import ShaWdao from "./ShaWdao-AWS";
 import BitSoul from "./bitsoul";
+import Mumbai from "./Mumbai";
 
 const { chains, provider } = configureChains(
   // 扩展不同的网络
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, BitSoul],
+  [
+    chain.mainnet,
+    chain.polygon,
+    chain.optimism,
+    chain.arbitrum,
+    BitSoul,
+    Mumbai,
+  ],
   [alchemyProvider({ apiKey: alchemyId }), publicProvider()]
 );
 
