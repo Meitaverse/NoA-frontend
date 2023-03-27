@@ -74,6 +74,15 @@ const CreateMyHub: FC<IProps> = props => {
   const [importContractAddress, setImportContractAddress] = useState("");
   const [importTokenId, setImportTokenId] = useState("");
   const [importURI, setImportURI] = useState("");
+  const [importImageMetaData, setImportImageMetaData] = useState<{
+    image: string;
+    name: string;
+    description: string;
+  }>({
+    image: "",
+    name: "",
+    description: "",
+  });
 
   const [checkOwnLoading, setCheckOwnLoading] = useState(false);
   const [signLoading, setSignLoading] = useState(false);
@@ -841,11 +850,19 @@ const CreateMyHub: FC<IProps> = props => {
                             data.toLowerCase() ===
                             account.address?.toLowerCase()
                           ) {
-                            const tokenURI = await caller[1].tokenURI(
+                            const tokenURIBase64 = await caller[1].tokenURI(
                               importTokenId
                             );
 
-                            setImportURI(tokenURI);
+                            const jsonData = JSON.parse(
+                              Buffer.from(
+                                tokenURIBase64.split(",")[1],
+                                "base64"
+                              ).toString()
+                            );
+
+                            setImportURI(jsonData.image);
+                            setImportImageMetaData(jsonData);
                             setImportStage("Three");
                           } else {
                             messageBox.error("This is not your nft");
@@ -908,7 +925,7 @@ const CreateMyHub: FC<IProps> = props => {
                           marginBottom: 36,
                         }}
                       >
-                        MAYC #9754
+                        {importImageMetaData.name}
                       </span>
                       <span
                         style={{
@@ -981,7 +998,9 @@ const CreateMyHub: FC<IProps> = props => {
                         setSignLoading(true);
 
                         try {
-                          const msg = `Contract Address: ${importContractAddress}
+                          const msg = `
+                          ${importImageMetaData.name}
+                          Contract Address: ${importContractAddress}
                           Token ID: ${importTokenId}
                           Owner: ${account.address}
                           `;
