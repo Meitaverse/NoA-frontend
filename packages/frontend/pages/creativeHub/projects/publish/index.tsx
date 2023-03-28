@@ -1015,6 +1015,14 @@ const CreateMyHub: FC<IProps> = props => {
 
                           if (res.err_code === 0) {
                             form.setFieldValue("media", importURI);
+                            form.setFieldValue(
+                              "name",
+                              importImageMetaData.name
+                            );
+                            form.setFieldValue(
+                              "description",
+                              importImageMetaData.description
+                            );
                             await reset();
                           }
                         } finally {

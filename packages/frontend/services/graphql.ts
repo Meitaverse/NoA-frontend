@@ -423,3 +423,25 @@ export const GetProjectsByWallet = (params, walletAddress: string) => {
     }
   }`);
 };
+
+export const GetHubsByWallet = (walletAddress: string) => {
+  return query<{
+    account: {
+      hub: {
+        id: string;
+        hubId: string;
+        name: string;
+        imageURI: string;
+      };
+    };
+  }>(`query getAccount {
+    account(id: "${walletAddress.toLowerCase()}") {
+      hub {
+        id
+        hubId
+        name
+        imageURI
+      }
+    }
+  }`);
+};

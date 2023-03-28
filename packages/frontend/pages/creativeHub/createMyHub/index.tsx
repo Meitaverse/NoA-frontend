@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
 import { Button, Form, Input, Radio } from "antd";
@@ -8,7 +8,12 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import messageBox from "@/components/messageBox";
 import { useAccount } from "wagmi";
 import { useUpdate } from "ahooks";
-import { createHub, getMyHubDetail, IGetMyHubDetail } from "@/services/hub";
+import {
+  createHub,
+  getMyHubDetail,
+  IGetMyHubDetail,
+  updateHub,
+} from "@/services/hub";
 import { useTransctionPending } from "@/hooks/useTransctionPending";
 import { waitForSomething } from "@/utils/waitForSomething";
 import { useRouter } from "next/router";
@@ -32,13 +37,18 @@ const CreateMyHub: FC<IProps> = props => {
 
   const [hubDetail, setHubDetail] = useState<IGetMyHubDetail | null>(null);
 
+  const isEdit = useMemo(() => {
+    return router.query.edit;
+  }, [router.query]);
+
   const getHubDetail = async () => {
     const res = await getMyHubDetail();
 
     if (res.err_code === 0) {
       setHubDetail(res.data);
       if (res.data) {
-        setCurrentHubLogo(res.data.log);
+        setCurrentHubLogo(res.data.background);
+        form.setFieldsValue(res.data);
       }
       return res.data;
     }
@@ -47,8 +57,10 @@ const CreateMyHub: FC<IProps> = props => {
   };
 
   useEffect(() => {
-    getHubDetail();
-  }, []);
+    if (router.query.edit) {
+      getHubDetail();
+    }
+  }, [router.query]);
 
   return (
     <div className={styles.createMyHub}>
@@ -231,7 +243,7 @@ const CreateMyHub: FC<IProps> = props => {
             </Form.Item>
 
             <Form.Item
-              name="desc"
+              name="description"
               label="Description"
               rules={[
                 {
@@ -248,9 +260,9 @@ const CreateMyHub: FC<IProps> = props => {
                   placeholder="Provide a detailed description of your hub"
                   className={styles.formInput}
                   rows={8}
-                  value={form.getFieldValue("desc")}
+                  value={form.getFieldValue("description")}
                   onChange={e => {
-                    form.setFieldValue("desc", e.target.value);
+                    form.setFieldValue("description", e.target.value);
                     update();
                   }}
                 ></Input.TextArea>
@@ -374,10 +386,6 @@ const CreateMyHub: FC<IProps> = props => {
                 loading={loadingOne || loadingTrans}
                 style={{ width: 528, height: 54, borderRadius: 16 }}
                 onClick={async () => {
-                  if (hubDetail?.blockchain_hub_id) {
-                    messageBox.error("You has been created hub");
-                    return;
-                  }
                   const values = await form.validateFields();
                   if (!currentHubLogo) {
                     messageBox.error("logo is required");
@@ -391,6 +399,33 @@ const CreateMyHub: FC<IProps> = props => {
 
                   try {
                     setLoadingOne(true);
+
+                    if (isEdit) {
+                      await updateHub({ ...values });
+                      const res = await manager.updateHub(
+                        hubDetail?.blockchain_hub_id || 0,
+                        form.getFieldValue("name"),
+                        form.getFieldValue("description"),
+                        form.getFieldValue("background"),
+                        {
+                          from: account.address,
+                        }
+                      );
+                      setLoadingOne(false);
+                      setLoadingTrans(true);
+
+                      const result = await refreshTrans(res.hash);
+
+                      if (result) {
+                        messageBox.success("hub update success");
+                        router.push("/creativeHub/projects");
+                      }
+                      return;
+                    }
+                    if (hubDetail?.blockchain_hub_id) {
+                      messageBox.error("You has been created hub");
+                      return;
+                    }
                     if (!hubDetail) {
                       // 如果不存在hub，则需要先告诉后端，等待创建，之后一直轮询到后端加入白名单为止。
                       const backendRes = await createHub({
@@ -416,7 +451,7 @@ const CreateMyHub: FC<IProps> = props => {
                         {
                           soulBoundTokenId: userInfo?.soul_bound_token_id,
                           name: values.name,
-                          description: values.desc,
+                          description: values.description,
                           imageURI: currentHubLogo,
                         },
                         {
@@ -446,6 +481,8 @@ const CreateMyHub: FC<IProps> = props => {
                   ? "Transaction Pending"
                   : loadingOne
                   ? "Confirm Transaction in wallet"
+                  : isEdit
+                  ? "Update"
                   : "Create"}
               </Button>
             </div>

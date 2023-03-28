@@ -83,14 +83,6 @@ const CreativeHub: FC<IProps> = props => {
               />
 
               <div className={styles.hubName}>{hub.name}</div>
-              <div className={styles.hubDetail}>
-                Total Sales:
-                <span
-                  style={{ color: "#fff", fontSize: "16px", lineHeight: 1.4 }}
-                >
-                  34 ETH
-                </span>
-              </div>
             </div>
           );
         })}

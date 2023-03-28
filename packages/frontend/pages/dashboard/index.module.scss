@@ -117,6 +117,33 @@
           border-radius: 12px;
         }
       }
+
+      .hubItem {
+        margin-right: 30px;
+        margin-bottom: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 277px;
+        background: radial-gradient(
+          151.95% 463.58% at -44.29% -62.34%,
+          rgba(255, 255, 255, 0.3) 0%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        backdrop-filter: blur(37px);
+        border-radius: 16px;
+        padding: 20px;
+        border: 2px solid #398dee;
+  
+        .hubName {
+          margin: 20px 0;
+        }
+  
+        .hubDetail {
+          color: #858584;
+        }
+      }
     }
 
     .mintCardPreview {

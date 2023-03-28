@@ -8,17 +8,19 @@ import { useRouter } from "next/router";
 import { Button, Tabs, TabsProps } from "antd";
 import PurchaseDialog from "@/components/purchaseDialog";
 import MintCard from "./components/mintCard";
-import { formatBalance } from "@/utils/format";
 import { useAtom } from "jotai";
 import { isLogin } from "@/store/userDetail";
 import Login from "@/components/login";
-import { voucherAssets, VoucherAssets } from "@/services/graphql";
+import {
+  GetHubsByWallet,
+  voucherAssets,
+  VoucherAssets,
+} from "@/services/graphql";
 import Recharge from "./components/recharge";
 import { getBgNow } from "@/services/voucher";
 import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
 import { toSoul } from "@/utils/toSoul";
-import messageBox from "@/components/messageBox";
 import { useInterval } from "ahooks";
 
 interface IProps {}
@@ -32,6 +34,14 @@ const items: TabsProps["items"] = [
     key: "DNFT",
     label: "My DNFT",
   },
+  {
+    key: "hub",
+    label: "My Hub",
+  },
+  {
+    key: "projects",
+    label: "My Project",
+  },
 ];
 
 const Dashboard: FC<IProps> = props => {
@@ -44,6 +54,12 @@ const Dashboard: FC<IProps> = props => {
   const [showRecharge, setShowRecharge] = useState(false);
   const [myCards, setMyCards] = useState<VoucherAssets["voucherAssets"]>([]);
   const [nowBg, setNowBg] = useState("");
+  const [hub, setHub] = useState<{
+    name: string;
+    imageURI: string;
+    id: string;
+    hubId: string;
+  }>();
   const getNowBg = async () => {
     const data = await getBgNow();
 
@@ -64,6 +80,12 @@ const Dashboard: FC<IProps> = props => {
     if (cards.data.voucherAssets) {
       setMyCards(cards.data.voucherAssets);
     }
+  };
+
+  const getMyHub = async () => {
+    const res = await GetHubsByWallet(address?.toLowerCase() || "");
+
+    setHub(res.data.account.hub);
   };
 
   const clear = useInterval(() => {
@@ -182,6 +204,10 @@ const Dashboard: FC<IProps> = props => {
                 items={items}
                 onChange={key => {
                   setActTab(key);
+
+                  if (key === "hub") {
+                    getMyHub();
+                  }
                 }}
               ></Tabs>
 
@@ -401,6 +427,40 @@ const Dashboard: FC<IProps> = props => {
                       })}
                     </div>
                   </div>
+                </div>
+              )}
+              {actTab === "hub" && (
+                <div style={{ display: "flex", flexWrap: "wrap" }}>
+                  {hub && (
+                    <div
+                      className={styles.hubItem}
+                      onClick={() => {
+                        router.push("/creativeHub/projects");
+                      }}
+                    >
+                      <img
+                        src={hub?.imageURI}
+                        alt=""
+                        style={{
+                          width: "120px",
+                          height: "120px",
+                          objectFit: "cover",
+                          borderRadius: "50%",
+                        }}
+                      />
+
+                      <div className={styles.hubName}>{hub?.name}</div>
+
+                      <div
+                        onClick={e => {
+                          e.stopPropagation();
+                          router.push(`/creativeHub/createMyHub?edit=1`);
+                        }}
+                      >
+                        <EditOutlined />
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
