@@ -262,7 +262,7 @@ const CreateProject: FC<IProps> = props => {
                       description: form.getFieldValue("desc"),
                       descriptor: account.address || "",
                       defaultRoyaltyPoints: 0,
-                      permitByHubOwner: true,
+                      permitByHubOwner: false,
                     },
                     {
                       from: account.address,

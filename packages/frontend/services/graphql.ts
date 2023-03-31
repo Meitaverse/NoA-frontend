@@ -395,11 +395,21 @@ export const CurrencyWhitelist = () => {
   }`);
 };
 
+export type WalletProjects = (IGetProjects["projects"][number] & {
+  publishes: {
+    id: string;
+  }[];
+  publications: {
+    id: string;
+    publishId: string;
+  }[];
+})[];
+
 export const GetProjectsByWallet = (params, walletAddress: string) => {
   return query<{
     account: {
       hub: {
-        projects: IGetProjects["projects"];
+        projects: WalletProjects;
       };
     };
   }>(`query getAccount {
@@ -418,6 +428,13 @@ export const GetProjectsByWallet = (params, walletAddress: string) => {
           description,
           image,
           timestamp
+          publishes {
+            id
+          }
+          publications {
+            id
+            publishId
+          }
         }
       }
     }

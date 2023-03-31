@@ -1,7 +1,11 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import styles from "./index.module.scss";
 import BgPng from "@/images/editProfile.png";
-import { CopyOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  CopyOutlined,
+  EditOutlined,
+  EllipsisOutlined,
+} from "@ant-design/icons";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
@@ -13,8 +17,11 @@ import { isLogin } from "@/store/userDetail";
 import Login from "@/components/login";
 import {
   GetHubsByWallet,
+  GetProjectsByWallet,
+  IGetProjects,
   voucherAssets,
   VoucherAssets,
+  WalletProjects,
 } from "@/services/graphql";
 import Recharge from "./components/recharge";
 import { getBgNow } from "@/services/voucher";
@@ -22,6 +29,8 @@ import logoPng from "@/images/logo.jpeg";
 import dayjs from "dayjs";
 import { toSoul } from "@/utils/toSoul";
 import { useInterval } from "ahooks";
+import { useManagerContract } from "@/hooks/useManagerContract";
+import { useTransctionPending } from "@/hooks/useTransctionPending";
 
 interface IProps {}
 
@@ -44,6 +53,91 @@ const items: TabsProps["items"] = [
   },
 ];
 
+const ProjectItem: FC<
+  WalletProjects[number] & { onPublish?: () => void }
+> = props => {
+  const [manager] = useManagerContract();
+  const { address } = useAccount();
+  const refreshTrans = useTransctionPending();
+  const [pubLoading, setPubloading] = useState(false);
+  const [transLoading, setTransloading] = useState(false);
+  const router = useRouter();
+
+  return (
+    <div className={styles.projectItem}>
+      <img src={props.image} alt="" className={styles.projectCover} />
+      <span className={styles.projectName}>{props.name}</span>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            background: "#1890FF",
+            borderRadius: "50%",
+            marginRight: 8,
+          }}
+        ></span>
+        <span>ongoing</span>
+        <span style={{ flex: 1 }}></span>
+        <EllipsisOutlined />
+      </div>
+
+      {props.publications.length && !props.publishes.length ? (
+        <Button
+          className="linearButton"
+          style={{ marginTop: "16px" }}
+          onClick={async () => {
+            setPubloading(true);
+            try {
+              const { hash } = await manager.publish(
+                +props.publications[0].publishId,
+                {
+                  from: address,
+                }
+              );
+
+              setPubloading(false);
+              setTransloading(true);
+
+              const result = await refreshTrans(hash);
+
+              if (result) {
+                props?.onPublish?.();
+              }
+            } finally {
+              setPubloading(false);
+              setTransloading(false);
+            }
+          }}
+          loading={pubLoading || transLoading}
+        >
+          {transLoading
+            ? "Transaction Pending"
+            : pubLoading
+            ? "Confirm in Wallet"
+            : "Publish"}
+        </Button>
+      ) : (
+        ""
+      )}
+
+      {!props.publications.length ? (
+        <Button
+          className="linearButton"
+          style={{ marginTop: "16px" }}
+          onClick={() => {
+            router.push(`/creativeHub/projects/publish?id=${props.projectId}`);
+          }}
+        >
+          Issue Genesis NFT
+        </Button>
+      ) : (
+        ""
+      )}
+    </div>
+  );
+};
+
 const Dashboard: FC<IProps> = props => {
   const [userInfo, initUserInfo] = useUserInfo();
   const { address } = useAccount();
@@ -60,6 +154,16 @@ const Dashboard: FC<IProps> = props => {
     id: string;
     hubId: string;
   }>();
+
+  // 暂不分页
+  const getProjectsParams = useRef({
+    first: 50,
+    skip: 0,
+  });
+  const loading = useRef(false);
+
+  const [projects, setProjects] = useState<WalletProjects>([]);
+
   const getNowBg = async () => {
     const data = await getBgNow();
 
@@ -88,6 +192,25 @@ const Dashboard: FC<IProps> = props => {
     setHub(res.data.account.hub);
   };
 
+  const fetchProjects = async (type?: "reset" | "next") => {
+    if (type === "reset") {
+      getProjectsParams.current.skip = 0;
+    }
+    if (loading.current) return;
+
+    try {
+      loading.current = true;
+      const data = await GetProjectsByWallet(
+        `first: ${getProjectsParams.current.first} skip: ${getProjectsParams.current.skip}`,
+        address || ""
+      );
+
+      setProjects(data.data.account.hub.projects);
+    } finally {
+      loading.current = false;
+    }
+  };
+
   const clear = useInterval(() => {
     initUserInfo("", true);
   }, 2000);
@@ -99,7 +222,6 @@ const Dashboard: FC<IProps> = props => {
 
   useEffect(() => {
     getNowBg();
-
     return () => {
       clear();
     };
@@ -207,6 +329,10 @@ const Dashboard: FC<IProps> = props => {
 
                   if (key === "hub") {
                     getMyHub();
+                  }
+
+                  if (key === "projects") {
+                    fetchProjects();
                   }
                 }}
               ></Tabs>
@@ -461,6 +587,21 @@ const Dashboard: FC<IProps> = props => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+              {actTab === "projects" && (
+                <div style={{ display: "flex", flexWrap: "wrap" }}>
+                  {projects.map(proj => {
+                    return (
+                      <ProjectItem
+                        key={proj.id}
+                        {...proj}
+                        onPublish={() => {
+                          fetchProjects();
+                        }}
+                      ></ProjectItem>
+                    );
+                  })}
                 </div>
               )}
             </div>

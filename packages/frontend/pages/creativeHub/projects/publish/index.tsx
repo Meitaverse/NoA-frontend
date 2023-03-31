@@ -388,6 +388,7 @@ const CreateMyHub: FC<IProps> = props => {
                     onChange={val => {
                       form.setFieldValue("media", val);
                       update();
+                      setShowImport(false);
                     }}
                   ></Upload>
                 </div>
@@ -624,15 +625,15 @@ const CreateMyHub: FC<IProps> = props => {
                   messageBox.error("unexcept error");
                   return;
                 }
-
                 try {
+                  console.log(Math.floor(+form.getFieldValue("time") / 1000));
                   const collectModuleInitData = defaultAbiCoder.encode(
                     ["uint256", "uint16", "uint16", "uint32"],
                     [
                       +form.getFieldValue("mintPrice"),
-                      +form.getFieldValue("royalties"),
+                      50,
                       +form.getFieldValue("mintLimit"),
-                      +form.getFieldValue("time") / 1000,
+                      Math.floor(+form.getFieldValue("time") / 1000),
                     ]
                   );
 
@@ -640,6 +641,7 @@ const CreateMyHub: FC<IProps> = props => {
                     ["address", "uint256"],
                     [TEMPLATE_ADDRESS, 1]
                   );
+
                   const { hash } = await manager.prePublish(
                     {
                       hubId: myHubDetail.blockchain_hub_id,
@@ -675,6 +677,7 @@ const CreateMyHub: FC<IProps> = props => {
                   const result = await refreshTrans(hash);
                   if (result) {
                     messageBox.success("Prepare publish Success");
+                    router.push("/dashboard?tab=projects");
                     // const data = await getProjects(
                     //   "first:1, orderBy: timestamp orderDirection: desc"
                     // );

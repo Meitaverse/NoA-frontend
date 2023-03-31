@@ -135,11 +135,11 @@
         border-radius: 16px;
         padding: 20px;
         border: 2px solid #398dee;
-  
+
         .hubName {
           margin: 20px 0;
         }
-  
+
         .hubDetail {
           color: #858584;
         }
@@ -184,6 +184,30 @@
         position: absolute;
         right: 23px;
         bottom: 24px;
+      }
+    }
+
+    .projectItem {
+      width: 282px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      padding: 20px;
+      background: #373963;
+      margin-right: 22px;
+      margin-bottom: 22px;
+      .projectCover {
+        width: 242px;
+        height: 242px;
+        object-fit: cover;
+        border-radius: 19px;
+      }
+
+      .projectName {
+        line-height: 27px;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 16px 0;
       }
     }
   }

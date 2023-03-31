@@ -11,6 +11,7 @@ import {
   getProjects,
   GetProjectsByWallet,
   IGetProjects,
+  WalletProjects,
 } from "@/services/graphql";
 import { useAccount } from "wagmi";
 import { getMyHubDetail } from "@/services/hub";
@@ -60,7 +61,7 @@ const Projects: FC<IProps> = props => {
     },
   ];
   const [myHubDetail, setMyHubDetail] = useState<any>({});
-  const [projects, setProjects] = useState<IGetProjects["projects"]>([]);
+  const [projects, setProjects] = useState<WalletProjects>([]);
 
   const getHubDetail = async () => {
     const resG = await getHubs();
