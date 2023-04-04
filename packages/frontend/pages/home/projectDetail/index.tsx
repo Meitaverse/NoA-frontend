@@ -1,10 +1,39 @@
+import messageBox from "@/components/messageBox";
+import { useManagerContract } from "@/hooks/useManagerContract";
+import { useTransctionPending } from "@/hooks/useTransctionPending";
+import { useUserInfo } from "@/hooks/useUserInfo";
+import { GetPublish, IGetPublish } from "@/services/graphql";
 import { Breadcrumb, Button } from "antd";
-import React, { FC } from "react";
+import { useRouter } from "next/router";
+import React, { FC, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import styles from "./index.module.scss";
 
 interface IProps {}
 
 const ProjectDetail: FC<IProps> = props => {
+  const router = useRouter();
+  const account = useAccount();
+  const [userDetail] = useUserInfo();
+  const [manager] = useManagerContract();
+
+  const [publishDetail, setPublishDetail] = useState<IGetPublish["publish"]>();
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [transLoading, setTransLoading] = useState(false);
+  const refreshTrans = useTransctionPending();
+
+  const init = async () => {
+    const detail = await GetPublish(router.query.id);
+
+    setPublishDetail(detail.data.publish);
+  };
+
+  useEffect(() => {
+    if (router.query.id) {
+      init();
+    }
+  }, [router.query]);
+
   return (
     <div className={styles.projectDetail}>
       <Breadcrumb>
@@ -20,7 +49,7 @@ const ProjectDetail: FC<IProps> = props => {
           {/* 整体是左右 */}
           <div style={{ position: "relative", marginRight: "40px" }}>
             <img
-              src="https://gateway.pinata.cloud/ipfs/bafybeieq6z2m56ji4mea4q242uxmdgf52dni7uiztvs4qnyfohsl277wxi"
+              src={publishDetail?.publication.materialURIs[0]}
               alt=""
               style={{
                 width: 600,
@@ -36,15 +65,16 @@ const ProjectDetail: FC<IProps> = props => {
               display: "flex",
               flexDirection: "column",
               maxWidth: "560px",
+              flex: 1,
             }}
           >
             <div className={styles.detailTitle}>
-              The Five People's signature NFT debut
+              {publishDetail?.publication.name}
             </div>
             <div className={styles.publisher}>
               <div style={{ display: "flex", alignItems: "center" }}>
                 <img
-                  src=""
+                  src={publishDetail?.publisher.profile.imageURI}
                   alt=""
                   style={{
                     width: 64,
@@ -70,7 +100,10 @@ const ProjectDetail: FC<IProps> = props => {
                       fontWeight: "600",
                     }}
                   >
-                    0Xae3...3456
+                    {publishDetail?.publisher.id.slice(0, 5)}...
+                    {publishDetail?.publisher.id.slice(
+                      publishDetail?.publisher.id.length - 4
+                    )}
                   </span>
                 </div>
               </div>
@@ -79,13 +112,9 @@ const ProjectDetail: FC<IProps> = props => {
               <span style={{ color: "rgba(255, 255, 255, 0.6)" }}>
                 Description：
               </span>
-              <span>
-                Description : Participate in the five-person online concert,
-                enter the activity code during the event time to receive,
-                limited to 1,000 copies, while stocks last.
-              </span>
+              <span>{publishDetail?.publication.description}</span>
             </div>
-            <div
+            {/* <div
               className={styles.secondCreation}
               style={{ marginTop: "24px" }}
             >
@@ -97,7 +126,7 @@ const ProjectDetail: FC<IProps> = props => {
                 enter the activity code during the event time to receive,
                 limited to 1,000 copies, while stocks last.
               </span>
-            </div>
+            </div> */}
 
             <div className={styles.mintInfo}>
               <div className={styles.price}>
@@ -111,7 +140,7 @@ const ProjectDetail: FC<IProps> = props => {
                     fontWeight: "700",
                   }}
                 >
-                  10.89 ETH
+                  {publishDetail?.publication.salePrice} SBT
                 </span>
               </div>
               <div className={styles.supply}>
@@ -125,7 +154,7 @@ const ProjectDetail: FC<IProps> = props => {
                     fontWeight: "700",
                   }}
                 >
-                  245/100
+                  0/{publishDetail?.amount}
                 </span>
               </div>
             </div>
@@ -133,8 +162,41 @@ const ProjectDetail: FC<IProps> = props => {
             <Button
               className="linearButton"
               style={{ marginTop: "40px", height: "56px", fontSize: "20px" }}
+              loading={walletLoading || transLoading}
+              onClick={async () => {
+                setWalletLoading(true);
+                debugger;
+                try {
+                  const { hash } = await manager.collect(
+                    {
+                      collectorSoulBoundTokenId:
+                        userDetail?.soul_bound_token_id || "",
+                      collectUnits: 1,
+                      publishId: (router.query.id as string) || "",
+                      data: [],
+                    },
+                    {
+                      from: account.address,
+                    }
+                  );
+                  setWalletLoading(false);
+                  setTransLoading(true);
+                  const result = await refreshTrans(hash);
+
+                  if (result) {
+                    messageBox.success("mint success");
+                  }
+                } finally {
+                  setWalletLoading(false);
+                  setTransLoading(false);
+                }
+              }}
             >
-              Mint
+              {transLoading
+                ? "Transaction Pending"
+                : walletLoading
+                ? "Confirm in Wallet"
+                : "Mint"}
             </Button>
           </div>
         </div>

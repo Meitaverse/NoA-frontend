@@ -396,6 +396,7 @@ export const CurrencyWhitelist = () => {
 };
 
 export type WalletProjects = (IGetProjects["projects"][number] & {
+  permitByHubOwner: boolean;
   publishes: {
     id: string;
   }[];
@@ -428,6 +429,7 @@ export const GetProjectsByWallet = (params, walletAddress: string) => {
           description,
           image,
           timestamp
+          permitByHubOwner
           publishes {
             id
           }
@@ -458,6 +460,64 @@ export const GetHubsByWallet = (walletAddress: string) => {
         hubId
         name
         imageURI
+      }
+    }
+  }`);
+};
+
+export interface IGetPublish {
+  publish: {
+    id: string;
+    amount: string;
+    project: {
+      id: string;
+      image: string;
+      metadataURI: string;
+      name: string;
+      projectId: string;
+      description: string;
+    };
+    publisher: {
+      id: string;
+      profile: {
+        imageURI: string;
+      };
+    };
+    publication: {
+      currency: string;
+      salePrice: string;
+      description: string;
+      name: string;
+      materialURIs: string[];
+    };
+  };
+}
+
+export const GetPublish = id => {
+  return query<IGetPublish>(`query {
+    publish(id: ${id}) {
+      id
+      amount
+      project {
+        id
+        image
+        metadataURI
+        name
+        projectId
+        description
+      }
+      publisher {
+        id
+        profile {
+          imageURI
+        }
+      }
+      publication {
+        currency
+        salePrice
+        description
+        name
+        materialURIs
       }
     }
   }`);

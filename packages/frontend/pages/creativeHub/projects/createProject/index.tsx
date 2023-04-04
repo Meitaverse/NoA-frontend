@@ -276,7 +276,7 @@ const CreateProject: FC<IProps> = props => {
                     messageBox.success("Create Success");
                     // router.push("/dashboard");
                     const data = await GetProjectsByWallet(
-                      `first: 1 rderBy: timestamp orderDirection: desc`,
+                      `first: 1 orderBy: timestamp orderDirection: desc`,
                       account.address || ""
                     );
                     router.push(

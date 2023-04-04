@@ -626,7 +626,6 @@ const CreateMyHub: FC<IProps> = props => {
                   return;
                 }
                 try {
-                  console.log(Math.floor(+form.getFieldValue("time") / 1000));
                   const collectModuleInitData = defaultAbiCoder.encode(
                     ["uint256", "uint16", "uint16", "uint32"],
                     [
@@ -641,7 +640,29 @@ const CreateMyHub: FC<IProps> = props => {
                     ["address", "uint256"],
                     [TEMPLATE_ADDRESS, 1]
                   );
-
+                  console.error({
+                    hubId: myHubDetail.blockchain_hub_id,
+                    soulBoundTokenId: userInfo?.soul_bound_token_id || "",
+                    projectId: +router.query.id || 1,
+                    name: form.getFieldValue("name"),
+                    description: form.getFieldValue("desc"),
+                    salePrice: form.getFieldValue("mintPrice"),
+                    currency: curSelectCurrency,
+                    canCollect:
+                      form.getFieldValue("issueMethod") === "true"
+                        ? true
+                        : false,
+                    materialURIs: form.getFieldValue("media")
+                      ? [form.getFieldValue("media")]
+                      : [],
+                    fromTokenIds: [],
+                    amount: form.getFieldValue("totalSupply"),
+                    collectModule: FEE_ADDRESS,
+                    publishModule: PUBLISH_ADDRESS,
+                    collectModuleInitData: collectModuleInitData,
+                    publishModuleInitData: publishModuleInitData,
+                    royaltyBasisPoints: +form.getFieldValue("royalties") * 100,
+                  });
                   const { hash } = await manager.prePublish(
                     {
                       hubId: myHubDetail.blockchain_hub_id,

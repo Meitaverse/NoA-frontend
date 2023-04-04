@@ -7,7 +7,10 @@ export const useNftContracts = () => {
   const { data: signerData } = useSigner();
   const provider = useProvider();
 
-  const [nftAddress, setNftAddress] = useState("");
+  // 必须被替换后才可以使用
+  const [nftAddress, setNftAddress] = useState(
+    "0x9bd03768a7DCc129555dE410FF8E85528A4F88b5"
+  );
 
   const signer = useContract({
     addressOrName: nftAddress,

@@ -65,8 +65,17 @@ const ProjectItem: FC<
 
   return (
     <div className={styles.projectItem}>
-      <img src={props.image} alt="" className={styles.projectCover} />
-      <span className={styles.projectName}>{props.name}</span>
+      <div
+        style={{ display: "flex", flexDirection: "column" }}
+        onClick={() => {
+          if (props.publishes[0].id) {
+            router.push(`/home/projectDetail?id=${props.publishes[0].id}`);
+          }
+        }}
+      >
+        <img src={props.image} alt="" className={styles.projectCover} />
+        <span className={styles.projectName}>{props.name}</span>
+      </div>
       <div style={{ display: "flex", alignItems: "center" }}>
         <span
           style={{
@@ -86,6 +95,7 @@ const ProjectItem: FC<
         <Button
           className="linearButton"
           style={{ marginTop: "16px" }}
+          disabled={props.permitByHubOwner}
           onClick={async () => {
             setPubloading(true);
             try {
