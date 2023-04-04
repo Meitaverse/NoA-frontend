@@ -165,7 +165,6 @@ const ProjectDetail: FC<IProps> = props => {
               loading={walletLoading || transLoading}
               onClick={async () => {
                 setWalletLoading(true);
-                debugger;
                 try {
                   const { hash } = await manager.collect(
                     {

@@ -251,6 +251,18 @@ const CreateProject: FC<IProps> = props => {
                 }
                 setLoadingOne(true);
 
+                console.error({
+                  hubId: myHubDetail.blockchain_hub_id,
+                  soulBoundTokenId: userInfo?.soul_bound_token_id || "",
+                  name: form.getFieldValue("name"),
+                  image: form.getFieldValue("media"),
+                  metadataURI: form.getFieldValue("media") || "",
+                  description: form.getFieldValue("desc"),
+                  descriptor: account.address || "",
+                  defaultRoyaltyPoints: 0,
+                  permitByHubOwner: false,
+                });
+
                 try {
                   const { hash } = await manager.createProject(
                     {

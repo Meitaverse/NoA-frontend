@@ -20,7 +20,12 @@ import {
 import { toSoul } from "@/utils/toSoul";
 import { CaretDownOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { useRouter } from "next/router";
-import { FEE_ADDRESS, PUBLISH_ADDRESS, TEMPLATE_ADDRESS } from "@/config";
+import {
+  FEE_ADDRESS,
+  PUBLISH_ADDRESS,
+  SBT_ADDRESS,
+  TEMPLATE_ADDRESS,
+} from "@/config";
 import { defaultAbiCoder } from "ethers/lib/utils";
 import Mumbai from "@/chain/Mumbai";
 import { useNftContracts } from "@/hooks/useNftContracts";
@@ -29,10 +34,9 @@ import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
 
 interface IProps {}
 // 临时方案
-const tempCurLabel = {
-  "0xa85233c63b9ee964add6f2cffe00fd84eb32338f": "SBT",
-  "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e": "ETH",
-};
+const tempCurLabel = {};
+
+tempCurLabel[SBT_ADDRESS] = "SBT";
 
 const nftNetworks = [
   {
@@ -58,10 +62,15 @@ const CreateMyHub: FC<IProps> = props => {
 
   // 位
   const [fee, setFee] = useState<number>(0);
-  const [curSelectCurrency, setCurSelectCurrency] = useState("");
+  const [curSelectCurrency, setCurSelectCurrency] = useState(SBT_ADDRESS);
   const [currencyList, setCurrencyList] = useState<
     { value: string; label: string }[]
-  >([]);
+  >([
+    {
+      label: "SBT",
+      value: SBT_ADDRESS,
+    },
+  ]);
   const [loadingOne, setLoadingOne] = useState(false);
   const [loadingTrans, setLoadingTrans] = useState(false);
 
@@ -117,24 +126,24 @@ const CreateMyHub: FC<IProps> = props => {
     }
   };
 
-  const getCurCurrencry = async () => {
-    const { data } = await CurrencyWhitelist();
+  // const getCurCurrencry = async () => {
+  //   const { data } = await CurrencyWhitelist();
 
-    setCurrencyList(
-      data.currencyWhitelists
-        .filter(i => i.whitelisted)
-        .map(i => {
-          return {
-            value: i.currency,
-            label: tempCurLabel[i.currency],
-          };
-        })
-    );
+  //   setCurrencyList(
+  //     data.currencyWhitelists
+  //       .filter(i => i.whitelisted)
+  //       .map(i => {
+  //         return {
+  //           value: i.currency,
+  //           label: tempCurLabel[i.currency],
+  //         };
+  //       })
+  //   );
 
-    setCurSelectCurrency(
-      data.currencyWhitelists.filter(i => i.whitelisted)[0].currency || ""
-    );
-  };
+  //   setCurSelectCurrency(
+  //     data.currencyWhitelists.filter(i => i.whitelisted)[0].currency || ""
+  //   );
+  // };
 
   const reset = async () => {
     await switchToSoulAsync();
@@ -147,7 +156,7 @@ const CreateMyHub: FC<IProps> = props => {
 
   useEffect(() => {
     getFeeSetting();
-    getCurCurrencry();
+    // getCurCurrencry();
     getHubDetail();
   }, []);
 
@@ -640,29 +649,7 @@ const CreateMyHub: FC<IProps> = props => {
                     ["address", "uint256"],
                     [TEMPLATE_ADDRESS, 1]
                   );
-                  console.error({
-                    hubId: myHubDetail.blockchain_hub_id,
-                    soulBoundTokenId: userInfo?.soul_bound_token_id || "",
-                    projectId: +router.query.id || 1,
-                    name: form.getFieldValue("name"),
-                    description: form.getFieldValue("desc"),
-                    salePrice: form.getFieldValue("mintPrice"),
-                    currency: curSelectCurrency,
-                    canCollect:
-                      form.getFieldValue("issueMethod") === "true"
-                        ? true
-                        : false,
-                    materialURIs: form.getFieldValue("media")
-                      ? [form.getFieldValue("media")]
-                      : [],
-                    fromTokenIds: [],
-                    amount: form.getFieldValue("totalSupply"),
-                    collectModule: FEE_ADDRESS,
-                    publishModule: PUBLISH_ADDRESS,
-                    collectModuleInitData: collectModuleInitData,
-                    publishModuleInitData: publishModuleInitData,
-                    royaltyBasisPoints: +form.getFieldValue("royalties") * 100,
-                  });
+
                   const { hash } = await manager.prePublish(
                     {
                       hubId: myHubDetail.blockchain_hub_id,
