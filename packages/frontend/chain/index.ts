@@ -6,7 +6,7 @@ import { getDefaultWallets } from "@rainbow-me/rainbowkit";
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID as string;
 
 import BitSoul from "./bitsoul";
-import Mumbai from "./Mumbai";
+import Mumbai from "./mumbai";
 
 const { chains, provider } = configureChains(
   // 扩展不同的网络
