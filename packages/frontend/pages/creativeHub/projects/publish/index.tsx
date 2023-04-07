@@ -27,7 +27,7 @@ import {
   TEMPLATE_ADDRESS,
 } from "@/config";
 import { defaultAbiCoder } from "ethers/lib/utils";
-import Mumbai from "@/chain/Mumbai";
+import Mumbai from "@/chain/mumbai";
 import { useNftContracts } from "@/hooks/useNftContracts";
 import { signLog } from "@/services/sign";
 import { useSwitchToSoul } from "@/hooks/useSwitchToSoul";
